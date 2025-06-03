@@ -64,8 +64,8 @@ const role = [
 ];
 const Sidebar = () => {
   return (
-    <div className="flex flex-col h-screen w-1/6 fixed bg-white px-4 shadow-lg justify-between">
-      <div className="">
+    <div className="flex flex-col h-screen w-[300px] bg-white px-6 shadow-lg justify-between">
+      <div>
         <div className="flex flex-row items-center justify-between py-4 ">
           <img src="/logo.png" className="w-1/2" />
           <FontAwesomeIcon icon={faBars} className="w-1/5" />
