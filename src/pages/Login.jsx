@@ -15,10 +15,6 @@ const Login = () => {
     });
   };
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
   const handlePasswordChange = (prop) => (event) => {
     setValues({
       ...values,
@@ -26,17 +22,15 @@ const Login = () => {
     });
   };
 
-  const [displayPassword, setDisplayPassword] = useState(false);
-
   return (
     <div className="Login min-h-screen min-w-screen font-medium"
       style={{ backgroundImage: 'linear-gradient(to bottom, #b5070e, black)' }} >
       <div className="min-h-screen min-w-screen bg-[url('./image-removebg-preview.png')] bg-cover bg-no-repeat bg-center opacity-40"></div>
 
       <div className="fixed top-0 bottom-0 left-0 right-0 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-md w-[360px] flex flex-col items-center">
+        <form className="bg-white p-8 rounded-md w-[360px] flex flex-col items-center">
           <img className="mb-4" src="/logo.png" width={'160px'} alt="logo" />
-          <input className="bg-[#fae5e2] placeholder:font-medium w-[100%] p-3 px-4 m-1 rounded placeholder:text-[#e18479]"
+          <input className="login-input bg-[#fae5e2] placeholder:text-[#e18479]"
             type="text"
             placeholder="Tên đăng nhập"
             onChange={(e) => {
@@ -44,7 +38,7 @@ const Login = () => {
             }}
             value={username}
           />
-          <input className="bg-[#fae5e2] mt-2 placeholder:font-medium w-[100%] p-3 px-4 m-1 rounded placeholder:text-[#e18479]"
+          <input className="login-input bg-[#fae5e2] placeholder:text-[#e18479]"
             type={
               values.showPassword
                 ? "text"
@@ -65,8 +59,8 @@ const Login = () => {
             </div>
             <a href="/quen-mat-khau" className="hover:underline">Quên mật khẩu</a>
           </div>
-          <button className="hover:cursor-pointer text-uppercase bg-[#b60f16] text-white w-[100%] py-3 mt-2 rounded">ĐĂNG NHẬP</button>
-        </div>
+          <button className="login-button">ĐĂNG NHẬP</button>
+        </form>
       </div>
     </div>
   )
