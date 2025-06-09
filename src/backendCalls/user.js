@@ -16,3 +16,24 @@ export const handleLogin = async (username, password) => {
         return error;
     }
 }
+
+export const handleLogout = async () => {
+    try {
+        const response = await axios.post(api.LOGOUT);
+        localStorage.removeItem('token');
+
+        return response;
+    } catch (error) {
+        return error;
+    }
+}
+
+export const getUser = async () => {
+    const response = await axios.get(api.GET_USER, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    });
+
+    return response;
+}

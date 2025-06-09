@@ -7,19 +7,19 @@ import {
   faGear,
 } from "@fortawesome/free-solid-svg-icons";
 
-const Header = () => {
+const Header = ({user}) => {
   return (
     <section className="flex flex-row fixed w-full">
-      <Sidebar />
+      <Sidebar user={user} />
       <div className="w-full">
-        <NavBar />
+        <NavBar user={user}/>
         <hr className="opacity-20" />
       </div>
     </section>
   );
 };
 
-const NavBar = () => {
+const NavBar = ({user}) => {
   return (
     <div className="flex flex-row justify-between py-4.5 px-8">
       <div className="flex flex-row gap-4 items-center opacity-50">
@@ -31,7 +31,7 @@ const NavBar = () => {
         <FontAwesomeIcon icon={faGear} size="lg" />
         <div className="flex flex-row rounded-full bg-white shadow-btn p-1.5 w-fit justify-between items-center gap-2">
           <div className="size-8 rounded-full bg-gray-200"></div>
-          <span className="px-3 font-medium">Ngoc Mai</span>
+          <span className="px-3 font-medium">{user.username}</span>
         </div>
       </div>
     </div>
