@@ -5,4 +5,6 @@ export const api = {
     REGISTER: `${baseUrl}/register`,
     FORGET_PASSWORD: `${baseUrl}/forget-password`,
     RESET_PASSWORD: `${baseUrl}/reset-password`,
+
+    GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
 }

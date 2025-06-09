@@ -4,7 +4,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import ImportOrder from './pages/Import';
-import CreateOrder from './pages/CreateOrder';
+import CreateimportOrder from './pages/CreateImportOrder';
 import ViewOrder from './pages/OrderForm';
 
 
@@ -16,7 +16,7 @@ function App() {
         <Route path="/dang-nhap" element={<Login />} />
         <Route path='/quen-mat-khau' element={<ForgotPassword />} />
         <Route path= '/nhap-hang' element={<ImportOrder />} />
-        <Route path='/nhap-hang/tao-don-nhap-hang' element={<CreateOrder />} /> 
+        <Route path='/nhap-hang/tao-don-nhap-hang' element={<CreateimportOrder />} /> 
         <Route path= '/nhap-hang/xem-don' element={<ViewOrder />} />
       </Routes>
     </div>
