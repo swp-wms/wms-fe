@@ -13,7 +13,7 @@ function App() {
         <Route path="/" element={<Home setUser={setUser} user={user} />} />
         <Route path="/dang-nhap" element={<Login />} />
         <Route path='/quen-mat-khau' element={<ForgotPassword />} />
-        <Route path="/tong-quan-kho" element={<Home />} />
+        <Route path="/tong-quan-kho" element={<Home setUser={setUser} user={user} />} />
       </Routes>
     </div>
   );

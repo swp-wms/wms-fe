@@ -15,7 +15,7 @@ const Login = () => {
       setError(response.response.data.message);
     } else {
       setError('');
-      navigate('/tong-quan-kho');
+      window.location.href = '/tong-quan-kho';
     }
   }
 
