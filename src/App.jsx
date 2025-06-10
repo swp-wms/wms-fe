@@ -9,9 +9,10 @@ function App() {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Login />} />
         <Route path="/dang-nhap" element={<Login />} />
         <Route path='/quen-mat-khau' element={<ForgotPassword />} />
+        <Route path="/tong-quan-kho" element={<Home />} />
       </Routes>
     </div>
   );

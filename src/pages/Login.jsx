@@ -18,7 +18,7 @@ const Login = () => {
       setError(response.response.data.message);
     } else {
       setError('');
-      navigate('/');
+      navigate('/tong-quan-kho');
     }
   }
 

@@ -87,7 +87,7 @@ const Sidebar = () => {
       <div className="mb-4 flex flex-row items-center justify-between">
         <div className="flex flex-row rounded-full bg-white shadow-btn p-2 w-fit justify-between items-center gap-2">
           <FontAwesomeIcon icon={faCircleUser} size="xl" />
-          <span className="px-3 font-medium">
+          <span className="px-3 font-medium text-nowrap">
             {role.filter((item) => item.id === 1)[0].name}
           </span>
         </div>
