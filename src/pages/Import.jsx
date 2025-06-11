@@ -26,7 +26,7 @@ const ImportOrder = () => {
 
     return(
         <>
-            <Header/>
+          
             <div className="bg-[#fafafa] pt-20 pl-65">
 
                 <div className="m-5 flex flex-wrap gap-7">
@@ -35,15 +35,15 @@ const ImportOrder = () => {
                     </Link>
 
                     {orders.map((order) => (
-                    <div className="bg-white w-full pb-4 sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex border-2 border-[#1e1e1e] justify-evenly content-around rounded-md ">
-                        <button className="w-[80%] h-12 bg-white border-2 border-gray-100 rounded-md flex gap-2 p-5 self-end justify-self-center  place-content-center justify-evenly content-around shadow-lg">
-                            <p className="place-self-center text-[#1e1e1e]">Ngày tạo: {order.createdate}</p>
-                            <p className="place-self-center text-[#1e1e1e]">Đối tác: {order.partner.name}</p>
-                            <p className="place-self-center text-[#1e1e1e]">Số lượng: {order.totalbar} cây</p>
-                            <p className="place-self-center text-[#1e1e1e]">Trọng lượng: {order.totalweight} kg</p>
+                    <div className="bg-white w-full pb-4 sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex flex-col border-2 border-[#1e1e1e] justify-evenly rounded-md ">
+                            <p className="m-1 text-[#1e1e1e]">Ngày tạo: {order.createdate}</p>
+                            <p className="m-1 text-[#1e1e1e]">Đối tác: {order.partner.name}</p>
+                            <p className="m-1 text-[#1e1e1e]">Số lượng: {order.totalbar} cây</p>
+                            <p className="m-1 text-[#1e1e1e]">Trọng lượng: {order.totalweight} kg</p>
+                        <Link to={`./id:${order.id}`} className="w-[80%] h-12 bg-white border-2 border-gray-100 rounded-md flex gap-2 self-center justify-self-center  place-content-center justify-evenly content-around shadow-lg">
                             <FontAwesomeIcon className="h-full place-self-center text-[#1e1e1e]" icon={faArrowUpRightFromSquare} />
                             <p className="place-self-center ">Xem chi tiết</p>
-                        </button>
+                        </Link>
                        
                     </div>
                     ))}

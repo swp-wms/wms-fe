@@ -18,7 +18,7 @@ function App() {
         <Route path='/quen-mat-khau' element={<ForgotPassword />} />
         <Route path= '/nhap-hang' element={<ImportOrder />} />
         <Route path='/nhap-hang/tao-don-nhap-hang' element={<CreateimportOrder />} /> 
-        <Route path= '/nhap-hang/xem-don' element={<ViewOrder />} />
+        <Route path= '/nhap-hang/:id' element={<ViewOrder />} />
       </Routes>
     </div>
   );

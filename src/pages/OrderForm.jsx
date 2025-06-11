@@ -1,6 +1,21 @@
 import React from "react";
 import Header from "../components/common/header";
+import {useState} from "react";
+import order from '../backendCalls/order';
 const OrderForm = () =>{
+  const [orderDetails, setOrderDetails] = useState('');
+
+  useEffect(() =>{
+    const fetchOrderDetails = async(id) =>{
+      try{
+        const response = await order.getOrderDetail(id);
+        setOrderDetails(response);
+      }catch(error){
+        console.error("Error fetching order details:", error);
+      }
+    }
+    fetchOrderDetails(req.params.id);
+  }, []);
     return(
       <>
       <Header />
@@ -15,21 +30,21 @@ const OrderForm = () =>{
               <div className="bg-white border-2 border-gray-800 rounded-md">
                 <div className="border-b-2 border-gray-800 px-4 py-2 rounded-t-md bg-white">
                   <h2 className="text-sm font-bold text-black">
-                    [MÃ CÔNG TY] - [TÊN CÔNG TY]
+                    [${orderDetails.partner.id}] - [${orderDetails.partner.name}]
                   </h2>
                 </div>
                 <div className="p-4 space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Địa chỉ:</label>
+                    <label className="block text-sm font-medium text-black mb-1">Địa chỉ: <span>{orderDetails.partner.address}</span></label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Mã số thuế:</label>
+                    <label className="block text-sm font-medium text-black mb-1">Mã số thuế: <span>{orderDetails.partner.taxcode}</span></label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Số điện thoại:</label>
+                    <label className="block text-sm font-medium text-black mb-1">Số điện thoại: <span>{orderDetails.partner.phonenumber}</span></label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Email:</label>
+                    <label className="block text-sm font-medium text-black mb-1">Email: <span>{orderDetails.partner.email}</span></label>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">Số tài khoản:</label>
@@ -72,6 +87,9 @@ const OrderForm = () =>{
                       <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Ghi chú</th>
                     </tr>
                   </thead>
+                  <tbody>
+
+                  </tbody>
                 </table>
                 
                 {/* Empty table body area */}
@@ -105,8 +123,7 @@ const OrderForm = () =>{
                     Chỉnh sửa
                   </button>
                 </div>
-              
-              
+ 
             </div>
           </div>
         </div>
