@@ -19,6 +19,7 @@ function App() {
         <Route path= '/nhap-hang' element={<ImportOrder />} />
         <Route path='/nhap-hang/tao-don-nhap-hang' element={<CreateimportOrder />} /> 
         <Route path= '/nhap-hang/:id' element={<ViewOrder />} />
+        <Route path="/tong-quan-kho" element={<Home setUser={setUser} user={user} />} />
       </Routes>
     </div>
   );

@@ -9,7 +9,7 @@ body {
 }
 
 .hover-btn{
-    @apply hover:bg-white hover:text-black hover:rounded-md hover:shadow-[0_2px_4px_rgba(0,0,0,0.25)] hover:duration-300 hover:cursor-pointer;
+    @apply hover:bg-white hover:text-black hover:rounded-md hover:shadow-[0_2px_4px_rgba(0,0,0,0.25)] hover:duration-200 hover:cursor-pointer;
 }
 
 .login-button {

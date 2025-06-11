@@ -15,7 +15,7 @@ const Login = () => {
       setError(response.response.data.message);
     } else {
       setError('');
-      window.location.href = '/';
+      window.location.href = '/tong-quan-kho';
     }
   }
 

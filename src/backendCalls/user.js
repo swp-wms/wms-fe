@@ -29,11 +29,16 @@ export const handleLogout = async () => {
 }
 
 export const getUser = async () => {
-    const response = await axios.get(api.GET_USER, {
-        headers: {
-            Authorization: `Bearer ${accessToken}`
-        }
-    });
+    try {
+        const response = await axios.get(api.GET_USER, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        console.log(response);
 
-    return response;
+        return response;
+    } catch (error) {
+        return error;
+    }
 }

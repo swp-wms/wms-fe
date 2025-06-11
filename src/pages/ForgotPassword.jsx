@@ -1,4 +1,6 @@
-import { createRef, use, useState } from "react";
+import axios from "axios";
+import { useState } from "react";
+import { api } from "../config/api";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
@@ -20,27 +22,55 @@ const ForgotPassword = () => {
         6: ''
     });
 
-    const handleCheckEmail = (e) => {
+    const handleCheckEmail = async (e) => {
         e.preventDefault();
-        if (email.endsWith('@gmail.com')) {
-            //send request to server: send email to user
-            setStep(2);
+        if (document.querySelector('.email-field').checkValidity()) {
             setError('');
+            try {
+                await axios.post(api.GET_OTP, {
+                    email: email
+                });
+                setStep(2);
+            } catch (error) {
+                setError(error.response.data.message);
+            }
         } else {
             setError('Email không đúng định dạng!');
         }
     }
 
-    const handleCheckNewPass = (e) => {
+    const handleCheckOtp = async (e) => {
         e.preventDefault();
-        if(password.length < 8 || password.length > 30) {
+        if (otp.length < 6) {
+            setError('Not valid otp');
+        }
+        const otpString = otp[1] + otp[2] + otp[3] + otp[4] + otp[5] + otp[6];
+
+        try {
+            await axios.post(api.VERIFY_OTP, {
+                otp: otpString,
+                email: email
+            });
+            setStep(3);
+        } catch (error) {
+            setError(error.response.data.message);
+        }
+    }
+
+    const handleCheckNewPass = async (e) => {
+        e.preventDefault();
+        if (password.length < 8 || password.length > 30) {
             setError('Mật khẩu tối thiểu 8 ký tự. Tối đa 30 ký tự.')
         } else if (!/^(?=.*\d)(?=.*[a-zA-Z]).*$/.test(password)) {
             setError('Mật khẩu phải chứa cả chữ và số.')
-        } else if(password!==retype){
+        } else if (password !== retype) {
             setError('Nhập lại mật khẩu chưa chính xác.')
         } else {
-            setError('ok');
+            await axios.post(api.RESET_PASSWORD, {
+                password: password,
+                email: email
+            });
+            window.location.href = '/dang-nhap';
         }
     }
 
@@ -57,7 +87,7 @@ const ForgotPassword = () => {
 
                     {step === 1 &&
                         <>
-                            <input className="login-input"
+                            <input className="email-field login-input"
                                 type="email" required
                                 placeholder="Email"
                                 onChange={(e) => {
@@ -86,11 +116,21 @@ const ForgotPassword = () => {
                                 <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, 6: e.target.value })} value={otp[6]} />
                             </div>
                             <p className="text-xs py-2">Kiểm tra hòm thư của bạn để lấy mã OTP</p>
-                            <button className="login-button" onClick={(e) => { e.preventDefault(); setStep(3) }}>
+                            <button className="login-button" onClick={(e) => { handleCheckOtp(e) }}>
                                 XÁC NHẬN
                             </button>
                             <p className="text-xs pt-4">Nếu chưa nhận được email hoặc mã đã hết hạn</p>
-                            <button className="login-button" style={{ backgroundColor: 'black' }}>
+                            <button className="login-button" onClick={(e) => {
+                                handleCheckEmail(e);
+                                setOtp({
+                                    1: '',
+                                    2: '',
+                                    3: '',
+                                    4: '',
+                                    5: '',
+                                    6: ''
+                                });
+                            }} style={{ backgroundColor: 'black' }}>
                                 GỬI LẠI OTP
                             </button>
                         </>
