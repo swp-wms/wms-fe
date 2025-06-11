@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../components/common/header";
 import {useState} from "react";
 import order from '../backendCalls/order';
+import { useParams } from "react-router-dom";
 const OrderForm = () =>{
   const [orderDetails, setOrderDetails] = useState('');
 
@@ -14,7 +15,8 @@ const OrderForm = () =>{
         console.error("Error fetching order details:", error);
       }
     }
-    fetchOrderDetails(req.params.id);
+    const { id } = useParams();
+    fetchOrderDetails(id);
   }, []);
     return(
       <>

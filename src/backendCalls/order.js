@@ -18,7 +18,7 @@ const getImportOrder = async () => {
 
 const getOrderDetail = async(id) =>{
     try{
-        const response  = await axios.get('./orders/${id}');
+        const response  = await axios.get(`./orders/${id}`);
         return response.data;
     }catch(error){
         return error;

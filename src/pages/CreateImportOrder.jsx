@@ -7,7 +7,7 @@ const CreateOrder = () => {
   //------------------ USE STATE ------------------
     const [partnerList, setPartnerList] = useState([]);
     const [focused, setFocused] = useState(false);
-    const [partnerFilteredSuggessions, setpartnerFilteredSuggestions] = useState([]);
+    const [partnerFilteredSuggestions, setpartnerFilteredSuggestions] = useState([]);
     const [productFilteredSuggessions, setProductFilteredSuggestions] = useState([]);
     const [inputpartner, setInputpartner] = useState("");
     const [inputProduct, setInputProduct] = useState("");
@@ -97,9 +97,9 @@ const CreateOrder = () => {
                         onFocus={() =>setFocused(true)}
                         onBlur={() => setTimeout(() => setFocused(false), 100)}
                       />
-                      {focused && partnerFilteredSuggessions.length > 0 &&(
+                      {focused && partnerFilteredSuggestions.length > 0 &&(
                       <ul className="z-50 absolute w-full bg-white border border-gray-300 rounded mt-1 max-h-48 overflow-y-auto">
-                        {partnerFilteredSuggessions.map((partner, index) => (
+                        {partnerFilteredSuggestions.map((partner, index) => (
                           <li key={index}>
                             <button 
                               className="w-full text-left px-3 py-2 hover:bg-gray-100 focus:bg-gray-200"

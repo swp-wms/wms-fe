@@ -14,6 +14,9 @@ export const api = {
     //partner API
     GET_PARTNERS: `${baseUrl}/partners`,
 
+    //product API
+    GET_PRODUCTS: `${baseUrl}/products`,
+
     GET_OTP: `${baseUrl}/reset-password/get-otp`,
     VERIFY_OTP: `${baseUrl}/reset-password/verify-otp`,
 }
