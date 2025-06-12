@@ -15,15 +15,15 @@ const ImportOrder = () => {
     const [orders, setOrders] = useState([]);
 
     React.useEffect(() => {
-        const fetchImportOrders = async () => {
+        const fetchExportOrders = async () => {
             try {
-                const response = await order.getImportOrder();
+                const response = await order.getExportOrder();
                 setOrders(response);
             } catch (error) {
-                console.error("Error fetching import orders:", error);
+                console.error("Error fetching export orders:", error);
             }
         };
-        fetchImportOrders();
+        fetchExportOrders();
     }, []);
 
     return(
@@ -32,7 +32,7 @@ const ImportOrder = () => {
             <div className="bg-[#fafafa] pt-20 pl-65">
 
                 <div className="m-5 flex flex-wrap gap-7">
-                    <Link to="./tao-don-nhap-hang" className="group bg-gray-100 w-full sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex border-2 border-gray-200 rounded-md hover:bg-gray-300 hover:border-gray-400 items-center justify-center">
+                    <Link to="./tao-don-xuat-hang" className="group bg-gray-100 w-full sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex border-2 border-gray-200 rounded-md hover:bg-gray-300 hover:border-gray-400 items-center justify-center">
                         <FontAwesomeIcon className="w-full text-gray-400 transition-colors duration-200 group-hover:text-gray-600" icon={faFileCirclePlus} size="3x"/>
                     </Link>
 

@@ -15,10 +15,25 @@ const getImportOrder = async () => {
         return error;
     }
 }
+const getExportOrder = async () => {
+    try{
+
+     const response = await axios.get(`${api.GET_EXPORT_ORDER}`, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    });
+    return response.data;
+    }catch(error){
+        return error;
+    }
+}
+
+
 
 const getOrderDetail = async(id) =>{
     try{
-        const response  = await axios.get(`./orders/${id}`);
+        const response  = await axios.get(`${api.GET_ORDER_DETAIL}/${id}`);
         return response.data;
     }catch(error){
         return error;

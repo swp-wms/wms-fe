@@ -10,6 +10,8 @@ export const api = {
     // Order API
     GET_ORDERS: `${baseUrl}/orders`,
     GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
+    GET_EXPORT_ORDER: `${baseUrl}/orders/export`,
+    GET_ORDER_DETAIL: `${baseUrl}/detail`,
 
     //partner API
     GET_PARTNERS: `${baseUrl}/partners`,
