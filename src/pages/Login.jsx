@@ -15,7 +15,7 @@ const Login = () => {
       setError(response.response.data.message);
     } else {
       setError('');
-      window.location.href = '/tong-quan-kho';
+      window.location.href = '/';
     }
   }
 
@@ -44,6 +44,7 @@ const Login = () => {
                 ? "text"
                 : "password"
             }
+            placeholder="Mật khẩu"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
           />

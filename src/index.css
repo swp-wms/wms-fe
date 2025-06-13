@@ -16,6 +16,10 @@ body {
     @apply hover:bg-white hover:text-black hover:rounded-md hover:shadow-[0_2px_4px_rgba(0,0,0,0.25)] hover:duration-200 hover:cursor-pointer;
 }
 
+.selected-btn{
+    @apply bg-white text-black rounded-md shadow-[0_2px_4px_rgba(0,0,0,0.25)] duration-200 cursor-pointer;
+}
+
 .login-button {
     @apply hover:cursor-pointer uppercase bg-[#b60f16] text-white w-[100%] py-3 mt-2 rounded font-bold
 }
