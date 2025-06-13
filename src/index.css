@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+:root {
+    --fill-color: #dcf1ca;
+}
+
 body {
     @apply bg-[#FAFAFA];
 }
