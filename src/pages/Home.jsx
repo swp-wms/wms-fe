@@ -16,7 +16,7 @@ const Home = ({ user, setUser }) => {
 
   return (
     <>
-      {user && <Header user={user} />}
+      {/* {user && <Header user={user} />} */}
     </>
   )
 }

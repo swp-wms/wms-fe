@@ -1,4 +1,5 @@
 import React from "react";
+import { useState, useParams } from "react";
 import Sidebar from "./sidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -6,25 +7,29 @@ import {
   faBell,
   faGear,
 } from "@fortawesome/free-solid-svg-icons";
+import sideElement from "../../data/sideElements";
 
 const Header = ({user}) => {
+  const [path, setPath] = useState('Trang chủ');
+
   return (
     <section className="flex flex-row fixed w-full">
-      <Sidebar user={user} />
+      <Sidebar user={user} setPath={setPath}/>
       <div className="w-full">
-        <NavBar user={user}/>
+
+        <NavBar user={user} data={path}/>
         <hr className="opacity-20" />
       </div>
     </section>
   );
 };
 
-const NavBar = ({user}) => {
+const NavBar = ({user, data}) => {
   return (
     <div className="flex flex-row justify-between py-4.5 px-8">
       <div className="flex flex-row gap-4 items-center opacity-50">
         <FontAwesomeIcon icon={faDoorOpen} size="lg" />
-        <span className=" text-gray-600 py-2 font-medium">Tổng quan kho</span>
+        <span className=" text-gray-600 py-2 font-medium">{data}</span>
       </div>
       <div className="flex flex-row gap-8 items-center">
         <FontAwesomeIcon icon={faBell} size="lg" />
