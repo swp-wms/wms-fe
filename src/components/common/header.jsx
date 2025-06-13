@@ -6,7 +6,6 @@ import {
   faBell,
   faGear,
 } from "@fortawesome/free-solid-svg-icons";
-import sideElement from "../../data/sideElements";
 
 const Header = ({user}) => {
   const [path, setPath] = useState('Trang chủ');
