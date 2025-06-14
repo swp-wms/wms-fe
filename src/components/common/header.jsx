@@ -13,7 +13,7 @@ const Header = ({user}) => {
   const [path, setPath] = useState('Trang chủ');
 
   return (
-    <section className="flex flex-row fixed w-full z-index-20">
+    <section className="flex flex-row fixed w-full">
       <Sidebar user={user} setPath={setPath}/>
       <div className="w-full">
 
