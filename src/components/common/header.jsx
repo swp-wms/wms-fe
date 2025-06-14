@@ -1,20 +1,18 @@
 import { useState } from "react";
 import Sidebar from "./sidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faDoorOpen,
-  faBell,
-  faGear,
-} from "@fortawesome/free-solid-svg-icons";
+import { faDoorOpen, faBell, faGear } from "@fortawesome/free-solid-svg-icons";
 
-const Header = ({user, setUser}) => {
-  const [path, setPath] = useState('Trang chủ');
+const Header = ({ user, setUser }) => {
+  const [path, setPath] = useState("Trang chủ");
 
   return (
-    <section className="flex flex-row fixed w-full">
-      <Sidebar user={user} setUser={setUser} setPath={setPath}/>
-      <div className="w-full">
-
+    <section className="flex flex-row w-full">
+      <div className="fixed z-10">
+        <Sidebar user={user} setUser={setUser} setPath={setPath} />
+      </div>
+      
+      <div className="w-full fixed ps-[300px]">
         <NavBar user={user} data={path}/>
         <hr className="opacity-20" />
       </div>
@@ -22,9 +20,9 @@ const Header = ({user, setUser}) => {
   );
 };
 
-const NavBar = ({user, data}) => {
+const NavBar = ({ user, data }) => {
   return (
-    <div className="flex flex-row justify-between py-4.5 px-8">
+    <div className="flex flex-row justify-between py-5.5 px-8 bg-[#fafafa]">
       <div className="flex flex-row gap-4 items-center opacity-50">
         <FontAwesomeIcon icon={faDoorOpen} size="lg" />
         <span className=" text-gray-600 py-2 font-medium">{data}</span>
