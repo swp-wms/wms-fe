@@ -1,72 +1,17 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBars,
-  faHouse,
-  faInbox,
-  faRightFromBracket,
-  faChartSimple,
-  faTruckFast,
-  faFile,
   faCircleUser,
   faPowerOff,
 } from "@fortawesome/free-solid-svg-icons";
 import { handleLogout } from "../../backendCalls/user";
+import sideElement from "../../data/sideElements";
 
-const sideElement = [
-  {
-    id: 1,
-    icon: faHouse,
-    path: "/tong-quan-kho",
-    name: "Tổng quan kho",
-    allowed: [3, 4]
-  },
-  {
-    id: 2,
-    icon: faInbox,
-    path: "/nhap-hang",
-    name: "Nhập hàng",
-    allowed: [3, 4]
-  },
-  {
-    id: 3,
-    icon: faRightFromBracket,
-    path: "/xuat-hang",
-    name: "Xuất hàng",
-    allowed: [3, 4]
-  },
-  {
-    id: 4,
-    icon: faChartSimple,
-    path: "/thong-ke-kho",
-    name: "Thống kê kho",
-    allowed: [3]
-  },
-  {
-    id: 5,
-    icon: faTruckFast,
-    path: "/ke-hoach-van-chuyen",
-    name: "Kế hoạch vận chuyển",
-    allowed: [3, 4]
-  },
-  {
-    id: 6,
-    icon: faFile,
-    path: "/cac-loai-don-tu-khac",
-    name: "Các loại đơn từ khác",
-    allowed: [3, 4]
-  }, {
-    id: 7,
-    icon: faFile,
-    path: "/danh-sach-nguoi-dung",
-    name: "Danh sách người dùng",
-    allowed: [1]
-  }
-];
-
-const Sidebar = ({ user }) => {
+const Sidebar = ({ user, setPath }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const logout = async () => {
     await handleLogout();
     navigate('/dang-nhap');
@@ -82,11 +27,11 @@ const Sidebar = ({ user }) => {
         <ul className="flex flex-col gap-2 mt-8">
           {sideElement.map((item) => {
             if (item.allowed.includes(user.roleid)) {
-
               return (
                 <li
+                  onClick={() => setPath(item.name)}
                   key={item.id}
-                  className=" text-gray-600 py-2 hover-btn"
+                  className={`text-gray-600 py-2 hover-btn ${location.pathname === item.path ? 'selected-btn' : ''}`}
                 >
                   <FontAwesomeIcon icon={item.icon} className="w-1/5" />
                   <Link to={item.path}>{item.name}</Link>

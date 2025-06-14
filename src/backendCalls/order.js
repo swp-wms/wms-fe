@@ -42,5 +42,6 @@ const getOrderDetail = async(id) =>{
 
 export default {
     getImportOrder,
+    getExportOrder,
     getOrderDetail
 }

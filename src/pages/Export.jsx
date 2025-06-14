@@ -37,7 +37,7 @@ const ImportOrder = () => {
                     </Link>
 
                     {orders.map((order) => (
-                    <div className=" space-y-2 bg-white w-full pb-4 sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex flex-col border-2 border-[#1e1e1e] justify-evenly rounded-md p-4 ">
+                    <div key={order.id}  className=" space-y-2 bg-white w-full pb-4 sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex flex-col border-2 border-[#1e1e1e] justify-evenly rounded-md p-4 ">
                           <div className="flex flex-col gap-1">
                                     <div className="flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
