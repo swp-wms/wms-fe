@@ -9,7 +9,7 @@ const fetchPartners = async () => {
             Authorization: `Bearer ${accessToken}`
         }
         });
-        return response.data.result.data.data;
+        return response.data;
     }catch(error){
         console.error("Error fetching partners:", error);
         throw error; // Re-throw the error for further handling

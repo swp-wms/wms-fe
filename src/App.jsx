@@ -15,7 +15,7 @@ function App() {
 
   return (
     <div>
-     
+      {user && <Header user={user} />}
       <Routes>
         
         <Route path="/" element={<Home setUser={setUser} user={user} />} />

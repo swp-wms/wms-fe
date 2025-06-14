@@ -8,7 +8,7 @@ const CreateOrder = () => {
   //------------------ USE STATE ------------------
     
     const [partnerList, setPartnerList] = useState([]);
-    const [focused, setFocused] = useState(false);
+    const [focused, setFocused] = useState('');
     const [partnerFilteredSuggestions, setpartnerFilteredSuggestions] = useState([]);
     const [productFilteredSuggessions, setProductFilteredSuggestions] = useState([]);
     const [inputpartner, setInputpartner] = useState("");
@@ -23,7 +23,6 @@ const CreateOrder = () => {
       const fetchPartners = async () => {
         try{
           const response = await partner.fetchPartners();
-          console.log(response);
           setPartnerList(response);
           // setpartnerFilteredSuggestions(response); // Initialize suggestions with all partners
 
@@ -46,7 +45,7 @@ const CreateOrder = () => {
           partner.name.trim().toLowerCase().includes(value.toLowerCase().trim())||
           partner.id.trim().toLowerCase().includes(value.toLowerCase().trim())
       );
-      console.log("Filtered Suggestions:", filteredSuggestions);
+      
       setpartnerFilteredSuggestions(filteredSuggestions);
     }
 
@@ -63,6 +62,7 @@ const CreateOrder = () => {
 
     const handlePartnerSelect = (partner) => {
       setInputpartner(partner.name || partner.id || "");
+      console.log("Selected Partner:", partner);
       setpartnerFilteredSuggestions([]);
     }
 
@@ -119,17 +119,16 @@ const CreateOrder = () => {
                         onBlur={() => setTimeout(() => setFocused(false), 100)}
                         // onKeyDown={handlePartnerKeyDown}
                       />
-                      {focused && partnerFilteredSuggestions.length > 0 &&(
+                      {partnerFilteredSuggestions.length > 0 &&(
                       <ul className="z-50 absolute w-full bg-white border border-gray-300 rounded mt-1 max-h-48 overflow-y-auto">
                         {partnerFilteredSuggestions.map((partner, index) => (
-                          <li key={index}>
-                            <button 
+                          <li key={index}
                               className="w-full text-left px-3 py-2 hover:bg-gray-100 focus:bg-gray-200"
                               onClick={() => handlePartnerSelect(partner)}
-                              // onMouseDown={() =>setFocused(false)}
+
                             >
                               {partner.id} - {partner.name}
-                            </button>
+                            
                           </li>
                         ))
                         }
