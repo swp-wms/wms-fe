@@ -14,7 +14,7 @@ function App() {
 
   return (
     <div>
-      {user && <Header user={user} />}
+      {user && <Header user={user} setUser={setUser} />}
       <Routes>
         <Route path="/" element={<Home setUser={setUser} user={user} />} />
         <Route path="/dang-nhap" element={<Login />} />
@@ -29,7 +29,10 @@ function App() {
           path="/tong-quan-kho"
           element={<Home setUser={setUser} user={user} />}
         />
-        <Route path="/ke-hoach-van-chuyen" element={<Delivery/>} />
+        <Route path="/ke-hoach-van-chuyen" element={<Delivery
+          setUser={setUser}
+          user={user}
+        />} />
       </Routes>
     </div>
   );

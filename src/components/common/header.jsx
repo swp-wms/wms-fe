@@ -7,12 +7,12 @@ import {
   faGear,
 } from "@fortawesome/free-solid-svg-icons";
 
-const Header = ({user}) => {
+const Header = ({user, setUser}) => {
   const [path, setPath] = useState('Trang chủ');
 
   return (
     <section className="flex flex-row fixed w-full">
-      <Sidebar user={user} setPath={setPath}/>
+      <Sidebar user={user} setUser={setUser} setPath={setPath}/>
       <div className="w-full">
 
         <NavBar user={user} data={path}/>

@@ -9,11 +9,12 @@ import {
 import { handleLogout } from "../../backendCalls/user";
 import sideElement from "../../data/sideElements";
 
-const Sidebar = ({ user, setPath }) => {
+const Sidebar = ({ user, setUser, setPath }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const logout = async () => {
     await handleLogout();
+    setUser(null);
     navigate('/dang-nhap');
   }
   return (
