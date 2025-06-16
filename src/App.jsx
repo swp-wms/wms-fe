@@ -7,8 +7,10 @@ import ImportOrder from "./pages/Import";
 import CreateImportOrder from "./pages/CreateImportOrder";
 import ViewOrder from "./pages/OrderForm";
 import Header from "./components/common/header";
-import Delivery from './pages/Delivery';
+import Delivery from "./pages/Delivery";
 import OverviewPage from "./pages/OverviewPage";
+import Profile from "./pages/Profile";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
   const [user, setUser] = useState();
@@ -30,10 +32,20 @@ function App() {
           path="/tong-quan-kho"
           element={<OverviewPage user={user} setUser={setUser} />}
         />
-        <Route path="/ke-hoach-van-chuyen" element={<Delivery
-          setUser={setUser}
-          user={user}
-        />} />
+        <Route
+          path="/ke-hoach-van-chuyen"
+          element={<Delivery setUser={setUser} user={user} />}
+        />
+
+        <Route
+          path="/thong-tin-ca-nhan"
+          element={<Profile user={user} setUser={setUser} />}
+        />
+
+        <Route
+          path="/danh-sach-nguoi-dung"
+          element={<AdminPage user={user} setUser={setUser} />}
+        />
       </Routes>
     </div>
   );
