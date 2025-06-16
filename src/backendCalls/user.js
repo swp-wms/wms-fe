@@ -35,8 +35,6 @@ export const getUser = async () => {
                 Authorization: `Bearer ${accessToken}`
             }
         });
-        console.log(response);
-
         return response;
     } catch (error) {
         return error;

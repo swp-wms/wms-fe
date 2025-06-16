@@ -10,6 +10,7 @@ export const api = {
     // Order API
     GET_ORDERS: `${baseUrl}/orders`,
     GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
+    GET_REMAIN_QUANTITY: (orderid) => `${baseUrl}/detail/${orderid}/remain`,
 
     //partner API
     GET_PARTNERS: `${baseUrl}/partners`,
@@ -17,6 +18,16 @@ export const api = {
     //product API
     GET_PRODUCTS: `${baseUrl}/products`,
 
+    //otp api
     GET_OTP: `${baseUrl}/reset-password/get-otp`,
     VERIFY_OTP: `${baseUrl}/reset-password/verify-otp`,
+
+    //delivery api
+    GET_IMPORT_DELIVERY: `${baseUrl}/delivery/import`,
+    GET_EXPORT_DELIVERY: `${baseUrl}/delivery/export`,
+    GET_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,
+    GET_DELIVERY_DETAIL: (deliveryid) => `${baseUrl}/delivery/${deliveryid}`,
+    CREATE_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,
+    ADD_TRUCK_FOR_DELIVERY: (deliveryid) => `${baseUrl}/delivery/${deliveryid}`,
+    APPROVE_TRUCK: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/approve`,
 }

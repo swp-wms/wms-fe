@@ -8,6 +8,7 @@ import CreateImportOrder from "./pages/CreateImportOrder";
 import ViewOrder from "./pages/OrderForm";
 import Header from "./components/common/header";
 import Delivery from './pages/Delivery';
+import DeliverySchedule from "./pages/DeliverySchedule";
 
 function App() {
   const [user, setUser] = useState();
@@ -30,6 +31,10 @@ function App() {
           element={<Home setUser={setUser} user={user} />}
         />
         <Route path="/ke-hoach-van-chuyen" element={<Delivery
+          setUser={setUser}
+          user={user}
+        />} />
+        <Route path="/ke-hoach-van-chuyen/:act" element={<DeliverySchedule
           setUser={setUser}
           user={user}
         />} />
