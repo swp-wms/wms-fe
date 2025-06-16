@@ -33,7 +33,11 @@ const getExportOrder = async () => {
 
 const getOrderDetail = async(id) =>{
     try{
-        const response  = await axios.get(`${api.GET_ORDER_DETAIL}/${id}`);
+        const response  = await axios.get(`${api.GET_ORDER_DETAIL}/${id}`,{
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
         return response.data;
     }catch(error){
         return error;

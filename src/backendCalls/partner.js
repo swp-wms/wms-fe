@@ -10,6 +10,7 @@ const fetchPartners = async () => {
         }
         });
         return response.data;
+        //.result.data.data
     }catch(error){
         console.error("Error fetching partners:", error);
         throw error; // Re-throw the error for further handling

@@ -22,7 +22,14 @@ const { id } = useParams();
   }, [id]);
 
   
-  let totalWeight = 0;
+  const total = (array,criteria) =>{
+    let sum = 0;
+    array.forEach(item => {
+      if (item[criteria]) sum += item[criteria];
+      
+    });
+    return sum;
+  }
     return(
       <>
       {/* <Header /> */}
@@ -108,8 +115,8 @@ const { id } = useParams();
                     ))}
                     <tr>
                       <td className="border border-gray-800 px-2 py-2 pl-15 text-xs font-bold text-black w-12" colSpan={4}>Tổng cộng</td>
-                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{orderDetail?.totalweight}</td>
-                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{orderDetail?.totalbars}</td>
+                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{(e) => sum(orderDetail?.detail, 'weight')}</td>
+                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{(e) => sum(orderDetail?.detail, 'numberofbars')}</td>
                       <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12"></td>
 
                     </tr>
@@ -125,7 +132,7 @@ const { id } = useParams();
               {/* Bottom Buttons */}
             
                 <div className="flex gap-3 justify-end mt-5 pb-5">
-                  <Link className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg">
+                  <Link to="/nhap-hang" className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg">
                    <svg className="mr-1 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" >
                       <path fillRule="evenodd" d="M12.5 9.75A2.75 2.75 0 0 0 9.75 7H4.56l2.22 2.22a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 1.06L4.56 5.5h5.19a4.25 4.25 0 0 1 0 8.5h-1a.75.75 0 0 1 0-1.5h1a2.75 2.75 0 0 0 2.75-2.75Z" clipRule="evenodd" />
                     </svg>

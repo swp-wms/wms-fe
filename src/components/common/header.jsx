@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useParams } from "react";
+import { useState } from "react";
 import Sidebar from "./sidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -7,14 +6,13 @@ import {
   faBell,
   faGear,
 } from "@fortawesome/free-solid-svg-icons";
-import sideElement from "../../data/sideElements";
 
-const Header = ({user}) => {
+const Header = ({user, setUser}) => {
   const [path, setPath] = useState('Trang chủ');
 
   return (
     <section className="flex flex-row fixed w-full">
-      <Sidebar user={user} setPath={setPath}/>
+      <Sidebar user={user} setUser={setUser} setPath={setPath}/>
       <div className="w-full">
 
         <NavBar user={user} data={path}/>
