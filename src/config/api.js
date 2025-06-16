@@ -5,6 +5,7 @@ export const api = {
     LOGOUT: `${baseUrl}/logout`,
     REGISTER: `${baseUrl}/register`,
     GET_USER: `${baseUrl}/users/me`,
+    UPDATE_USER: (userid) => `${baseUrl}/users/${userid}`,
     FORGET_PASSWORD: `${baseUrl}/forget-password`,
     RESET_PASSWORD: `${baseUrl}/reset-password`,
     // Order API
