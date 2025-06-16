@@ -10,6 +10,7 @@ const PartnerSearch = ({
   setSelectedPartner,
   focused,
   setFocused,
+  setActiveTab
 }) => {
   const handlePartnerInputChange = (e) => {
     const value = e.target.value;
@@ -72,7 +73,8 @@ const PartnerSearch = ({
             </ul>
           )}
           
-            <button className=" inline-block ml-1 pb-2 py-1  w-[7%] aspect-square justify-center border border-gray-300 rounded text-sm bg-white hover:bg-gray-100 hover:border-gray-400 align-bottom " verticalAlign="bottom" align>
+            <button className=" inline-block ml-1 pb-2 py-1  w-[7%] aspect-square justify-center border border-gray-300 rounded text-sm bg-white hover:bg-gray-100 hover:border-gray-400 align-bottom "
+            onClick={()=>setActiveTab('partner')}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 ml-1 text-gray-500" >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>

@@ -15,10 +15,15 @@ export const api = {
 
     //partner API
     GET_PARTNERS: `${baseUrl}/partners`,
+    ADD_PARTNER: `${baseUrl}/partners/`,
 
     //product API
     GET_PRODUCTS: `${baseUrl}/products`,
+    ADD_PRODUCT: `${baseUrl}/products`,
 
     GET_OTP: `${baseUrl}/reset-password/get-otp`,
     VERIFY_OTP: `${baseUrl}/reset-password/verify-otp`,
+
+    //catalog API
+    GET_CATALOGS: `${baseUrl}/catalog`,
 }

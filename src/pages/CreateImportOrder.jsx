@@ -28,8 +28,8 @@ const CreateOrder = ({user, setUser}) => {
   const [inputProduct, setInputProduct] = useState("");
 
   //-- ACTIVE TAB
-  const [activeTab, setActiveTab] = useState(''); // state to manage active tab
-
+  const [activeTab, setActiveTab] = useState('partner'); // state to manage active tab
+  const [showForm, setShowForm] = useState(false)
 
   //------------------ USE REF --------------------
   const inputRef = useRef(null);
@@ -70,8 +70,16 @@ const CreateOrder = ({user, setUser}) => {
   return (
     
     <div className="min-h-screen bg-[#fafafa] pt-25 pl-70 pr-5 ">
-      <CompleteForm activeTab={activeTab} setActiveTab={setActiveTab} />
+      
       <div className="max-X`w-9xl mx-auto relative">
+        {showForm && (
+          <CompleteForm 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            setShowForm={setShowForm}
+            partnerList={partnerList}
+          />
+        )}
         <div className="grid grid-cols-5 :grid-cols-5 gap-4">
           {/* Left Column */}
           <div className="space-y-4 col-span-2">
@@ -85,6 +93,7 @@ const CreateOrder = ({user, setUser}) => {
               setSelectedPartner={setSelectedPartner}
               focused={focused}
               setFocused={setFocused}
+              setActiveTab={tab => {setActiveTab(tab); setShowForm(true);}}
             />
           </div>
           {/* Right Column */}
@@ -98,11 +107,13 @@ const CreateOrder = ({user, setUser}) => {
                 setProductFilteredSuggestions={setProductFilteredSuggestions}
                 selectedProducts={selectedProducts}
                 setSelectedProducts={setSelectedProducts}
+                setActiveTab={tab => {setActiveTab(tab); setShowForm(true);}}
               />
               <OrderTable
                 selectedProducts={selectedProducts}
                 setSelectedProducts={setSelectedProducts}
                 productList={productList}
+                setActiveTab={setActiveTab}
               />
             </div>
             {/* Bottom Buttons */}

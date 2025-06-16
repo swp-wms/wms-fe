@@ -7,6 +7,12 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList }) => {
 
 
   const handleProductFieldChange = (id, field, value) => {
+    if (
+      (field === "numberofbars" || field === "weight") &&
+      (isNaN(value) || value === '' || Number(value) < 0)
+    ) {
+      return; // Do not update if invalid
+    }
     let updateProduct = selectedProducts.find(product => product.trueId === id);
     
     if(updateProduct)  {
@@ -154,7 +160,12 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList }) => {
                     type="number"
                     className="w-full h-full focus:outline-none"
                     value={product.numberofbars || ''}
-                    onChange={e => handleProductFieldChange(product.trueId, "numberofbars", e.target.value)}
+                    onChange={e => {
+                        const val = e.target.value;
+                        if (/^\d*$/.test(val)) { // Only allow non-negative integers
+                          handleProductFieldChange(product.trueId, "numberofbars", val === '' ? '' : Number(val));
+                        }
+                      }}
                   />
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-9">
@@ -162,7 +173,12 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList }) => {
                     type="number"
                     className="w-full h-full focus:outline-none"
                     value={product.weight || ''}
-                    onChange={e => handleProductFieldChange(product.trueId, "weight", e.target.value)}
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (/^\d*\.?\d*$/.test(val)) { // Only allow non-negative numbers
+                        handleProductFieldChange(product.trueId, "weight", val === '' ? '' : Number(val));
+                      }
+                    }}
                   />
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
