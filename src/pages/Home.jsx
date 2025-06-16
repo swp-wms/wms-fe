@@ -15,9 +15,10 @@ const Home = ({ user, setUser }) => {
   }, []);
 
   return (
-    <>
-      {/* {user && <Header user={user} />} */}
-    </>
+    <div className='fixed left-[25%] text-center flex flex-col items-center justify-center scale-60'>
+      <img src="/home.png"/>
+      <span className='text-4xl font-bold opacity-50 mt-16'>Chào mừng đến với Hệ thống Quản lý Kho hàng Thép Đất Việt</span>
+    </div>
   )
 }
 
