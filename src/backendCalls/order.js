@@ -44,8 +44,24 @@ const getOrderDetail = async(id) =>{
     }
 }
 
+const createImportOrder = async (orderData) => {
+    try {
+        const response = await axios.post(`${api.CREATE_ORDER}`, orderData, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error creating import order:", error);
+        throw error;
+    }
+}
+
 export default {
     getImportOrder,
     getExportOrder,
-    getOrderDetail
+    getOrderDetail,
+    createImportOrder
 }

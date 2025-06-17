@@ -12,6 +12,7 @@ export const api = {
     GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
     GET_EXPORT_ORDER: `${baseUrl}/orders/export`,
     GET_ORDER_DETAIL: `${baseUrl}/detail`,
+    CREATE_ORDER: `${baseUrl}/orders/`,
 
     //partner API
     GET_PARTNERS: `${baseUrl}/partners`,

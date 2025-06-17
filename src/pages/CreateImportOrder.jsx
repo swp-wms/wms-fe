@@ -7,6 +7,7 @@ import partner from "../backendCalls/partner";
 import product from "../backendCalls/product";
 import { getUser } from "../backendCalls/user";
 import CompleteForm from "../components/order/partnerForm";
+import orderCalls from "../backendCalls/order";
 const CreateOrder = ({user, setUser}) => {
   
 
@@ -66,6 +67,44 @@ const CreateOrder = ({user, setUser}) => {
     fetchProducts();
   }, [partnerList]);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedPartner || selectedProducts.length === 0) {
+      alert("Please select a partner and at least one product.");
+      return;
+    }
+    // Here you would typically send the order data to your backend
+    const orderData = {
+      type: "I",
+      partnerid: selectedPartner.id,
+      address: selectedPartner.address,
+      totalbars: totalBars,
+      totalweight: totalWeight,
+      date: new Date().toISOString(),
+      user: user,
+      orderdetail: selectedProducts.map(product => ({
+        productid: product.id,
+        numberofbars: product.numberofbars,
+        weight: product.weight,
+        // add other product-specific fields if needed
+        }))
+    };
+    console.log("Order Data:", orderData);
+    orderCalls.createImportOrder(orderData);
+    setSelectedProducts([]);
+    setSelectedPartner(null);
+  };
+
+  // Calculate totals for selectedProducts
+  const totalBars = selectedProducts.reduce((sum, item) => {
+    const value = Number(item.numberofbars);
+    return !isNaN(value) ? sum + value : sum;
+  }, 0);
+
+  const totalWeight = selectedProducts.reduce((sum, item) => {
+    const value = Number(item.weight);
+    return !isNaN(value) ? sum + value : sum;
+  }, 0);
 
   return (
     
@@ -114,6 +153,8 @@ const CreateOrder = ({user, setUser}) => {
                 setSelectedProducts={setSelectedProducts}
                 productList={productList}
                 setActiveTab={setActiveTab}
+                totalBars={totalBars}
+                totalWeight={totalWeight}
               />
             </div>
             {/* Bottom Buttons */}
@@ -124,7 +165,12 @@ const CreateOrder = ({user, setUser}) => {
                 </svg>
                 Quay lại
               </Link>
-              <button className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm">
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm"
+                onClick={handleSubmit}
+                disabled={selectedProducts.length === 0 || !selectedPartner}
+              >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
