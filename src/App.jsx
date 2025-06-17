@@ -11,6 +11,8 @@ import Delivery from "./pages/Delivery";
 import OverviewPage from "./pages/OverviewPage";
 import Statistic from "./pages/Statistic";
 import DeliverySchedule from "./pages/DeliverySchedule";
+import Profile from "./pages/Profile";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
   const [user, setUser] = useState();
@@ -44,6 +46,16 @@ function App() {
           setUser={setUser}
           user={user}
         />} />
+
+        <Route
+          path="/thong-tin-ca-nhan"
+          element={<Profile user={user} setUser={setUser} />}
+        />
+
+        <Route
+          path="/danh-sach-nguoi-dung"
+          element={<AdminPage user={user} setUser={setUser} />}
+        />
       </Routes>
     </div>
   );

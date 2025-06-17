@@ -2,6 +2,7 @@ import { useState } from "react";
 import Sidebar from "./sidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDoorOpen, faBell, faGear } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 const Header = ({ user, setUser }) => {
   const [path, setPath] = useState("Trang chủ");
@@ -30,10 +31,10 @@ const NavBar = ({ user, data }) => {
       <div className="flex flex-row gap-8 items-center">
         <FontAwesomeIcon icon={faBell} size="lg" />
         <FontAwesomeIcon icon={faGear} size="lg" />
-        <div className="flex flex-row rounded-full bg-white shadow-btn p-1.5 w-fit justify-between items-center gap-2">
+        <Link to={"/thong-tin-ca-nhan"} className="flex flex-row rounded-full bg-white shadow-btn p-1.5 w-fit justify-between items-center gap-2">
           <div className="size-8 rounded-full bg-gray-200"></div>
           <span className="px-3 font-medium">{user.username}</span>
-        </div>
+        </Link>
       </div>
     </div>
   );
