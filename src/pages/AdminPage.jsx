@@ -1,6 +1,7 @@
 import React from "react";
 import { useEffect } from "react";
 import { getUser } from "../backendCalls/user";
+import AccountManage from "../components/admin/AccountManage";
 
 const AdminPage = ({user, setUser}) => {
     useEffect(() => {
@@ -16,7 +17,9 @@ const AdminPage = ({user, setUser}) => {
                 getData();
             }
         }, []);
-    return <div></div>
+    return(
+        <AccountManage/>
+    )
 };
 
 export default AdminPage;
