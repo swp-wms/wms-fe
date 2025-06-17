@@ -50,6 +50,12 @@ const UserInfo = () => {
     setEditPassWord(!editPassWord);
   };
 
+  const handleSavePassWordButton = async () => {
+    await updateUserInfo(user);
+    console.log("User: ", user);
+    setEditPassWord(false);
+  };
+
   return (
     <div className="flex gap-6 p-6 max-w-6xl mt-24 ml-80 ">
       {/* Div edit */}
@@ -173,6 +179,7 @@ const UserInfo = () => {
                 value={user.username}
                 readOnly={!edit}
                 onChange={(e) => setUser({ ...user, username: e.target.value })}
+                
                 className="flex-1 ml-2 h-8 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -352,14 +359,18 @@ const UserInfo = () => {
                 <span className="text-sm font-medium text-gray-700 w-32">
                   MẬT KHẨU MỚI:
                 </span>
-                <input className="text-sm text-gray-900 bg-white px-3 py-1 rounded border" />
+                <input
+                  className="text-sm text-gray-900 bg-white px-3 py-1 rounded border"
+                />
               </div>
 
               <div className="flex items-center gap-6 mt-3">
                 <span className="text-sm font-medium text-gray-700 w-32">
                   NHẬP LẠI MẬT KHẨU:
                 </span>
-                <input className="text-sm text-gray-900 bg-white px-3 py-1 rounded border" />
+                <input
+                  className="text-sm text-gray-900 bg-white px-3 py-1 rounded border"
+                />
               </div>
               <div className="flex justify-end">
                 <div className="">
@@ -375,6 +386,7 @@ const UserInfo = () => {
                 <div className="">
                   <button className="p-2 hover:bg-gray-200 rounded mx-2">
                     <FontAwesomeIcon
+                      onClick={() => handleEditPassWordButton()}
                       icon={faDownload}
                       className="text-lg text-gray-600"
                     />
