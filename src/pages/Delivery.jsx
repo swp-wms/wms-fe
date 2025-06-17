@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import OrderList from "../components/delivery/OrderList"
-import DeliveryList from "../components/delivery/DeliveryList"
 import { getUser } from "../backendCalls/user";
-import DeliveryForm from "../components/delivery/DeliveryForm";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFileExport, faFileImport } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 
 const Delivery = ({ user, setUser }) => {
@@ -21,25 +21,15 @@ const Delivery = ({ user, setUser }) => {
   }, []);
 
   return (
-    <div className="Delivery fixed bottom-0 right-0 top-[80px] left-[260px]">
-      <div className="w-full h-5/6 p-[20px] flex">
-        <div className="flex-1 h-full">
-          <h1 className="font-medium mb-2">Đơn nhập hàng</h1>
-          <OrderList />
-        </div>
-        {/* table */}
-        <div className="flex-2 h-full ml-4">
-          <div className="flex justify-between">
-            <h1 className="font-medium mb-2">Thêm xe</h1>
-            <h1 className="font-medium mb-2">ABC Company</h1>
-          </div>
-          <DeliveryForm />
-        </div>
-      </div>
-
-      <div className="w-full h-1/6">
-        <DeliveryList />
-      </div>
+    <div className="Delivery text-lg flex gap-4 font-semibold items-center justify-center fixed bottom-0 right-0 top-[80px] left-[20%]">
+      <Link to={'/ke-hoach-van-chuyen/nhap'} className="text-center btn px-[40px] py-[60px] rounded">
+        <FontAwesomeIcon className="text-3xl mb-4" icon={faFileImport} />
+        <p>Kế hoạch xuất kho</p>
+      </Link>
+      <Link to={'/ke-hoach-van-chuyen/xuat'} className="text-center btn px-[40px] py-[60px] rounded">
+        <FontAwesomeIcon className="text-3xl mb-4" icon={faFileExport} />
+        <p>Kế hoạch nhập kho</p>
+      </Link>
     </div>
   )
 }
