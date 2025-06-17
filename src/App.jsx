@@ -10,12 +10,12 @@ import CreateExportOrder from "./pages/CreateExportOrder";
 import ViewOrder from "./pages/OrderForm";
 import Header from "./components/common/header";
 import Delivery from './pages/Delivery';
-<<<<<<< HEAD
+
 import OverviewPage from "./pages/OverviewPage";
 import DeliverySchedule from "./pages/DeliverySchedule";
-=======
+
 import FormTemplate from "./components/order/partnerForm";
->>>>>>> nhap-hang
+
 
 function App() {
   const [user, setUser] = useState();
