@@ -16,6 +16,23 @@ const fetchProducts = async () => {
     }
 }
 
+const addProduct = async(productInfo) => {
+    try{
+        const responsse = await axios.post(`${api.ADD_PRODUCT}`,productInfo,{
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log('Product added:', response.data);
+        return response;
+
+    }catch(error){
+        console.error("Error adding product:", error);
+        throw error; // Re-throw the error for further handling
+    }
+}
 export default {
-    fetchProducts
+    fetchProducts,
+    addProduct
 }
