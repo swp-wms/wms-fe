@@ -10,6 +10,7 @@ import Header from "./components/common/header";
 import Delivery from "./pages/Delivery";
 import OverviewPage from "./pages/OverviewPage";
 import Statistic from "./pages/Statistic";
+import DeliverySchedule from "./pages/DeliverySchedule";
 
 function App() {
   const [user, setUser] = useState();
@@ -32,13 +33,17 @@ function App() {
           element={<OverviewPage user={user} setUser={setUser} />}
         />
         <Route
-          path="/ke-hoach-van-chuyen"
-          element={<Delivery setUser={setUser} user={user} />}
-        />
-        <Route
           path="/thong-ke-kho"
           element={<Statistic user={user} setUser={setUser} />}
         />
+        <Route path="/ke-hoach-van-chuyen" element={<Delivery
+          setUser={setUser}
+          user={user}
+        />} />
+        <Route path="/ke-hoach-van-chuyen/:act" element={<DeliverySchedule
+          setUser={setUser}
+          user={user}
+        />} />
       </Routes>
     </div>
   );
