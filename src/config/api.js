@@ -1,4 +1,4 @@
-const baseUrl = 'http://localhost:3800';
+const baseUrl = "http://localhost:3800";
 
 export const api = {
     LOGIN: `${baseUrl}/login`,
@@ -12,11 +12,20 @@ export const api = {
     GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
     GET_REMAIN_QUANTITY: (orderid) => `${baseUrl}/detail/${orderid}/remain`,
 
-    //partner API
-    GET_PARTNERS: `${baseUrl}/partners`,
+  //partner API
+  GET_PARTNERS: `${baseUrl}/partners`,
 
-    //product API
-    GET_PRODUCTS: `${baseUrl}/products`,
+  //product API
+  GET_PRODUCTS: `${baseUrl}/products`,
+
+  //warehouse API
+  GET_WAREHOUSE: `${baseUrl}/warehouse`,
+
+  //import API
+  GET_IMPORT: `${baseUrl}/warehouse/import`,
+
+  //export API
+  GET_EXPORT: `${baseUrl}/warehouse/export`,
 
     //otp api
     GET_OTP: `${baseUrl}/reset-password/get-otp`,
