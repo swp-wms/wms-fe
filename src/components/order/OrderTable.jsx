@@ -1,10 +1,24 @@
-import React, {useState} from "react";
+import React, {useState,useEffect, use} from "react";
 
 const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalBars, totalWeight }) => {
   // Handler for changing product fields (e.g. quantity)
   
-  
+  // useEffect(() => {
 
+  //   const filtered = new Map();
+  //   if(selectedProducts.length > 1) {
+  //     selectedProducts.forEach((item,index) => {
+  //       const key =`${item.name}-${item.brandname}`;
+  //       if(filtered.has(key)){
+  //         filtered.set(key,{...selectedProducts[index],numberofbars: item.numberofbars + 1}); 
+  //       } else {
+  //         filtered.set(key,{...selectedProducts[index]}); 
+  //       }
+  //     })
+
+  //     setSelectedProducts(Array.from(filtered.values()).sort((a,b) => a.trueId - b.trueId));
+  //   } 
+  // }, [selectedProducts, setSelectedProducts]);
   const handleProductFieldChange = (id, field, value) => {
     if (
       (field === "numberofbars" || field === "weight") &&

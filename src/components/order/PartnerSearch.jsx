@@ -44,14 +44,15 @@ const PartnerSearch = ({
   return (
     <div className="bg-white border-2 border-gray-600 rounded-md p-4">
       <div className="space-y-4">
-        <div className="relative">
+        <div className="relative flex">
+          <div className="relative flex-grow">
           <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
             type="text"
             placeholder="Tìm kiếm mã khách hàng, tên công ty"
-            className="w-[91%] pl-10 pr-4 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={inputpartner}
             onChange={handlePartnerInputChange}
             onFocus={() => setFocused(true)}
@@ -72,8 +73,8 @@ const PartnerSearch = ({
               ))}
             </ul>
           )}
-          
-            <button className=" inline-block ml-1 pb-2 py-1  w-[7%] aspect-square justify-center border border-gray-300 rounded text-sm bg-white hover:bg-gray-100 hover:border-gray-400 align-bottom "
+          </div>
+            <button className=" ml-1 size-9.5  aspect-square justify-center border border-gray-300 rounded text-sm bg-white hover:bg-gray-100 hover:border-gray-400 align-bottom "
             onClick={()=>setActiveTab('partner')}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 ml-1 text-gray-500" >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

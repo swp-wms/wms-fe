@@ -38,7 +38,7 @@ const ImportOrder = ({user, setUser}) => {
     }, []);
 
     return(
-            <div className="relative ml-70 pt-24">
+            <div className="relative ml-75 pt-24">
 
                 <div className="m-5 flex flex-wrap gap-7  ">
                     

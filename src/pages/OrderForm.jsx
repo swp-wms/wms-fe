@@ -33,7 +33,7 @@ const { id } = useParams();
     return(
       <>
       {/* <Header /> */}
-      <div className="min-h-screen bg-[#fafafa] pt-22 pl-70 pr-5">
+      <div className="min-h-screen bg-[#fafafa] pt-25 pl-77 pr-5">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
             

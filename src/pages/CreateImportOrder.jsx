@@ -69,24 +69,26 @@ const CreateOrder = ({user, setUser}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedPartner || selectedProducts.length === 0) {
+    if (!selectedPartner || !selectedProducts || selectedProducts.length === 0) {
       alert("Please select a partner and at least one product.");
       return;
     }
     // Here you would typically send the order data to your backend
     const orderData = {
       type: "I",
-      partnerid: selectedPartner.id,
-      address: selectedPartner.address,
+      partnerid: selectedPartner?.id,
+      address: selectedPartner?.address,
       totalbars: totalBars,
       totalweight: totalWeight,
       date: new Date().toISOString(),
-      user: user,
+      salesmanid: user.id,
+      note:"",
+
       orderdetail: selectedProducts.map(product => ({
-        productid: product.id,
-        numberofbars: product.numberofbars,
-        weight: product.weight,
-        // add other product-specific fields if needed
+        productid: product?.id,
+        numberofbars: product?.numberofbars,
+        weight: product?.weight
+        
         }))
     };
     console.log("Order Data:", orderData);
@@ -108,7 +110,7 @@ const CreateOrder = ({user, setUser}) => {
 
   return (
     
-    <div className="min-h-screen bg-[#fafafa] pt-25 pl-70 pr-5 ">
+    <div className="min-h-screen bg-[#fafafa] pt-25 pl-77 pr-5 ">
       
       <div className="max-X`w-9xl mx-auto relative">
         {showForm && (

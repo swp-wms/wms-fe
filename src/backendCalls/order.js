@@ -52,6 +52,7 @@ const createImportOrder = async (orderData) => {
                 'Content-Type': 'application/json'
             }
         });
+        console.log("Order created successfully:", response.data);
         return response.data;
     } catch (error) {
         console.error("Error creating import order:", error);
