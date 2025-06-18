@@ -1,128 +1,162 @@
-import { faAdd, faCancel, faPlusCircle, faRemove, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faCancel, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React from 'react'
+import ProductTable from './ProductTable'
+import DriverInfo from './DriverInfo'
+import { useState } from 'react'
+import { handleApproveTruck, handleCreateDelivery } from '../../backendCalls/delivery'
+import { deliveryStatus } from '../../data/deliveryStatus'
 
-const DeliveryForm = () => {
+const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDetail = null, user }) => {
+    // const { deliverydate, deliverytime, gettime, getdate, note, listDeliveryDetail } = req.body;
+
+    const [newDelivery, setNewDelivery] = useState({});
+
+    const [newDeliveryList, setNewDeliveryList] = useState([]);
+    const [error, setError] = useState();
+
+    const createDelivery = async (e) => {
+        e.preventDefault();
+        if (document.querySelector('.DeliveryForm').checkValidity()) {
+            setError();
+            try {
+                const data = { ...newDelivery, listDeliveryDetail: newDeliveryList };
+                const response = await handleCreateDelivery(currentOrder.orderid, data);
+                window.location.reload();
+
+            } catch (error) {
+                setError(error.response.data.message);
+            }
+        } else {
+            setError('Trừ ghi chú, bạn cần điền hết các trường yêu cầu.\n Số lượng và khối lượng phải lớn hơn 0.');
+        }
+
+    }
+
+    const handleApprove = async (e) => {
+        e.preventDefault();
+        setError();
+        try {
+            handleApproveTruck(currentDelivery.id, true);
+            window.location.reload();
+
+        } catch (error) {
+            setError(error.response.data.message);
+        }
+    }
+    const handleReject = async (e) => {
+        e.preventDefault();
+        setError();
+        try {
+            handleApproveTruck(currentDelivery.id, false);
+            window.location.reload();
+
+        } catch (error) {
+            setError(error.response.data.message);
+        }
+    }
     return (
-        <div className='DeliveryForm relative font-[500] text-[14px] bg-white h-[90%] shadow-[0_0_2px_#ccc] p-5'>
+        <form className='DeliveryForm overflow-y-scroll relative font-[500] text-[14px] bg-white h-[90%] shadow-[0_0_2px_#ccc] p-5'>
+            <div className="mb-3 flex justify-between">
+                <span>Mã đơn: {currentOrder.orderid}</span>
+                <span>Địa chỉ: {currentOrder.address}</span>
+            </div>
             <div className="flex items-center justify-between">
                 <div className="">
-                    <label htmlFor="">Ngày:</label>
-                    <input className='border-[1px] border-[#aaa] rounded py-1 px-2 ml-2' type="date" />
+                    <label htmlFor="">Ngày bốc hàng: {currentDelivery && currentDelivery.getdate}</label>
+                    {!currentDelivery &&
+                        <input
+                            onChange={(e) => {
+                                setNewDelivery({ ...newDelivery, getdate: e.target.value })
+                            }}
+                            required
+                            className='border-[1px] border-[#aaa] rounded py-1 px-2 ml-2' type="date"
+                        />}
                 </div>
                 <div className="">
-                    <label htmlFor="">Thời gian:</label>
-                    <input className='border-[1px] border-[#aaa] rounded py-1 px-2 ml-2' type="text" />
+                    <label htmlFor="">Thời gian bốc hàng: {currentDelivery && currentDelivery.gettime}</label>
+                    {!currentDelivery &&
+                        <input
+                            onChange={(e) => {
+                                setNewDelivery({ ...newDelivery, gettime: e.target.value })
+                            }}
+                            required
+                            className='border-[1px] w-[100px] border-[#aaa] rounded py-1 px-2 ml-2' type="text"
+                        />}
                 </div>
-                <span>Mã đơn: 123</span>
-            </div>
-            <div className="mt-2">
-                <label htmlFor="">Khối lượng xe:</label>
-                <input className='border-[1px] border-[#aaa] rounded py-1 px-2 ml-2' type="number" />
-            </div>
 
-            <div className="flex justify-between items-center my-3">
-                <h1 className='font-bold'>THÔNG TIN HÀNG HÓA</h1>
-                <div className="border-[1px] border-[#aaa]  rounded px-3 py-2 w-[50%] flex items-center">
-                    <FontAwesomeIcon icon={faSearch} className='mr-3 cursor-pointer' title='Tìm kiếm'/>
-                    <input className='flex-1 outline-0'
-                        type="text" placeholder='Tìm kiếm mã hàng hóa, tên hàng hóa' />
+            </div>
+            <div className="flex items-center justify-between mt-2">
+                <div className="">
+                    <label htmlFor="">Ngày giao hàng: {currentDelivery && currentDelivery.deliverydate}</label>
+                    {!currentDelivery &&
+                        <input
+                            onChange={(e) => {
+                                setNewDelivery({ ...newDelivery, deliverydate: e.target.value })
+                            }}
+                            required
+                            className='border-[1px] border-[#aaa] rounded py-1 px-2 ml-2' type="date"
+                        />}
+                </div>
+                <div className="">
+                    <label htmlFor="">Thời gian giao hàng: {currentDelivery && currentDelivery.deliverytime}</label>
+                    {!currentDelivery &&
+                        <input
+                            onChange={(e) => {
+                                setNewDelivery({ ...newDelivery, deliverytime: e.target.value })
+                            }}
+                            required
+                            className='border-[1px] w-[100px] border-[#aaa] rounded py-1 px-2 ml-2' type="text"
+                        />}
                 </div>
             </div>
+            {currentDelivery && <div className="flex justify-end">
+                <p
+                    className={`w-fit border-[1px] rounded-full py-2 mt-2 px-4 bg-[var(--fill-color)] border-black`}
+                >{(deliveryStatus.find(d => d.id === currentDelivery.deliverystatus)).name}</p>
+            </div>}
 
-            <table className='products w-full text-[13px]'>
-                <tr>
-                    <th className='border-[1px] border-black'>STT</th>
-                    <th className='border-[1px] border-black'>Mã hàng</th>
-                    <th className='border-[1px] border-black'>Đơn trọng</th>
-                    <th className='border-[1px] border-black'>Dài</th>
-                    <th className='border-[1px] border-black'>Tổng khối lượng</th>
-                    <th className='border-[1px] border-black w-[25%]'>Ghi chú</th>
-                    <th className='border-[1px] border-black'>Xóa</th>
-                </tr>
-                <tr>
-                    <td className='border-[1px] border-black text-center'>1</td>
-                    <td className='border-[1px] border-black text-center'>CD19029H</td>
-                    <td className='border-[1px] border-black text-center'>3</td>
-                    <td className='border-[1px] border-black text-center'>11.7</td>
-                    <td className='border-[1px] border-black text-center'>
-                        <input type="number" placeholder='...' className='w-[60px] text-center' /> kg
-                    </td>
-                    <td className='border-[1px] border-black text-center'>
-                        <input type="text" className='w-[100%] text-center' />
-                    </td>
-                    <td className='border-[1px] border-black text-center'>
-                        <FontAwesomeIcon icon={faRemove} className='text-red-600 hover:cursor-pointer' title='Xóa' />
-                    </td>
-                </tr>
-                <tr>
-                    <td className='border-[1px] border-black text-center'>1</td>
-                    <td className='border-[1px] border-black text-center'>CD19029H</td>
-                    <td className='border-[1px] border-black text-center'>3</td>
-                    <td className='border-[1px] border-black text-center'>11.7</td>
-                    <td className='border-[1px] border-black text-center'>
-                        <input type="number" placeholder='...' className='w-[60px] text-center' /> kg
-                    </td>
-                    <td className='border-[1px] border-black text-center'>
-                        <input type="text" className='w-[100%] text-center' />
-                    </td>
-                    <td className='border-[1px] border-black text-center'>
-                        <FontAwesomeIcon icon={faRemove} className='text-red-600 hover:cursor-pointer' title='Xóa' />
-                    </td>
-                </tr>
-                <tr>
-                    <td className='border-[1px] border-black text-center'>1</td>
-                    <td className='border-[1px] border-black text-center'>CD19029H</td>
-                    <td className='border-[1px] border-black text-center'>3</td>
-                    <td className='border-[1px] border-black text-center'>11.7</td>
-                    <td className='border-[1px] border-black text-center'>
-                        <input type="number" placeholder='...' className='w-[60px] text-center' /> kg
-                    </td>
-                    <td className='border-[1px] border-black text-center'>
-                        <input type="text" className='w-[100%] text-center' />
-                    </td>
-                    <td className='border-[1px] border-black text-center'>
-                        <FontAwesomeIcon icon={faRemove} className='text-red-600 hover:cursor-pointer' title='Xóa' />
-                    </td>
-                </tr>
-                <tr>
-                    <td className='border-[1px] border-black text-center'>1</td>
-                    <td className='border-[1px] border-black text-center'>CD19029H</td>
-                    <td className='border-[1px] border-black text-center'>3</td>
-                    <td className='border-[1px] border-black text-center'>11.7</td>
-                    <td className='border-[1px] border-black text-center'>
-                        <input type="number" placeholder='...' className='w-[60px] text-center' /> kg
-                    </td>
-                    <td className='border-[1px] border-black text-center'>
-                        <input type="text" className='w-[100%] text-center' />
-                    </td>
-                    <td className='border-[1px] border-black text-center'>
-                        <FontAwesomeIcon icon={faRemove} className='text-red-600 hover:cursor-pointer' title='Xóa' />
-                    </td>
-                </tr>
+            {currentOrder && <ProductTable
+                newDeliveryList={newDeliveryList}
+                setNewDeliveryList={setNewDeliveryList}
+                currentOrder={currentOrder}
+                newDelivery={newDelivery}
+                setNewDelivery={setNewDelivery}
+                currentDelivery={currentDelivery}
+                currentDeliveryDetail={currentDeliveryDetail}
+                user={user}
+            />}
 
-                {/* Tổng */}
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td className='text-center'>Tổng: 38kg</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </table>
-            <div className="absolute flex gap-3 bottom-[20px] right-[20px]">
-                <button className='btn'>
+            {currentDelivery && <DriverInfo
+                currentDelivery={currentDelivery}
+                user={user}
+            />}
+
+            <p className="text-red-700 font-medium text-center my-2">{error}</p>
+
+            {!currentDelivery && user.roleid === 3 && <div className="absolute flex gap-3 bottom-[20px] right-[20px]">
+                <button className='btn px-4 py-2' onClick={(e) => createDelivery(e)}>
                     <FontAwesomeIcon icon={faPlusCircle} className='mr-2' />
                     Thêm
                 </button>
-                <button className='btn'>
+                <button className='btn px-4 py-2 '>
                     <FontAwesomeIcon icon={faCancel} className='mr-2' />
                     Hủy
                 </button>
-            </div>
-        </div>
+            </div>}
+            {currentDelivery && currentDelivery.deliverystatus === '2' && user.roleid === 3 && <div className="absolute flex gap-3 bottom-[20px] right-[20px]">
+                <button className='btn px-4 py-2 '
+                    onClick={(e) => {handleApprove(e)}}>
+                    <FontAwesomeIcon icon={faPlusCircle} className='mr-2' />
+                    Duyệt
+                </button>
+                <button className='btn px-4 py-2 '
+                    onClick={(e) => {handleReject(e)}}
+                >
+                    <FontAwesomeIcon icon={faCancel} className='mr-2' />
+                    Từ chối
+                </button>
+            </div>}
+        </form>
     )
 }
 

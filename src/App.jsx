@@ -9,8 +9,15 @@ import CreateImportOrder from "./pages/CreateImportOrder";
 import CreateExportOrder from "./pages/CreateExportOrder";
 import ViewOrder from "./pages/OrderForm";
 import Header from "./components/common/header";
-import Delivery from './pages/Delivery';
+
 import FormTemplate from "./components/order/partnerForm";
+import Delivery from "./pages/Delivery";
+import OverviewPage from "./pages/OverviewPage";
+import Statistic from "./pages/Statistic";
+import DeliverySchedule from "./pages/DeliverySchedule";
+import Profile from "./pages/Profile";
+import AdminPage from "./pages/AdminPage";
+
 
 function App() {
   const [user, setUser] = useState();
@@ -41,13 +48,31 @@ function App() {
         
         <Route
           path="/tong-quan-kho"
-          element={<Home setUser={setUser} user={user} />}
+          element={<OverviewPage user={user} setUser={setUser} />}
+        />
+        <Route
+          path="/thong-ke-kho"
+          element={<Statistic user={user} setUser={setUser} />}
         />
 
         <Route path="/ke-hoach-van-chuyen" element={<Delivery
           setUser={setUser}
           user={user}
         />} />
+        <Route path="/ke-hoach-van-chuyen/:act" element={<DeliverySchedule
+          setUser={setUser}
+          user={user}
+        />} />
+
+        <Route
+          path="/thong-tin-ca-nhan"
+          element={<Profile user={user} setUser={setUser} />}
+        />
+
+        <Route
+          path="/danh-sach-nguoi-dung"
+          element={<AdminPage user={user} setUser={setUser} />}
+        />
       </Routes>
     </div>
   );

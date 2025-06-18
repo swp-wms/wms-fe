@@ -21,7 +21,7 @@ const sideElement = [
       icon: faShapes,
       path: "/tong-quan-kho",
       name: "Tổng quan kho",
-      allowed: [3, 4]
+      allowed: [3, 4, 5]
     },
     {
       id: 2,
@@ -49,14 +49,14 @@ const sideElement = [
       icon: faTruckFast,
       path: "/ke-hoach-van-chuyen",
       name: "Kế hoạch vận chuyển",
-      allowed: [3, 4]
+      allowed: [3, 4, 5]
     },
     {
       id: 6,
       icon: faFile,
       path: "/cac-loai-don-tu-khac",
       name: "Các loại đơn từ khác",
-      allowed: [3, 4]
+      allowed: [3, 4, 5]
     }, {
       id: 7,
       icon: faFile,
