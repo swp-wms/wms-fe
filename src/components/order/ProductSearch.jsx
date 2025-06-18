@@ -24,10 +24,33 @@ const ProductSearch = ({
   const handleProductSelect = (product) => {
     setInputProduct(product.name);
     setProductFilteredSuggestions([]);
-    product.trueId = selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].trueId + 1;
-    product.weight = '';
-    product.numberofbars = '';
-    setSelectedProducts([...selectedProducts, product]);
+
+    const existingIndex = selectedProducts.findIndex(
+      (item) => item.name === product.name
+    )
+
+    if(existingIndex !== -1) {
+      const updatedProductList = selectedProducts.map(
+        (item, idx) => existingIndex === idx 
+        ? {...item, numberofbars: (item.numberofbars || 0) + 1} 
+        : item
+      );
+      setSelectedProducts(updatedProductList);
+    } else {
+      // setSelectedProducts()
+      // product.trueId = selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].trueId + 1;
+      // product.weight = '';
+      // product.numberofbars = '';
+      // const filtered = new Map();
+
+      setSelectedProducts([...selectedProducts, {
+        ...product,
+        trueId: selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].trueId + 1,
+        
+        
+      }]);
+    }
+    
   };
 
   const handleKeyDown = (e) => {
@@ -44,14 +67,15 @@ const ProductSearch = ({
 
   return (
     <div className="bg-white border-2 border-white rounded-md p-4">
-      <div className="relative rounded-md">
+      <div className="relative rounded-md flex flex-row ">
+        <div className="relative flex-grow ">
         <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
           type="text"
           placeholder="Tìm kiếm mã hàng hóa, tên hàng hóa"
-          className="w-[94%] pl-10 pr-4 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={inputProduct}
           onChange={handleProductInputChange}
           onKeyDown={handleKeyDown}
@@ -71,9 +95,10 @@ const ProductSearch = ({
             ))}
           </ul>
         )}
-        <button className=" ml-1 pb-2 py-2 pt-1 w-[5%] aspect-square justify-center border border-gray-300 rounded text-sm bg-white align-bottom hover:bg-gray-100 hover:border-gray-400" 
+        </div>
+        <button className=" size-9.5 py-2 ml-1 justify-center  aspect-square border border-gray-300 rounded text-sm bg-white hover:bg-gray-100 hover:border-gray-400" 
         onClick={() => setActiveTab('product')}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 pl-2 text-gray-500" >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 pl-2 text-gray-500 align-middle" >
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
         </button>

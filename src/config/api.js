@@ -41,6 +41,8 @@ export const api = {
 
     //catalog API
     GET_CATALOGS: `${baseUrl}/catalog`,
+    ADD_CATALOG: `${baseUrl}/catalog`,
+
     GET_IMPORT_DELIVERY: `${baseUrl}/delivery/import`,
     GET_EXPORT_DELIVERY: `${baseUrl}/delivery/export`,
     GET_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,
@@ -49,4 +51,6 @@ export const api = {
     ADD_TRUCK_FOR_DELIVERY: (deliveryid) => `${baseUrl}/delivery/${deliveryid}`,
     APPROVE_TRUCK: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/approve`,
 
+
 }
+    
