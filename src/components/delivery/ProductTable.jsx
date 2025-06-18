@@ -25,7 +25,7 @@ const ProductTable = ({
             setSearch(response.data);
         }
         getData();
-    }, []);
+    }, [currentOrder]);
 
     useEffect(() => {
         let ttw = 0;

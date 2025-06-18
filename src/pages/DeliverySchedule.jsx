@@ -71,7 +71,7 @@ const DeliverySchedule = ({ user, setUser }) => {
     <div className="DeliverySchedule fixed bottom-0 right-0 top-[80px] left-[23%]">
       <div className="w-full h-5/6 p-[20px] flex">
         <div className="flex-1 h-full">
-          <h1 className="font-medium mb-2">Đơn nhập hàng</h1>
+          <h1 className="font-medium mb-2">Đơn hàng</h1>
           {orders && <OrderList
             orders={orders} setOrders={setOrders}
             currentOrder={currentOrder}
