@@ -240,7 +240,7 @@ const validateProduct = () => {
       newErrors[key] = "";
     }
   });
-
+  
   setProductErrors(newErrors);
   return valid;
 };
