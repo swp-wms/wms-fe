@@ -37,6 +37,15 @@ const ImportOrder = ({user, setUser}) => {
         fetchImportOrders();
     }, []);
 
+    const total = (array,criteria) =>{
+        let sum = 0;
+        array.forEach(item => {
+        if (item[criteria]) sum += item[criteria];
+        
+        });
+        return sum;
+    }
+
     return(
             <div className="relative ml-75 pt-24">
 
@@ -85,7 +94,7 @@ const ImportOrder = ({user, setUser}) => {
 
                                         <span className="text-[12px] font-medium text-gray-500">Số lượng</span>
                                     </div>
-                                    <p className="text-xs text-gray-800 font-medium pl-6">{order.totalbars}</p>
+                                    <p className="text-xs text-gray-800 font-medium pl-6">{total(order.orderdetail,"numberofbars")}</p>
                                 </div>
 
                                 <div className="flex flex-col gap-1">
@@ -96,7 +105,7 @@ const ImportOrder = ({user, setUser}) => {
 
                                         <span className="text-[12px] font-medium text-gray-500">Trọng lượng</span>
                                     </div>
-                                    <p className="text-xs text-gray-800 font-medium pl-6">{order.totalweight} kg</p>
+                                    <p className="text-xs text-gray-800 font-medium pl-6">{Number(total(order.orderdetail,"weight")).toFixed(1)} kg</p>
                                 </div>
                         <Link to={`/nhap-hang/${order.id}`} className="w-[80%] h-12 bg-white hover:bg-gray-100 border-2  border-gray-100 hover:border-gray-400  rounded-md flex gap-2 self-center justify-self-center  place-content-center justify-evenly content-around shadow-lg">
                             <FontAwesomeIcon className="h-full place-self-center text-[#1e1e1e]" icon={faArrowUpRightFromSquare} />
