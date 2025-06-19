@@ -15,9 +15,16 @@ const StatusButton = ({ currentDelivery, user }) => {
             setError('Bạn không có quyền chuyển trạng thái.');
             return;
         }
-        await handleIsDeliverying(currentDelivery.id);
-        setError();
-        setStatus('4');
+        try {
+            console.log(currentDelivery.id);
+
+            await handleIsDeliverying(currentDelivery.id);
+            console.log("run");
+            setError();
+            setStatus('4');
+        } catch (error) {
+            setError("Có lỗi xảy ra. Vui lòng thử lại sau");
+        }
     }
 
     return (

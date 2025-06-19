@@ -110,11 +110,15 @@ export const handleConfirmNotEnoughTruck = async (deliveryid) => {
 }
 export const handleIsDeliverying = async (deliveryid) => {
     try {
-        const response = await axios.put(api.IS_DELIVERYING(deliveryid), {}, {
+        console.log(hi);
+        
+        const response = await axios.put('http://localhost:3800/delivery/22/is-deliverying', {}, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
         });
+        console.log(response);
+        
         return response;
     } catch (error) {
         return error;

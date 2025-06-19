@@ -8,7 +8,7 @@ import StatusButton from './StatusButton'
 
 const DeliveryForm = ({ 
     currentOrder, 
-    currentDelivery = null, 
+    currentDelivery = null, setCurrentDelivery,
     currentDeliveryDetail = null, setCurrentDeliveryDetail,
     user }) => {
 
@@ -112,7 +112,7 @@ const DeliveryForm = ({
                         />}
                 </div>
             </div>
-            {currentDelivery && <StatusButton currentDelivery={currentDelivery} user={user}/>}
+            {currentDelivery && <StatusButton setCurrentDelivery={setCurrentDelivery} currentDelivery={currentDelivery} user={user}/>}
 
             {currentOrder && <ProductTable
                 newDeliveryList={newDeliveryList}

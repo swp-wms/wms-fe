@@ -39,7 +39,7 @@ const DeliveryList = ({ deliverySchedule, currentOrder, currentDelivery, setCurr
           setCurrentDelivery(null);
           setCurrentDeliveryDetail(null);
         }}
-      >Add</div>}
+      >Thêm</div>}
     </div>
   )
 }

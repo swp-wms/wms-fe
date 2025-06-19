@@ -87,6 +87,7 @@ const DeliverySchedule = ({ user, setUser }) => {
           {currentOrder ? <DeliveryForm
             currentOrder={currentOrder}
             currentDelivery={currentDelivery}
+            setCurrentDelivery={setCurrentDelivery}
             currentDeliveryDetail={currentDeliveryDetail}
             setCurrentDeliveryDetail={setCurrentDeliveryDetail}
             user={user}

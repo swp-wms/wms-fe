@@ -1,6 +1,6 @@
 import { faCancel, faPlusCircle } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useState } from "react"
+import { use, useState } from "react"
 import { handleAddTruck, handleConfirmNotEnoughTruck } from "../../backendCalls/delivery";
 
 const DriverInfo = ({ currentDelivery, user }) => {
@@ -88,19 +88,25 @@ const DriverInfo = ({ currentDelivery, user }) => {
                     </div>
                     <div className="">
                         <label>Ghi chú:  {(currentDelivery?.drivername && !edit) && currentDelivery.note}</label> <br />
-                        {(user.roleid == 5 && ((!currentDelivery.drivername) || (currentDelivery?.deliverystatus === '-2' && edit === true))) && <textarea className='mt-2 p-2 border-[1px] border-[#aaa] rounded w-full min-h-[100px]'></textarea>}
+                        {(user.roleid == 5 && ((!currentDelivery.drivername) || (currentDelivery?.deliverystatus === '-2' && edit === true))) 
+                            && <textarea 
+                                    onChange={(e) => {
+                                        setDriver({ ...driver, note: e.target.value });
+                                    }}
+                                    value={driver.note}
+                                    className='mt-2 p-2 border-[1px] border-[#aaa] rounded w-full min-h-[100px]'></textarea>}
                     </div>
                 </div>
             </div>
             <p className="text-red-700">{error}</p>
             <div className="flex gap-3 justify-end  mt-4">
-                {((currentDelivery.deliverystatus === '1') || (currentDelivery.deliverystatus === '-2' && edit)) && <button className='btn px-4 py-2 '
+                {((currentDelivery.deliverystatus === '1') || (currentDelivery.deliverystatus === '-2' && edit)) && user.roleid === 5 && <button className='btn px-4 py-2 '
                     onClick={(e) => addTruck(e)}
                 >
                     <FontAwesomeIcon icon={faPlusCircle} className='mr-2' />
                     Xác nhận
                 </button>}
-                {currentDelivery.deliverystatus === '1' &&
+                {currentDelivery.deliverystatus === '1' && user.roleid === 5 &&
                     <button className='btn px-4 py-2 '
                         onClick={(e) => handleNotEnoughTruck(e)}>
                         <FontAwesomeIcon icon={faCancel} className='mr-2' />
