@@ -5,7 +5,7 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import { getAllUserInfo } from "../../backendCalls/userInfo"
 
 const AccountManage = () => {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [search, setSearch] = useState("")
   const [selectedPosition, setSelectedPosition] = useState("")
   const [users, setUsers] = useState([])
 
@@ -18,7 +18,7 @@ const AccountManage = () => {
           return
         }
         const userData = response.data
-        // Đảm bảo userData là array
+        // userData là Array để tách lấy thông tin
         setUsers(Array.isArray(userData) ? userData : [])
       } catch (error) {
         console.error("Error fetching user data:", error)
@@ -30,39 +30,11 @@ const AccountManage = () => {
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user?.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase())
-
+      user?.id?.toString().toLowerCase().includes(search.toLowerCase()) ||
+      user?.fullname?.toLowerCase().includes(search.toLowerCase())
     const matchesPosition = selectedPosition === "" || user?.role === getRoleFromPosition(selectedPosition)
-
     return matchesSearch && matchesPosition
   })
-
-  const getRolePosition = (role) => {
-    switch (role) {
-      case 3:
-        return "Salesman"
-      case 4:
-        return "Warehouse Keeper"
-      case 5:
-        return "Delivery Staff"
-      default:
-        return "Unknown"
-    }
-  }
-
-  const getRoleFromPosition = (position) => {
-    switch (position) {
-      case "Salesman":
-        return 3
-      case "Warehouse Keeper":
-        return 4
-      case "Delivery Staff":
-        return 5
-      default:
-        return null
-    }
-  }
 
   const positions = ["Salesman", "Warehouse Keeper", "Delivery Staff"]
 
@@ -91,8 +63,8 @@ const AccountManage = () => {
           <input
             type="text"
             placeholder="Tìm kiếm mã nhân viên, tên nhân viên"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -113,7 +85,7 @@ const AccountManage = () => {
           </select>
         </div>
 
-        {/* Add Account Button */}
+        {/* Add Account */}
         <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
           <span className="text-lg">+</span>
           <span>Thêm tài khoản</span>
@@ -138,11 +110,13 @@ const AccountManage = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 TRẠNG THÁI
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 TÙY CHỌN
               </th>
             </tr>
           </thead>
+
+          
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredUsers.length === 0 ? (
               <tr>
@@ -153,10 +127,11 @@ const AccountManage = () => {
             ) : (
               filteredUsers.map((user, index) => (
                 <tr key={user?.id || index} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user?.id || "N/A"}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user?.fullname || "N/A"}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={getPositionColor(getRolePosition(user?.role))}>{getRolePosition(user?.role)}</span>
+                  <td className="px-6 py-4 whitespace-normal text-sm font-medium text-gray-900">{user?.id || "N/A"}</td>
+                  {console.log(user)}
+                  <td className="px-6 py-4 whitespace-normal text-sm text-gray-900">{user?.fullname || "N/A"}</td>
+                  <td className="px-6 py-4 whitespace-normal text-sm">
+                    <span>{user?.rolename}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user?.username || "N/A"}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -169,7 +144,7 @@ const AccountManage = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 justify-center">
                       <button className="text-gray-400 hover:text-gray-600 transition-colors">
                         <FontAwesomeIcon icon={faPenToSquare} className="h-4 w-4" />
                       </button>
