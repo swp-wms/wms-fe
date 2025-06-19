@@ -16,6 +16,20 @@ const fetchCatalog = async () => {
     }
 }
 
+const addCatalog = async (catalog) => {
+    try{
+        const response = await axios.post(`${api.ADD_CATALOG}`, catalog, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        return response.data;
+    }catch(error) {
+        console.error("Error adding catalog:", error);
+        throw error;
+    }
+}
 export default {
-    fetchCatalog
+    fetchCatalog,
+    addCatalog
 }
