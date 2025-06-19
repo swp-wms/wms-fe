@@ -112,7 +112,7 @@ export const handleIsDeliverying = async (deliveryid) => {
     try {
         console.log(hi);
         
-        const response = await axios.put('http://localhost:3800/delivery/22/is-deliverying', {}, {
+        const response = await axios.put(api.IS_DELIVERYING(deliveryid), {}, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
