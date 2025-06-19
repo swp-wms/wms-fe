@@ -4,10 +4,15 @@ export const api = {
     LOGIN: `${baseUrl}/login`,
     LOGOUT: `${baseUrl}/logout`,
     REGISTER: `${baseUrl}/register`,
+
+    //user API
+    GET_ALL_USER: `${baseUrl}/users`,
     GET_USER: `${baseUrl}/users/me`,
     UPDATE_USER: (userid) => `${baseUrl}/users/${userid}`,
     FORGET_PASSWORD: `${baseUrl}/forget-password`,
     RESET_PASSWORD: `${baseUrl}/reset-password`,
+
+
     // Order API
     GET_ORDERS: `${baseUrl}/orders`,
     GET_IMPORT_ORDER: `${baseUrl}/orders/import`,

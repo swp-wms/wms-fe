@@ -23,12 +23,12 @@ const UserInfo = () => {
   });
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const getData = async () => {
       let response = await getUserInfo();
       console.log("check useeffect", response);
       setUser(response.data);
     };
-    fetchUserInfo();
+    getData();
   }, []);
 
   let [edit, setEdit] = useState(false);

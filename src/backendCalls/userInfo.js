@@ -37,4 +37,19 @@ export const updateUserInfo = async (newUserData) => {
     }
 }
 
+export const getAllUserInfo = async () => {
+    try {
+        const response = await axios.get(api.GET_ALL_USER, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        console.log(response);
+
+        return response;
+    } catch (error) {
+        return error;
+    }
+}
+
 export default getUserInfo;
