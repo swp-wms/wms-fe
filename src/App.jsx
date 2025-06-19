@@ -34,7 +34,7 @@ function App() {
 
         <Route path="/quen-mat-khau" element={<ForgotPassword />} />
         <Route path="/nhap-hang" element={<ImportOrder setUser={setUser} user={user}  />} />
-        <Route path='/xuat-hang' element={<ExportOrder />} />
+        <Route path='/xuat-hang' element={<ExportOrder setUser={setUser} user={user}/>} />
         <Route
           path="/nhap-hang/tao-don-nhap-hang"
           element={<CreateImportOrder setUser={setUser} user={user} />}

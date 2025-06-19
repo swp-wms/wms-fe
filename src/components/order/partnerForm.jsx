@@ -4,7 +4,7 @@ const CompleteForm = (props) => {
   const {
     partner, partnerErrors, product, productErrors, catalog, catalogErrors, catalogList,
     handleChange, handleProductChange, handleCatalogChange, handleSubmit,
-    activeTab, setActiveTab, setShowForm, partnerList
+    activeTab, setActiveTab, setShowForm, partnerList, setPartnerList,productList, selectedProducts, selectedPartner, setSelectedPartner, setSelectedProducts
   } = usePartnerFormLogic(props);
 
 return (

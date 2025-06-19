@@ -111,27 +111,34 @@ const PartnerSearch = ({
         </div>
         <div className="h-fit border border-gray-300 rounded bg-white p-2">
           <div className="pl-2 pt-2">
-            <label className="block text-sm font-medium text-black mb-1">
-              {selectedPartner ? <>Địa chỉ: <span>{selectedPartner.address || ""}</span></> : ""}
+            <h2 className="text-sm font-bold text-black">
+                    {selectedPartner?.id} - {selectedPartner?.name}
+            </h2>
+          </div>
+          <div className="pl-2 pt-2">
+            <label className="block text-sm font-semibold text-black mb-1">
+              {selectedPartner ? <>Địa chỉ: <span className="text-sm font-normal text-black mb-1">{selectedPartner.address || ""}</span></> : ""}
             </label>
           </div>
           <div className="pl-2 pt-2">
-            <label className="block text-sm font-medium text-black mb-1">
-              {selectedPartner ? <>Mã số thuế: <span>{selectedPartner.taxcode || ""}</span></> : ""}
+            <label className="block text-sm font-semibold text-black mb-1">
+              {selectedPartner ? <>Mã số thuế: <span className="text-sm font-normal text-black mb-1">{selectedPartner.taxcode || ""}</span></> : ""}
             </label>
           </div>
           <div className="pl-2 pt-2">
-            {selectedPartner ? <>Số điện thoại: <span>{selectedPartner.phonenumber || ""}</span></> : ""}
+            <label className="block text-sm font-semibold text-black mb-1">
+              {selectedPartner ? <>Số điện thoại: <span className="text-sm font-normal text-black mb-1">{selectedPartner.phonenumber || ""}</span></> : ""}
+            </label>
           </div>
           <div className="pl-2 pt-2">
-            <label className="block text-sm font-medium text-black mb-1">
-              {selectedPartner ? <>Email: <span>{selectedPartner.email || ""}</span></> : ""}
+            <label className="block text-sm font-semibold text-black mb-1">
+              {selectedPartner ? <>Email: <span className="text-sm font-normal text-black mb-1">{selectedPartner.email || ""}</span></> : ""}
             </label>
           </div>
         </div>
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <label className="text-sm font-medium text-black whitespace-nowrap">
+            <label className="text-sm font-semibold text-black whitespace-nowrap">
               PHỤ TRÁCH VẬN CHUYỂN:
             </label>
             <div className="relative flex-1">
@@ -144,7 +151,7 @@ const PartnerSearch = ({
             </div>
           </div>
           <div className="flex gap-4">
-            <label className="text-sm font-medium text-black whitespace-nowrap mt-2">GHI CHÚ:</label>
+            <label className="text-sm font-semibold text-black whitespace-nowrap mt-2">GHI CHÚ:</label>
             <textarea
               rows={6}
               className="flex-1 border border-gray-400 rounded px-3 py-2 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"

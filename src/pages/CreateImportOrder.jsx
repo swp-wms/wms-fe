@@ -66,7 +66,7 @@ const CreateOrder = ({user, setUser}) => {
     };
     fetchPartners();
     fetchProducts();
-  },);
+  },[]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,7 +76,14 @@ const CreateOrder = ({user, setUser}) => {
     }
     // Here you would typically send the order data to your backend
     const orderData = {
-                                                                                                                             
+      type: "I",
+      partnerid: selectedPartner?.id,
+      address: selectedPartner?.address,
+      totalbars: totalBars,
+      totalweight: totalWeight,
+      date: new Date().toISOString(),
+      salesmanid: user.id,
+      note:"",
 
       orderdetail: selectedProducts.map(product => ({
         productid: product?.id,
@@ -111,6 +118,12 @@ const CreateOrder = ({user, setUser}) => {
             setActiveTab={setActiveTab} 
             setShowForm={setShowForm}
             partnerList={partnerList}
+            setPartnerList={setPartnerList}
+            selectedProducts={selectedProducts}
+            selectedPartner={selectedPartner}
+            setSelectedPartner={setSelectedPartner}
+            setSelectedProducts={setSelectedProducts}
+            
           />
         )}
         <div className="grid grid-cols-5 :grid-cols-5 gap-4">

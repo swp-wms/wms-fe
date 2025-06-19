@@ -1,4 +1,4 @@
-import React from "react";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { 
     faFileCirclePlus,
@@ -7,14 +7,26 @@ import {
  } from "@fortawesome/free-solid-svg-icons";
 import Header from "../components/common/header";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import order from "../backendCalls/order";
 
+import { getUser } from "../backendCalls/user";
 
-const ImportOrder = () => {
+
+const ImportOrder = ({user, setUser}) => {
     const [orders, setOrders] = useState([]);
 
-    React.useEffect(() => {
+    useEffect(() => {
+         if(!user){const getData = async () => {
+                  const response = await getUser();
+                  if (response.status!==200) {
+                    window.location.href = '/dang-nhap';
+                  }
+                  const user = response.data;
+                  setUser(user);
+                }
+                getData();}
+
         const fetchExportOrders = async () => {
             try {
                 const response = await order.getExportOrder();
@@ -29,7 +41,7 @@ const ImportOrder = () => {
     return(
         <>
           
-            <div className="bg-[#fafafa] pt-20 pl-65">
+            <div className="bg-[#fafafa] ml-75 pt-24">
 
                 <div className="m-5 flex flex-wrap gap-7">
                     <Link to="./tao-don-xuat-hang" className="group bg-gray-100 w-full sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex border-2 border-gray-200 rounded-md hover:bg-gray-300 hover:border-gray-400 items-center justify-center">
