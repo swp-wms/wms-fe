@@ -32,7 +32,6 @@ const DeliverySchedule = ({ user, setUser }) => {
       if (currentDelivery) {        
         const response = await getDeliveryDetail(currentDelivery.id);
         setCurrentDeliveryDetail(response.data);      
-        console.log(response.data);  
       }
     }
 
@@ -89,6 +88,7 @@ const DeliverySchedule = ({ user, setUser }) => {
             currentOrder={currentOrder}
             currentDelivery={currentDelivery}
             currentDeliveryDetail={currentDeliveryDetail}
+            setCurrentDeliveryDetail={setCurrentDeliveryDetail}
             user={user}
           /> : (
             <div className="h-[90%] bg-white flex items-center justify-center text-[#999] rounded">
@@ -104,6 +104,7 @@ const DeliverySchedule = ({ user, setUser }) => {
           currentOrder={currentOrder}
           deliverySchedule={deliverySchedule}
           setDeliverySchedule={setDeliverySchedule}
+          currentDelivery={currentDelivery}
           setCurrentDelivery={setCurrentDelivery}
           setCurrentDeliveryDetail={setCurrentDeliveryDetail}
         />}

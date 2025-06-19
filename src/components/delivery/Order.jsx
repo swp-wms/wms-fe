@@ -14,8 +14,8 @@ const Order = ({order, setOrder, setCurrentOrder, currentOrder}) => {
             <div style={{width: `${order.percent}%`}} className={`percentage z-[-2] absolute top-0 bottom-0 left-0 bg-[var(--fill-color)]`}></div>
             <div className="">
                 <p className="my-3">{order.partnername}</p>
-                <p className="my-3">Hoàn thành: {order.percent}%</p>
-                <p className="my-3">Tiến độ: {order.process}%</p>
+                <p className="my-3">Hoàn thành: {Number(order.percent).toFixed(2)}%</p>
+                <p className="my-3">Tiến độ: {Number(order.process).toFixed(2)}%</p>
             </div>
             <div className="flex flex-col items-end justify-between">
                 <FontAwesomeIcon className="text-lg" icon={faStickyNote} />

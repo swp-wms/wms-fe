@@ -2,10 +2,12 @@ import { useEffect, useState } from "react"
 import { getRemainQuantityOfOrder } from "../../backendCalls/orderDetail";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRemove, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { handleUpdateRealData } from "../../backendCalls/delivery";
 
 const ProductTable = ({
     currentOrder,
     currentDelivery, currentDeliveryDetail,
+    setCurrentDeliveryDetail,
     user,
     newDeliveryList, setNewDeliveryList
 }) => {
@@ -15,8 +17,28 @@ const ProductTable = ({
     const [totalWeight, setTotalWeight] = useState(0);
     const [totalQuantity, setTotalQuantity] = useState(0);
     const [error, setError] = useState();
-    const [realBar, setRealBar] = useState();
-    const [realWeight, setRealWeight] = useState();
+    const [realTotalWeight, setRealTotalWeight] = useState(currentDeliveryDetail ? currentDeliveryDetail.realsum : 0);
+
+    const handleConfirmCompleteDelivery = async (e) => {
+        e.preventDefault();
+        const realData = currentDeliveryDetail.deliveryDetail.map(c => {
+            return {
+                productid: c.productid,
+                realnumberofbars: c.realnumberofbars,
+                realtotalweight: c.realtotalweight
+            }
+        });        
+
+        try {
+            await handleUpdateRealData(currentDelivery.id, realData);
+            setError();
+            window.location.reload();
+        } catch (error) {
+            console.log(error);
+            
+            setError(error.response.data.message);
+        }
+    }
 
     useEffect(() => {
         const getData = async () => {
@@ -42,6 +64,18 @@ const ProductTable = ({
         setTotalQuantity(ttq);
 
     }, [newDeliveryList, setNewDeliveryList])
+
+    useEffect(() => {
+        if (currentDeliveryDetail) {
+            let ttw = 0;
+            for (let index = 0; index < currentDeliveryDetail.deliveryDetail.length; index++) {
+                if (currentDeliveryDetail.deliveryDetail[index].realtotalweight) {
+                    ttw += Number(currentDeliveryDetail.deliveryDetail[index].realtotalweight);
+                }
+            }
+            setRealTotalWeight(ttw);
+        }
+    }, [currentDeliveryDetail, setCurrentDeliveryDetail]);
 
     return (
         <div className="">
@@ -98,29 +132,53 @@ const ProductTable = ({
                         <tr key={index}>
                             <td className='border-[1px] border-black text-center'>{index + 1}</td>
                             <td className='border-[1px] border-black text-center'>{d.name}</td>
-                            <td className='border-[1px] border-black text-center'>{d.weightperbar.toFixed(2)}</td>
+                            <td className='border-[1px] border-black text-center'>{Number(d.weightperbar).toFixed(2)}</td>
                             <td className='border-[1px] border-black text-center'>{d.length}</td>
 
                             <td className='border-[1px] border-black text-center'>
                                 {d.numberofbars}
                             </td>
-                            <td className='border-[1px] border-black text-center'>
+                            <td className='real-bar border-[1px] border-black text-center'>
                                 {(user.roleid === 4 && currentDelivery.deliverystatus === '4') ? (
                                     <input
-                                        onChange={(e) => { setRealBar(e.target.value) }}
+                                        onChange={(e) => {
+                                            setCurrentDeliveryDetail(
+                                                {
+                                                    ...currentDeliveryDetail,
+                                                    deliveryDetail: [...currentDeliveryDetail.deliveryDetail]
+                                                        .map((r) => r.productid === d.productid ? { ...r, realnumberofbars: e.target.value } : r)
+                                                });
+                                        }}
                                         min={1}
                                         required
-                                        value={realBar}
+                                        value={currentDeliveryDetail.deliveryDetail[index].realnumberofbars ? currentDeliveryDetail.deliveryDetail[index].realnumberofbars : ''}
                                         type="number" placeholder='...'
                                         className='w-[60px] text-center'
                                     />
                                 ) : d.realnumberofbars}
                             </td>
                             <td className='border-[1px] border-black text-center'>
-                                {d.totalweight.toFixed(2)}
+                                {Number(d.totalweight).toFixed(2)}
                             </td>
-                            <td className='border-[1px] border-black text-center'>
-                                {d.realtotalweight && d.realtotalweight.toFixed(2)}
+                            <td className='real-weight border-[1px] border-black text-center'>
+                                {(user.roleid === 4 && currentDelivery.deliverystatus === '4') ? (
+                                    <input
+                                        onChange={(e) => {
+                                            setCurrentDeliveryDetail(
+                                                {
+                                                    ...currentDeliveryDetail,
+                                                    deliveryDetail: [...currentDeliveryDetail.deliveryDetail]
+                                                        .map((r) => r.productid === d.productid ? { ...r, realtotalweight: e.target.value } : r)
+                                                });
+                                        }}
+                                        min={0.01}
+                                        step={"any"}
+                                        required
+                                        value={currentDeliveryDetail.deliveryDetail[index].realtotalweight ? currentDeliveryDetail.deliveryDetail[index].realtotalweight : ''}
+                                        type="number" placeholder='...'
+                                        className='w-[60px] text-center'
+                                    />
+                                ) : d.realtotalweight}
                             </td>
                             <td className='border-[1px] border-black text-center'>
                                 {d.note}
@@ -131,7 +189,7 @@ const ProductTable = ({
                             <tr key={index}>
                                 <td className='border-[1px] border-black text-center'>{index + 1}</td>
                                 <td className='border-[1px] border-black text-center'>{d.name}</td>
-                                <td className='border-[1px] border-black text-center'>{d.weightperbar.toFixed(2)}</td>
+                                <td className='border-[1px] border-black text-center'>{Number(d.weightperbar).toFixed(2)}</td>
                                 <td className='border-[1px] border-black text-center'>{d.length}</td>
 
                                 <td className='total-bar border-[1px] border-black text-center'>
@@ -224,8 +282,8 @@ const ProductTable = ({
                             <>
                                 <td></td>
                                 <td></td>
-                                <td className='text-center'>Tổng: {currentDeliveryDetail && currentDeliveryDetail.sum.toFixed(2)}kg</td>
-                                <td className='text-center'>Tổng: {currentDeliveryDetail && currentDeliveryDetail.realsum}kg</td>
+                                <td className='text-center'>Tổng: {currentDeliveryDetail && Number(currentDeliveryDetail.sum).toFixed(2)}kg</td>
+                                <td className='text-center'>Tổng: {realTotalWeight.toFixed(2)}kg</td>
                             </>
                         }
                         {!currentDelivery > 0 &&
@@ -239,6 +297,9 @@ const ProductTable = ({
                 </tbody>
             </table>
             <p className="text-red-700 font-medium text-center my-2">{error}</p>
+            {user.roleid === 4 && currentDelivery && currentDelivery.deliverystatus === '4' && <div className="flex justify-end">
+                <button className="btn p-2 px-4" onClick={(e) => handleConfirmCompleteDelivery(e)}>Xác nhận</button>
+            </div>}
         </div>
     )
 }
