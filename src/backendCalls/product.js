@@ -18,7 +18,7 @@ const fetchProducts = async () => {
 
 const addProduct = async(productInfo) => {
     try{
-        const responsse = await axios.post(`${api.ADD_PRODUCT}`,productInfo,{
+        const response = await axios.post(`${api.ADD_PRODUCT}`,productInfo,{
             headers: {
                 Authorization: `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'

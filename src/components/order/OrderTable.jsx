@@ -1,10 +1,24 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 
 const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalBars, totalWeight }) => {
   // Handler for changing product fields (e.g. quantity)
   
-  
+  // useEffect(() => {
 
+  //   const filtered = new Map();
+  //   if(selectedProducts.length > 1) {
+  //     selectedProducts.forEach((item,index) => {
+  //       const key =`${item.name}-${item.brandname}`;
+  //       if(filtered.has(key)){
+  //         filtered.set(key,{...selectedProducts[index],numberofbars: item.numberofbars + 1}); 
+  //       } else {
+  //         filtered.set(key,{...selectedProducts[index]}); 
+  //       }
+  //     })
+
+  //     setSelectedProducts(Array.from(filtered.values()).sort((a,b) => a.trueId - b.trueId));
+  //   } 
+  // }, [selectedProducts, setSelectedProducts]);
   const handleProductFieldChange = (id, field, value) => {
     if (
       (field === "numberofbars" || field === "weight") &&
@@ -106,7 +120,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
           <thead>
             <tr className="bg-gray-100">
               <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-5">STT</th>
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Mã hàng</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-16">Mã hàng</th>
               <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Tên hãng</th>
               <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Tên hàng hóa</th>
               <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Dài</th>
@@ -120,38 +134,43 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
             {selectedProducts.map((product, index) => (
               <tr key={product.trueId || index}>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-5">{product.trueId}</td>
-                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
-                    <input
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-16">
+                    {/* <input
                       type="text"
                       className="w-full h-full focus:outline-none"
                       value={product.name || ''}
                       onChange={e => handleProductFieldChange(product.trueId, "name", e.target.value)}
-                    />
+                    /> */}
+                    {product.name}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
-                    <input
+                    {/* <input
                       type="text"
                       className="w-full h-full focus:outline-none"
                       value={product.brandname || ''}
                       onChange={e => handleProductFieldChange(product.trueId, "brandname", e.target.value)}
-                    />
+                    /> */}
+                    {product.brandname}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
-                  <input
+                  {/* <input
                     type="text"
                     className="w-full h-full focus:outline-none"
                     value={product.namedetail || ''}
                     onChange={e => handleProductFieldChange(product.trueId, "namedetail", e.target.value)}
-                  />
+                  /> */}
+                  {product.namedetail}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-9">
-                  <input
+                  {/* <input
                     type="text"
                     className="w-full h-full focus:outline-none"
                     value={product.catalog?.length || ''}
                     onChange={e => handleProductFieldChange(product.trueId, "catalog.length", e.target.value)}
-                  /></td>
-                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-9">
+                  /> */}
+                  {product.catalog?.length}
+                </td>
+                <td className="border border-gray-800  py-2 text-xs text-black w-9">
                   <input
                     type="number"
                     className="w-full h-full focus:outline-none"
@@ -164,7 +183,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
                       }}
                   />
                 </td>
-                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-9">
+                <td className="border border-gray-800  py-2 text-xs text-black w-9">
                   <input
                     type="number"
                     className="w-full h-full focus:outline-none"
@@ -208,14 +227,14 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
                 colSpan={8}
                 style={{ textAlign: "center", verticalAlign: "middle" }}
               >
-                <div className="flex items-center justify-center h-full w-full">
+                {/* <div className="flex items-center justify-center h-full w-full">
                   <button onClick={addBlankProduct} className=" border rounded-md border-gray-100 shadow-lg flex px-2 py-[2px]  text-center items-center justify-center bg-white hover:bg-gray-100">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 pr-2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>
                     <p>Thêm thông tin</p>
                   </button>
-                </div>
+                </div> */}
               </td>
             </tr>
           </tbody>

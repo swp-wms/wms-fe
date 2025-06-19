@@ -59,34 +59,37 @@ const CreateOrder = ({user, setUser}) => {
       try {
         const response = await product.fetchProducts();
         setProductList(response);
+        console.log("Product List:", response);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
     fetchPartners();
     fetchProducts();
-  }, [partnerList]);
+  },[]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedPartner || selectedProducts.length === 0) {
+    if (!selectedPartner || !selectedProducts || selectedProducts.length === 0) {
       alert("Please select a partner and at least one product.");
       return;
     }
     // Here you would typically send the order data to your backend
     const orderData = {
       type: "I",
-      partnerid: selectedPartner.id,
-      address: selectedPartner.address,
+      partnerid: selectedPartner?.id,
+      address: selectedPartner?.address,
       totalbars: totalBars,
       totalweight: totalWeight,
       date: new Date().toISOString(),
-      user: user,
+      salesmanid: user.id,
+      note:"",
+
       orderdetail: selectedProducts.map(product => ({
-        productid: product.id,
-        numberofbars: product.numberofbars,
-        weight: product.weight,
-        // add other product-specific fields if needed
+        productid: product?.id,
+        numberofbars: product?.numberofbars,
+        weight: product?.weight
+        
         }))
     };
     console.log("Order Data:", orderData);
@@ -107,9 +110,7 @@ const CreateOrder = ({user, setUser}) => {
   }, 0);
 
   return (
-    
-    <div className="min-h-screen bg-[#fafafa] pt-25 pl-70 pr-5 ">
-      
+    <div className="min-h-screen bg-[#fafafa] pt-25 pl-77 pr-5 ">
       <div className="max-X`w-9xl mx-auto relative">
         {showForm && (
           <CompleteForm 
@@ -117,6 +118,12 @@ const CreateOrder = ({user, setUser}) => {
             setActiveTab={setActiveTab} 
             setShowForm={setShowForm}
             partnerList={partnerList}
+            setPartnerList={setPartnerList}
+            selectedProducts={selectedProducts}
+            selectedPartner={selectedPartner}
+            setSelectedPartner={setSelectedPartner}
+            setSelectedProducts={setSelectedProducts}
+            
           />
         )}
         <div className="grid grid-cols-5 :grid-cols-5 gap-4">
@@ -167,9 +174,14 @@ const CreateOrder = ({user, setUser}) => {
               </Link>
               <button
                 type="button"
-                className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm"
+                className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
                 onClick={handleSubmit}
-                disabled={selectedProducts.length === 0 || !selectedPartner}
+                disabled={
+                  !selectedPartner ||
+                  !selectedProducts ||
+                  selectedProducts.length === 0
+                }
+
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -181,7 +193,6 @@ const CreateOrder = ({user, setUser}) => {
         </div>
       </div>
     </div>
-
   );
 }
 
