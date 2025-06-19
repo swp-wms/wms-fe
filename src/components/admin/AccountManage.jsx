@@ -2,12 +2,15 @@ import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons"
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
-import { getAllUserInfo } from "../../backendCalls/userInfo"
+import { getAllUserInfo, updateUserInfo } from "../../backendCalls/userInfo"
 
 const AccountManage = () => {
-  const [search, setSearch] = useState("")
+  const [searchTerm, setSearchTerm] = useState("")
   const [selectedPosition, setSelectedPosition] = useState("")
   const [users, setUsers] = useState([])
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [isUpdating, setIsUpdating] = useState(false)
 
   useEffect(() => {
     const getData = async () => {
@@ -18,7 +21,13 @@ const AccountManage = () => {
           return
         }
         const userData = response.data
-        // userData là Array để tách lấy thông tin
+
+        // Debug: Kiểm tra cấu trúc dữ liệu
+        console.log("API Response:", userData)
+        if (userData && userData.length > 0) {
+          console.log("First user status:", userData[0].status, typeof userData[0].status)
+        }
+
         setUsers(Array.isArray(userData) ? userData : [])
       } catch (error) {
         console.error("Error fetching user data:", error)
@@ -30,25 +39,71 @@ const AccountManage = () => {
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user?.id?.toString().toLowerCase().includes(search.toLowerCase()) ||
-      user?.fullname?.toLowerCase().includes(search.toLowerCase())
+      user?.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase())
+
     const matchesPosition = selectedPosition === "" || user?.role === getRoleFromPosition(selectedPosition)
+
     return matchesSearch && matchesPosition
   })
 
+  const getRoleFromPosition = (position) => {
+    switch (position) {
+      case "Salesman":
+        return 3
+      case "Warehouse Keeper":
+        return 4
+      case "Delivery Staff":
+        return 5
+      default:
+        return null
+    }
+  }
+
   const positions = ["Salesman", "Warehouse Keeper", "Delivery Staff"]
 
-  const getPositionColor = (position) => {
-    switch (position) {
-      case "Delivery Staff":
-        return "text-red-600"
-      case "Salesman":
-        return "text-red-600"
-      case "Warehouse Keeper":
-        return "text-red-600"
-      default:
-        return "text-gray-600"
+  const handleStatusClick = (user) => {
+    setSelectedUser(user)
+    setShowConfirmModal(true)
+  }
+
+  const handleConfirmStatusChange = async () => {
+    if (!selectedUser) return
+
+    setIsUpdating(true)
+    try {
+      // Đảo ngược trạng thái: "1" -> "0", "0" -> "1"
+      const newStatus = selectedUser.status === "1" ? "0" : "1"
+
+      const updatedUserData = {
+        ...selectedUser,
+        status: newStatus,
+      }
+      {}
+      const response = await updateUserInfo(updatedUserData)
+
+      if (response.status === 200) {
+        // Cập nhật state local
+        setUsers((prevUsers) =>
+          prevUsers.map((user) => (user.id === selectedUser.id ? { ...user, status: newStatus } : user)),
+        )
+        alert("Cập nhật trạng thái thành công!")
+      } else {
+        alert("Có lỗi xảy ra khi cập nhật trạng thái!")
+      }
+    } catch (error) {
+      console.error("Error updating user status:", error)
+      alert("Có lỗi xảy ra khi cập nhật trạng thái!")
+    } finally {
+      setIsUpdating(false)
+      setShowConfirmModal(false)
+      setSelectedUser(null)
     }
+  }
+
+  const handleCancelStatusChange = () => {
+    setShowConfirmModal(false)
+    setSelectedUser(null)
   }
 
   return (
@@ -63,8 +118,8 @@ const AccountManage = () => {
           <input
             type="text"
             placeholder="Tìm kiếm mã nhân viên, tên nhân viên"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -85,7 +140,7 @@ const AccountManage = () => {
           </select>
         </div>
 
-        {/* Add Account */}
+        {/* Add Account Button */}
         <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
           <span className="text-lg">+</span>
           <span>Thêm tài khoản</span>
@@ -115,8 +170,6 @@ const AccountManage = () => {
               </th>
             </tr>
           </thead>
-
-          
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredUsers.length === 0 ? (
               <tr>
@@ -127,24 +180,26 @@ const AccountManage = () => {
             ) : (
               filteredUsers.map((user, index) => (
                 <tr key={user?.id || index} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-normal text-sm font-medium text-gray-900">{user?.id || "N/A"}</td>
-                  {console.log(user)}
-                  <td className="px-6 py-4 whitespace-normal text-sm text-gray-900">{user?.fullname || "N/A"}</td>
-                  <td className="px-6 py-4 whitespace-normal text-sm">
-                    <span>{user?.rolename}</span>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user?.id || "N/A"}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user?.fullname || "N/A"}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span>{user?.role?.rolename || "N/A"}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user?.username || "N/A"}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
-                        user?.status === 1 ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                    <button
+                      onClick={() => handleStatusClick(user)}
+                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium transition-colors hover:opacity-80 ${
+                        user?.status === "1"
+                          ? "bg-green-100 text-green-800 hover:bg-green-200"
+                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                       }`}
                     >
-                      {user?.status === 1 ? "Active" : "Inactive"}
-                    </span>
+                      {user?.status === "1" ? "Active" : "Inactive"}
+                    </button>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex items-center gap-2 justify-center">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                    <div className="flex items-center justify-center gap-2">
                       <button className="text-gray-400 hover:text-gray-600 transition-colors">
                         <FontAwesomeIcon icon={faPenToSquare} className="h-4 w-4" />
                       </button>
@@ -179,6 +234,43 @@ const AccountManage = () => {
           </button>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Xác nhận thay đổi trạng thái</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Bạn có chắc chắn muốn thay đổi trạng thái của người dùng{" "}
+              <span className="font-medium text-gray-900">{selectedUser?.fullname}</span> từ{" "}
+              <span className={`font-medium ${selectedUser?.status === "1" ? "text-green-600" : "text-gray-600"}`}>
+                {selectedUser?.status === "1" ? "Active" : "Inactive"}
+              </span>{" "}
+              thành{" "}
+              <span className={`font-medium ${selectedUser?.status === "1" ? "text-gray-600" : "text-green-600"}`}>
+                {selectedUser?.status === "1" ? "Inactive" : "Active"}
+              </span>
+              ?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={handleCancelStatusChange}
+                disabled={isUpdating}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirmStatusChange}
+                disabled={isUpdating}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+              >
+                {isUpdating ? "Đang cập nhật..." : "Xác nhận"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
