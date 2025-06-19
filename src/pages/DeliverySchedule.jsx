@@ -4,23 +4,27 @@ import DeliveryList from "../components/delivery/DeliveryList"
 import { getUser } from "../backendCalls/user";
 import DeliveryForm from "../components/delivery/DeliveryForm";
 import { useParams } from "react-router-dom";
-import { getAllImportDelivery, getDeliveriesForOrder, getDeliveryDetail } from "../backendCalls/delivery";
+import { getAllExportDelivery, getAllImportDelivery, getDeliveriesForOrder, getDeliveryDetail } from "../backendCalls/delivery";
 
 
 const DeliverySchedule = ({ user, setUser }) => {
   const { act } = useParams();
 
-  const [orders, setOrders] = useState();
-  const [currentOrder, setCurrentOrder] = useState();
+  const [orders, setOrders] = useState(); //list big order. load 1 time
+  const [currentOrder, setCurrentOrder] = useState(); //hit 1 order, then load
   const [deliverySchedule, setDeliverySchedule] = useState([]);
   const [currentDelivery, setCurrentDelivery] = useState();
   const [currentDeliveryDetail, setCurrentDeliveryDetail] = useState();
+  const [reload, setReload] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
+      setDeliverySchedule([]);
+      setCurrentDelivery();
+      setCurrentDeliveryDetail();
       if (currentOrder) {
         const response = (await getDeliveriesForOrder(currentOrder.orderid)).data;
-        setDeliverySchedule(response.sort((a, b) => new Date(a.deliverydate) - new Date(b.deliverydate)));        
+        setDeliverySchedule(response.length > 0 ? response.sort((a, b) => new Date(a.deliverydate) - new Date(b.deliverydate)) : []);
       }
     }
 
@@ -29,9 +33,9 @@ const DeliverySchedule = ({ user, setUser }) => {
 
   useEffect(() => {
     const getData = async () => {
-      if (currentDelivery) {        
+      if (currentDelivery) {
         const response = await getDeliveryDetail(currentDelivery.id);
-        setCurrentDeliveryDetail(response.data);      
+        setCurrentDeliveryDetail(response.data);
       }
     }
 
@@ -50,7 +54,7 @@ const DeliverySchedule = ({ user, setUser }) => {
     }
 
     getData();
-  }, []);
+  }, [reload, setReload]);
 
   useEffect(() => {
     if (!user) {
@@ -72,6 +76,7 @@ const DeliverySchedule = ({ user, setUser }) => {
         <div className="flex-1 h-full">
           <h1 className="font-medium mb-2">Đơn hàng</h1>
           {orders && <OrderList
+            setReload={setReload}
             orders={orders} setOrders={setOrders}
             currentOrder={currentOrder}
             setCurrentOrder={setCurrentOrder}
@@ -85,6 +90,7 @@ const DeliverySchedule = ({ user, setUser }) => {
           </div>
 
           {currentOrder ? <DeliveryForm
+            setReload={setReload}
             currentOrder={currentOrder}
             currentDelivery={currentDelivery}
             setCurrentDelivery={setCurrentDelivery}
@@ -101,6 +107,7 @@ const DeliverySchedule = ({ user, setUser }) => {
 
       <div className="w-full h-1/6">
         {currentOrder && <DeliveryList
+          setReload={setReload}
           user={user}
           currentOrder={currentOrder}
           deliverySchedule={deliverySchedule}
