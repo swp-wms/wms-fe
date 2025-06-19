@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useRef,useState} from "react";
 
 const ProductSearch = ({
   inputProduct, // input valure for search bar
@@ -10,9 +10,25 @@ const ProductSearch = ({
   setSelectedProducts,
   setActiveTab // để show cái form tạo sản phẩm mới
 }) => {
+     const [showSuggestions, setShowSuggestions] = useState(false);
+     const inputRef = useRef(null);
+     const dropdownRef = useRef(null);
+      const handleBlur = () => {
+      setTimeout(() => {
+        if (
+          !inputRef.current?.contains(document.activeElement) &&
+          !dropdownRef.current?.contains(document.activeElement)
+        ) {
+          setShowSuggestions(false);
+        }
+      }, 100);
+    };
+
+
   const handleProductInputChange = (e) => {
     const value = e.target.value;
     setInputProduct(value);
+    console.log("productList", productList);
     const filteredSuggestions = productList.filter(
       product =>
         product.namedetail.trim().toLowerCase().includes(value.trim().toLowerCase()) ||
@@ -73,21 +89,29 @@ const ProductSearch = ({
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
+          ref={inputRef}
           type="text"
           placeholder="Tìm kiếm mã hàng hóa, tên hàng hóa"
           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={inputProduct}
           onChange={handleProductInputChange}
           onKeyDown={handleKeyDown}
-          
+          onBlur={handleBlur}
+          onFocus={() => setShowSuggestions(true)}
         />
-        {productFilteredSuggestions.length > 0 && (
-          <ul className="z-50 absolute w-full bg-white border border-gray-300 rounded mt-1 max-h-48 overflow-y-auto">
+        {showSuggestions && productFilteredSuggestions.length > 0 && (
+          <ul className="z-50 absolute w-full bg-white border border-gray-300 rounded mt-1 max-h-48 overflow-y-auto"
+          ref={dropdownRef}
+          tabIndex={-1}
+          onBlur={handleBlur}>
             {productFilteredSuggestions.map((product, index) => (
               <li key={index}>
                 <button
                   className="w-full text-left px-3 py-2 hover:bg-gray-100 focus:bg-gray-200"
-                  onClick={() => handleProductSelect(product)}
+                  onClick={() => {handleProductSelect(product)
+                    setShowSuggestions(false);
+                  }}
+                  onMouseDown={e => e.preventDefault()} // Prevent input blur before click
                 >
                   {product.brandname} - {product.namedetail}
                 </button>

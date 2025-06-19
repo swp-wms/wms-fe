@@ -308,6 +308,11 @@ return (
                             </option>
                           ))}
                         </select>
+                        {productErrors.partnerid && (
+                          <div className="text-red-500 text-xs mt-1">
+                            {productErrors.partnerid}
+                          </div>
+                        )}
                         </div>
 
                       {/* <div className="space-y-2">

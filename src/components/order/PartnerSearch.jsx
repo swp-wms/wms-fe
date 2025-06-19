@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 
 const PartnerSearch = ({
   inputpartner,
@@ -12,6 +12,23 @@ const PartnerSearch = ({
   setFocused,
   setActiveTab
 }) => {
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const inputRef = useRef(null);
+    const dropdownRef = useRef(null);
+
+
+  const handleBlur = () => {
+  setTimeout(() => {
+    if (
+      !inputRef.current?.contains(document.activeElement) &&
+      !dropdownRef.current?.contains(document.activeElement)
+    ) {
+      setShowSuggestions(false);
+    }
+  }, 100);
+};
+
+
   const handlePartnerInputChange = (e) => {
     const value = e.target.value;
     setInputpartner(value);
@@ -50,22 +67,32 @@ const PartnerSearch = ({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
+            ref={inputRef}
             type="text"
             placeholder="Tìm kiếm mã khách hàng, tên công ty"
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={inputpartner}
-            onChange={handlePartnerInputChange}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setTimeout(() => setFocused(false), 100)}
+            onChange={e => { handlePartnerInputChange(e); setShowSuggestions(true); }}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={handleBlur}
             onKeyDown={handleKeyDown}
           />
-          {partnerFilteredSuggestions.length > 0 && (
-            <ul className="z-50 absolute w-full bg-white border border-gray-300 rounded mt-1 max-h-48 overflow-y-auto">
+          {showSuggestions && partnerFilteredSuggestions.length > 0 && (
+            <ul
+              ref={dropdownRef}
+              tabIndex={-1}
+              className="z-50 absolute w-full bg-white border border-gray-300 rounded mt-1 max-h-48 overflow-y-auto"
+              onBlur={handleBlur}
+            >
               {partnerFilteredSuggestions.map((partner, index) => (
                 <li key={index}>
                   <button
                     className="w-full text-left px-3 py-2 hover:bg-gray-100 focus:bg-gray-200"
-                    onClick={() => handlePartnerSelect(partner)}
+                    onClick={() => {
+                      handlePartnerSelect(partner);
+                      setShowSuggestions(false);
+                    }}
+                    onMouseDown={e => e.preventDefault()} // Prevent input blur before click
                   >
                     {partner.id} - {partner.name}
                   </button>
@@ -73,7 +100,7 @@ const PartnerSearch = ({
               ))}
             </ul>
           )}
-          </div>
+        </div>
             <button className=" ml-1 size-9.5  aspect-square justify-center border border-gray-300 rounded text-sm bg-white hover:bg-gray-100 hover:border-gray-400 align-bottom "
             onClick={()=>setActiveTab('partner')}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 ml-1 text-gray-500" >

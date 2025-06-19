@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import partnerCalls from "../../backendCalls/partner";
 import catalogCalls from "../../backendCalls/catalog";
 import productCalls from "../../backendCalls/product";
+import  toast, {Toaster} from 'react-hot-toast';
 
 //INITIAL FORM VALUES FOR PARTNER
 const initialPartner = {
@@ -108,11 +109,21 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
 
     fetchCatalogs();
 
-    const handleProductChange = (e) => {
-
+    const fetchPartners = async () => {
+      try {
+        const partners = await partnerCalls.fetchPartners();
+        // console.log("Fetched partners:", partners);
+        // Filter out partners with empty id
+        const filteredPartners = partners.filter(partner => partner.id && partner.id.trim() !== "");
+        setPartnerList(filteredPartners);
+      } catch (error) {
+        console.error("Error fetching partners:", error);
+      }
     }
-    
-  }, []);
+
+    fetchPartners();
+
+  }, );
 
   useEffect(() => {
   if (activeTab === "product" && setShowForm) {
@@ -149,8 +160,9 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
   switch (name) {
     case "id":
       if (!value.trim()) return "Bắt buộc";
-      if (hasSpecialChars(value)) return "Không chứa ký tự đặc biệt";
-      if (Array.isArray(partnerList) && partnerList.some(item => item.id.trim() === value.trim())) return "Mã đã tồn tại";
+      else if (hasSpecialChars(value)) return "Không chứa ký tự đặc biệt";
+      else if (partnerList && partnerList.some(item => item.id.trim() === value.trim())) return "Mã đã tồn tại";
+      else return "";
       break;
     case "name":
       if (!value.trim()) return "Bắt buộc";
@@ -187,7 +199,7 @@ const validateProductField = (name, value) => {
     case "partnerid":
       if (value.trim() === "") return "Bắt buộc";
       // Check if partner exists in the list
-      if (!partnerList.some(partner => partner.id === value.trim())) return "Đối tác không tồn tại";
+      if (partnerList.some(partner => partner.id === value.trim())) return "Đối tác không tồn tại";
       break;
     case "name": // mã hàng
       if (!value.trim()) return "Bắt buộc";
@@ -257,6 +269,8 @@ const validateCatalogField = (name, value, catalog) => {
       newErrors[key] = errorMsg;
     });
     setPartnerErrors(newErrors);
+    if(!valid)
+      toast.error("Vui lòng điền đầy đủ thông tin đối tác");
     return valid;
   };
 
@@ -275,9 +289,9 @@ const validateProduct = () => {
 
   const catalogFields = ["brandname", "standard", "barsperbundle", "length", "weightpermeter", "weightperbundle", "type", "weightperroll"];
   catalogFields.forEach((key) => {
-    const errorMsg = validateCatalogField(key, catalog[key], catalog);
-    if (errorMsg) valid = false;
-    newCatalogErrors[key] = errorMsg;
+    const errorMsg2 = validateCatalogField(key, catalog[key], catalog);
+    if (errorMsg2) valid = false;
+    newCatalogErrors[key] = errorMsg2;
   })
   
 
@@ -299,8 +313,14 @@ const validateProduct = () => {
     }
   });
   console.log("Product Errors:", newErrors);
+  console.log("Catalog Errors:", newCatalogErrors);
   setCatalogErrors(newCatalogErrors);
   setProductErrors(newErrors);
+
+  if (!valid) {
+    toast.error("Vui lòng điền đầy đủ thông tin sản phẩm");
+  }
+
   return valid;
 };
 //-------------------------------------------
@@ -318,7 +338,7 @@ const validateProduct = () => {
     }
 
     // Reset error for the field being edited
-    // setPartnerErrors((prev) => ({ ...prev, [name]: "" }));
+    setPartnerErrors((prev) => ({ ...prev, [name]: "" }));
 
   }
 
@@ -396,27 +416,40 @@ const validateProduct = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (activeTab === 'partner') {
-      if(validate() ) partnerCalls.addPartner(partner);
+      if(validate() ){
+         partnerCalls.addPartner(partner);
+         toast.success("Thêm đối tác thành công");
+         setShowForm(false);
+      }
+      
       
     }else if (activeTab === 'product') {
       if(validateProduct()){
         if(isCatalogExists.current){
            productCalls.addProduct(product);
+          toast.success("Thêm sản phẩm thành công");
            setShowForm(false);
+           productCalls.fetchProducts()
         }
         
         else {
             console.log("Catalog: ",catalog);
             const log = catalogCalls.addCatalog(catalog)
+            console.log("catalog log: ",log)
+            
+
             .then(() => {
-              console.log(log);
-               console.log('add product:', product);
+              
+              console.log('add product:', product);
               productCalls.addProduct(product);
+              toast.success("Thêm sản phẩm thành công");
+              setShowForm(false);
+
             })
           }
         }
       }
-      setShowForm(false);
+      
   };
 
 
