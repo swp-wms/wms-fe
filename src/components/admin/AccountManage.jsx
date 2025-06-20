@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons"
+import { faPenToSquare, faSave, faBackward, faPlus } from "@fortawesome/free-solid-svg-icons"
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
-import { getAllUserInfo, updateUserInfo } from "../../backendCalls/userInfo"
+import { getAllUserInfo, updateUserInfo, createNewUser } from "../../backendCalls/userInfo"
 
 const AccountManage = () => {
   const [searchTerm, setSearchTerm] = useState("")
@@ -11,6 +11,26 @@ const AccountManage = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
+  const [editFormData, setEditFormData] = useState({
+    fullname: "",
+    username: "",
+    password: "",
+    role: "",
+  })
+  const [isEditUpdating, setIsEditUpdating] = useState(false)
+
+  // New states for create user functionality
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [createFormData, setCreateFormData] = useState({
+    fullname: "",
+    username: "",
+    password: "",
+    role: "",
+  })
+  const [isCreating, setIsCreating] = useState(false)
+  const [emailError, setEmailError] = useState("")
 
   useEffect(() => {
     const getData = async () => {
@@ -22,7 +42,6 @@ const AccountManage = () => {
         }
         const userData = response.data
 
-        // Debug: Kiểm tra cấu trúc dữ liệu
         console.log("API Response:", userData)
         if (userData && userData.length > 0) {
           console.log("First user status:", userData[0].status, typeof userData[0].status)
@@ -42,25 +61,18 @@ const AccountManage = () => {
       user?.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
       user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase())
 
-    const matchesPosition = selectedPosition === "" || user?.role === getRoleFromPosition(selectedPosition)
+    const matchesPosition = selectedPosition === "" || user?.role?.rolename === selectedPosition
 
     return matchesSearch && matchesPosition
   })
 
-  const getRoleFromPosition = (position) => {
-    switch (position) {
-      case "Salesman":
-        return 3
-      case "Warehouse Keeper":
-        return 4
-      case "Delivery Staff":
-        return 5
-      default:
-        return null
-    }
-  }
+  const positions = ["Salesman", "Warehouse Keeper", "Delivery Staff", "System admin"]
 
-  const positions = ["Salesman", "Warehouse Keeper", "Delivery Staff"]
+  // Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
 
   const handleStatusClick = (user) => {
     setSelectedUser(user)
@@ -72,18 +84,14 @@ const AccountManage = () => {
 
     setIsUpdating(true)
     try {
-      // Đảo ngược trạng thái: "1" -> "0", "0" -> "1"
       const newStatus = selectedUser.status === "1" ? "0" : "1"
-
       const updatedUserData = {
         ...selectedUser,
         status: newStatus,
       }
-      {}
       const response = await updateUserInfo(updatedUserData)
 
       if (response.status === 200) {
-        // Cập nhật state local
         setUsers((prevUsers) =>
           prevUsers.map((user) => (user.id === selectedUser.id ? { ...user, status: newStatus } : user)),
         )
@@ -104,6 +112,173 @@ const AccountManage = () => {
   const handleCancelStatusChange = () => {
     setShowConfirmModal(false)
     setSelectedUser(null)
+  }
+
+  const handleEditClick = (user) => {
+    setEditingUser(user)
+    setEditFormData({
+      fullname: user.fullname || "",
+      username: user.username || "",
+      password: "",
+      role: user.role?.rolename || "",
+    })
+    setShowEditModal(true)
+  }
+
+  const handleEditFormChange = (field, value) => {
+    setEditFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingUser) return
+
+    setIsEditUpdating(true)
+    try {
+      const updatedUserData = {
+        ...editingUser,
+        fullname: editFormData.fullname,
+        username: editFormData.username,
+        ...(editFormData.password && { password: editFormData.password }),
+        role: getRoleIdFromName(editFormData.role),
+      }
+
+      const response = await updateUserInfo(updatedUserData)
+
+      if (response.status === 200) {
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.id === editingUser.id
+              ? {
+                  ...user,
+                  ...updatedUserData,
+                  role: { ...user.role, rolename: editFormData.role },
+                }
+              : user,
+          ),
+        )
+        alert("Cập nhật thông tin thành công!")
+        setShowEditModal(false)
+        setEditingUser(null)
+      } else {
+        alert("Có lỗi xảy ra khi cập nhật thông tin!")
+      }
+    } catch (error) {
+      console.error("Error updating user info:", error)
+      alert("Có lỗi xảy ra khi cập nhật thông tin!")
+    } finally {
+      setIsEditUpdating(false)
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setShowEditModal(false)
+    setEditingUser(null)
+    setEditFormData({
+      fullname: "",
+      username: "",
+      password: "",
+      role: "",
+    })
+  }
+
+  // New create user handlers
+  const handleCreateClick = () => {
+    setCreateFormData({
+      fullname: "",
+      username: "",
+      password: "",
+      role: "",
+    })
+    setEmailError("")
+    setShowCreateModal(true)
+  }
+
+  const handleCreateFormChange = (field, value) => {
+    setCreateFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+
+    // Validate email for username field
+    if (field === "username") {
+      if (value && !validateEmail(value)) {
+        setEmailError("Tên đăng nhập phải có định dạng email hợp lệ")
+      } else {
+        setEmailError("")
+      }
+    }
+  }
+
+  const handleCreateUser = async () => {
+    // Validation
+    if (!createFormData.fullname || !createFormData.username || !createFormData.password || !createFormData.role) {
+      alert("Vui lòng điền đầy đủ thông tin!")
+      return
+    }
+
+    if (!validateEmail(createFormData.username)) {
+      alert("Tên đăng nhập phải có định dạng email hợp lệ!")
+      return
+    }
+
+    setIsCreating(true)
+    try {
+      const newUserData = {
+        fullname: createFormData.fullname,
+        username: createFormData.username,
+        password: createFormData.password,
+        role: getRoleIdFromName(createFormData.role),
+      }
+
+      const response = await createNewUser(newUserData)
+
+      if (response.status === 200 || response.status === 201) {
+        // Refresh user list
+        const getUsersResponse = await getAllUserInfo()
+        if (getUsersResponse.status === 200) {
+          setUsers(Array.isArray(getUsersResponse.data) ? getUsersResponse.data : [])
+        }
+
+        alert("Tạo tài khoản thành công!")
+        setShowCreateModal(false)
+      } else {
+        alert("Có lỗi xảy ra khi tạo tài khoản!")
+      }
+    } catch (error) {
+      console.error("Error creating user:", error)
+      alert("Có lỗi xảy ra khi tạo tài khoản!")
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
+  const handleCancelCreate = () => {
+    setShowCreateModal(false)
+    setCreateFormData({
+      fullname: "",
+      username: "",
+      password: "",
+      role: "",
+    })
+    setEmailError("")
+  }
+
+  const getRoleIdFromName = (roleName) => {
+    switch (roleName) {
+      case "Salesman":
+        return 3
+      case "Warehouse Keeper":
+        return 4
+      case "Delivery Staff":
+        return 5
+      case "System admin":
+        return 1
+      default:
+        return null
+    }
   }
 
   return (
@@ -141,7 +316,10 @@ const AccountManage = () => {
         </div>
 
         {/* Add Account Button */}
-        <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+        <button
+          onClick={handleCreateClick}
+          className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
           <span className="text-lg">+</span>
           <span>Thêm tài khoản</span>
         </button>
@@ -200,7 +378,10 @@ const AccountManage = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                     <div className="flex items-center justify-center gap-2">
-                      <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                      <button
+                        onClick={() => handleEditClick(user)}
+                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                      >
                         <FontAwesomeIcon icon={faPenToSquare} className="h-4 w-4" />
                       </button>
                     </div>
@@ -210,29 +391,6 @@ const AccountManage = () => {
             )}
           </tbody>
         </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-center mt-6">
-        <div className="flex items-center space-x-2">
-          <button className="p-2 text-gray-400 hover:text-gray-600">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <div className="flex space-x-1">
-            <button className="w-8 h-8 rounded bg-blue-500 text-white text-sm">1</button>
-            <button className="w-8 h-8 rounded text-gray-500 hover:bg-gray-100 text-sm">2</button>
-            <button className="w-8 h-8 rounded text-gray-500 hover:bg-gray-100 text-sm">3</button>
-            <span className="w-8 h-8 flex items-center justify-center text-gray-400">...</span>
-            <button className="w-8 h-8 rounded text-gray-500 hover:bg-gray-100 text-sm">10</button>
-          </div>
-          <button className="p-2 text-gray-400 hover:text-gray-600">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
       </div>
 
       {/* Confirmation Modal */}
@@ -267,6 +425,215 @@ const AccountManage = () => {
               >
                 {isUpdating ? "Đang cập nhật..." : "Xác nhận"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Form */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 relative">
+            <button
+              onClick={handleCancelEdit}
+              className="absolute top-4 right-4 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 text-lg font-bold"
+            >
+              ×
+            </button>
+
+            <div className="flex items-start gap-8">
+              {/* Avatar */}
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
+                  <svg className="w-12 h-12 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+
+                {/* Role dropdown */}
+                <div className="w-40">
+                  <select
+                    value={editFormData.role}
+                    onChange={(e) => handleEditFormChange("role", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  >
+                    <option value="">Chọn vị trí</option>
+                    {positions.map((position) => (
+                      <option key={position} value={position}>
+                        {position}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Form fields */}
+              <div className="flex-1 space-y-4">
+                <div className="flex items-center gap-4">
+                  <label className="w-32 text-sm font-medium text-gray-700">MÃ NHÂN VIÊN:</label>
+                  <input
+                    type="text"
+                    value={editingUser?.id || ""}
+                    disabled
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
+                  />
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <label className="w-32 text-sm font-medium text-gray-700">TÊN NHÂN VIÊN:</label>
+                  <input
+                    type="text"
+                    value={editFormData.fullname}
+                    onChange={(e) => handleEditFormChange("fullname", e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <label className="w-32 text-sm font-medium text-gray-700">TÊN ĐĂNG NHẬP:</label>
+                  <input
+                    type="text"
+                    value={editFormData.username}
+                    onChange={(e) => handleEditFormChange("username", e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <label className="w-32 text-sm font-medium text-gray-700">MẬT KHẨU:</label>
+                  <input
+                    type="password"
+                    value={editFormData.password}
+                    onChange={(e) => handleEditFormChange("password", e.target.value)}
+                    placeholder="Để trống nếu không muốn thay đổi"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={isEditUpdating}
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 min-w-[100px]"
+                >
+                  <FontAwesomeIcon icon={faSave} />
+                  <span>{isEditUpdating ? "Đang lưu..." : "Lưu"}</span>
+                </button>
+
+                <button
+                  onClick={handleCancelEdit}
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 min-w-[100px]"
+                >
+                  <FontAwesomeIcon icon={faBackward} />
+                  <span>Quay lại</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create User Form */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 relative">
+
+            <div className="flex items-start gap-8">
+              {/* Avatar */}
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
+                  <svg className="w-12 h-12 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+
+                {/* Roles */}
+                <div className="w-40">
+                  <select
+                    value={createFormData.role}
+                    onChange={(e) => handleCreateFormChange("role", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  >
+                    <option value="">Chọn vị trí</option>
+                    {positions.map((position) => (
+                      <option key={position} value={position}>
+                        {position}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Form fields */}
+              <div className="flex-1 space-y-4">
+                <div className="flex items-center gap-4">
+                  <label className="w-32 text-sm font-medium text-gray-700">TÊN NHÂN VIÊN:</label>
+                  <input
+                    type="text"
+                    value={createFormData.fullname}
+                    onChange={(e) => handleCreateFormChange("fullname", e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Nhập tên nhân viên"
+                  />
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <label className="w-32 text-sm font-medium text-gray-700">TÊN ĐĂNG NHẬP:</label>
+                  <div className="flex-1">
+                    <input
+                      type="email"
+                      value={createFormData.username}
+                      onChange={(e) => handleCreateFormChange("username", e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        emailError ? "border-red-500" : "border-gray-300"
+                      }`}
+                      placeholder="example@email.com"
+                    />
+                    {emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <label className="w-32 text-sm font-medium text-gray-700">MẬT KHẨU:</label>
+                  <input
+                    type="password"
+                    value={createFormData.password}
+                    onChange={(e) => handleCreateFormChange("password", e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Nhập mật khẩu"
+                  />
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={handleCreateUser}
+                  disabled={isCreating || emailError}
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 min-w-[100px]"
+                >
+                  <FontAwesomeIcon icon={faPlus} />
+                  <span>{isCreating ? "Đang tạo..." : "Tạo"}</span>
+                </button>
+
+                <button
+                  onClick={handleCancelCreate}
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 min-w-[100px]"
+                >
+                  <FontAwesomeIcon icon={faBackward} />
+                  <span>Quay lại</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

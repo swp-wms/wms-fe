@@ -6,6 +6,7 @@ export const api = {
     REGISTER: `${baseUrl}/register`,
 
     //user API
+    CREATE_USER: `${baseUrl}/users`,
     GET_ALL_USER: `${baseUrl}/users`,
     GET_USER: `${baseUrl}/users/me`,
     UPDATE_USER: (userid) => `${baseUrl}/users/${userid}`,

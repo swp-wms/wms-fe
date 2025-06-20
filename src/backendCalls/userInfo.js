@@ -52,4 +52,19 @@ export const getAllUserInfo = async () => {
     }
 }
 
+export const createNewUser = async (newUserData) => {
+    try {
+        const response = await axios.post(api.CREATE_USER, newUserData, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        console.log(response);
+
+        return response;
+    } catch (error) {
+        return error;
+    }
+}
+
 export default getUserInfo;
