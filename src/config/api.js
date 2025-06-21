@@ -14,6 +14,8 @@ export const api = {
   GET_EXPORT_ORDER: `${baseUrl}/orders/export`,
   GET_ORDER_DETAIL: `${baseUrl}/detail`,
   CREATE_ORDER: `${baseUrl}/orders/`,
+  GET_REMAIN_QUANTITY: (orderid) => `${baseUrl}/detail/${orderid}/remain`,
+  CHECK_COMPLETE: (orderid) => `${baseUrl}/orders/${orderid}/complete`,
 
   //partner API
   GET_PARTNERS: `${baseUrl}/partners`,
@@ -22,7 +24,6 @@ export const api = {
   //product API
   GET_PRODUCTS: `${baseUrl}/products`,
   ADD_PRODUCT: `${baseUrl}/products`,
-  GET_REMAIN_QUANTITY: (orderid) => `${baseUrl}/detail/${orderid}/remain`,
 
 
   //warehouse API
@@ -43,6 +44,7 @@ export const api = {
   GET_CATALOGS: `${baseUrl}/catalog`,
   ADD_CATALOG: `${baseUrl}/catalog`,
 
+  // DELIVERY API
   GET_IMPORT_DELIVERY: `${baseUrl}/delivery/import`,
   GET_EXPORT_DELIVERY: `${baseUrl}/delivery/export`,
   GET_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,
@@ -51,6 +53,7 @@ export const api = {
   ADD_TRUCK_FOR_DELIVERY: (deliveryid) => `${baseUrl}/delivery/${deliveryid}`,
   APPROVE_TRUCK: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/approve`,
   IS_DELIVERYING: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/is-deliverying`,
+  COMPLETE: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/complete`,
   NOT_ENOUGH_TRUCK: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/not-enough-truck`,
   UPDATE_REAL_DELIVERY_DATA: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/real`,
 }

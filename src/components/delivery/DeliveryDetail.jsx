@@ -1,5 +1,6 @@
 import { faCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { deliveryStatus } from '../../data/deliveryStatus'
 
 const DeliveryDetail = ({ delivery, setCurrentDelivery, currentDelivery }) => {
     return (
@@ -11,11 +12,7 @@ const DeliveryDetail = ({ delivery, setCurrentDelivery, currentDelivery }) => {
                 <p className='text-[10px]'>Code:{delivery.id}</p>
             </div>
             {delivery.deliverystatus !== null && <FontAwesomeIcon icon={faCircle} className={`absolute top-[-5px] right-[-5px] 
-                ${delivery.deliverystatus === '-1' ? 'text-red-500'
-                    : delivery.deliverystatus === '2' ? "text-green-900"
-                        : delivery.deliverystatus === '-2' ? "text-yellow-300"
-                            : delivery.deliverystatus === '1' ? "text-blue-400"
-                                : "text-transparent"}`} />}
+                ${(deliveryStatus.find(d => d.id === delivery.deliverystatus)).color}`} />}
         </div>
     )
 }

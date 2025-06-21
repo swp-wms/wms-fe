@@ -108,25 +108,25 @@ export const handleConfirmNotEnoughTruck = async (deliveryid) => {
         return error;
     }
 }
-export const handleIsDeliverying = async (deliveryid) => {
+export const handleIsDeliverying = async (deliveryid, act) => {
     try {
         console.log(hi);
-        
+
         const response = await axios.put(api.IS_DELIVERYING(deliveryid), {}, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
         });
         console.log(response);
-        
+
         return response;
     } catch (error) {
         return error;
     }
 }
-export const handleUpdateRealData = async (deliveryid, realData) => {
+export const handleUpdateRealData = async (deliveryid, realData, act) => {
     try {
-        const response = await axios.put(api.UPDATE_REAL_DELIVERY_DATA(deliveryid), realData, {
+        const response = await axios.put(api.UPDATE_REAL_DELIVERY_DATA(deliveryid), { realData, act }, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }

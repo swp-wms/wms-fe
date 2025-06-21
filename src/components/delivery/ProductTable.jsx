@@ -8,7 +8,7 @@ const ProductTable = ({
     currentOrder,
     currentDelivery, currentDeliveryDetail,
     setCurrentDeliveryDetail,
-    user,
+    user, act,
     newDeliveryList, setNewDeliveryList
 }) => {
     const [show, setShow] = useState(false);
@@ -27,15 +27,21 @@ const ProductTable = ({
                 realnumberofbars: c.realnumberofbars,
                 realtotalweight: c.realtotalweight
             }
-        });        
+        });
+
+        for (let index = 0; index < realData.length; index++) {
+            if(realData[index].productid === null || realData[index].realnumberofbars === null || realData[index].realtotalweight === null) {
+                return setError("Vui lòng nhập đầy đủ thông tin về khối lượng thực tế và số lượng thực tế.");
+            }
+        }
 
         try {
-            await handleUpdateRealData(currentDelivery.id, realData);
+            await handleUpdateRealData(currentDelivery.id, realData, act);
             setError();
             window.location.reload();
         } catch (error) {
             console.log(error);
-            
+
             setError(error.response.data.message);
         }
     }
@@ -139,7 +145,9 @@ const ProductTable = ({
                                 {d.numberofbars}
                             </td>
                             <td className='real-bar border-[1px] border-black text-center'>
-                                {(user.roleid === 4 && currentDelivery.deliverystatus === '4') ? (
+                                {(user.roleid === 4 &&
+                                    ((currentDelivery.deliverystatus === '4' && act === 'nhap') || (currentDelivery.deliverystatus === '3' && act === 'xuat'))
+                                ) ? (
                                     <input
                                         onChange={(e) => {
                                             setCurrentDeliveryDetail(
@@ -161,7 +169,9 @@ const ProductTable = ({
                                 {Number(d.totalweight).toFixed(2)}
                             </td>
                             <td className='real-weight border-[1px] border-black text-center'>
-                                {(user.roleid === 4 && currentDelivery.deliverystatus === '4') ? (
+                                {(user.roleid === 4
+                                    && ((currentDelivery.deliverystatus === '4' && act === 'nhap') || (currentDelivery.deliverystatus === '3' && act === 'xuat'))
+                                ) ? (
                                     <input
                                         onChange={(e) => {
                                             setCurrentDeliveryDetail(
@@ -297,9 +307,10 @@ const ProductTable = ({
                 </tbody>
             </table>
             <p className="text-red-700 font-medium text-center my-2">{error}</p>
-            {user.roleid === 4 && currentDelivery && currentDelivery.deliverystatus === '4' && <div className="flex justify-end">
-                <button className="btn p-2 px-4" onClick={(e) => handleConfirmCompleteDelivery(e)}>Xác nhận</button>
-            </div>}
+            {user.roleid === 4 && currentDelivery
+                && ((currentDelivery.deliverystatus === '4' && act === 'nhap') || (currentDelivery.deliverystatus === '3' && act === 'xuat')) && <div className="flex justify-end">
+                    <button className="btn p-2 px-4" onClick={(e) => handleConfirmCompleteDelivery(e)}>Xác nhận</button>
+                </div>}
         </div>
     )
 }

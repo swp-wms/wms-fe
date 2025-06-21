@@ -15,7 +15,6 @@ const DeliverySchedule = ({ user, setUser }) => {
   const [deliverySchedule, setDeliverySchedule] = useState([]);
   const [currentDelivery, setCurrentDelivery] = useState();
   const [currentDeliveryDetail, setCurrentDeliveryDetail] = useState();
-  const [reload, setReload] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -54,7 +53,7 @@ const DeliverySchedule = ({ user, setUser }) => {
     }
 
     getData();
-  }, [reload, setReload]);
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -74,12 +73,12 @@ const DeliverySchedule = ({ user, setUser }) => {
     <div className="DeliverySchedule fixed bottom-0 right-0 top-[80px] left-[23%]">
       <div className="w-full h-5/6 p-[20px] flex">
         <div className="flex-1 h-full">
-          <h1 className="font-medium mb-2">Đơn hàng</h1>
+          <h1 className="font-medium mb-2">Đơn {act === 'nhap' ? 'nhập' : 'xuất'} hàng</h1>
           {orders && <OrderList
-            setReload={setReload}
             orders={orders} setOrders={setOrders}
             currentOrder={currentOrder}
             setCurrentOrder={setCurrentOrder}
+            user={user}
           />}
         </div>
         {/* table */}
@@ -90,13 +89,13 @@ const DeliverySchedule = ({ user, setUser }) => {
           </div>
 
           {currentOrder ? <DeliveryForm
-            setReload={setReload}
             currentOrder={currentOrder}
             currentDelivery={currentDelivery}
             setCurrentDelivery={setCurrentDelivery}
             currentDeliveryDetail={currentDeliveryDetail}
             setCurrentDeliveryDetail={setCurrentDeliveryDetail}
             user={user}
+            act={act}
           /> : (
             <div className="h-[90%] bg-white flex items-center justify-center text-[#999] rounded">
               <h1 className="font-medium">Chưa đơn hàng nào được chọn.</h1>
@@ -107,7 +106,6 @@ const DeliverySchedule = ({ user, setUser }) => {
 
       <div className="w-full h-1/6">
         {currentOrder && <DeliveryList
-          setReload={setReload}
           user={user}
           currentOrder={currentOrder}
           deliverySchedule={deliverySchedule}

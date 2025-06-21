@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { deliveryStatus } from '../../data/deliveryStatus'
-import { handleIsDeliverying } from '../../backendCalls/delivery';
 import axios from 'axios';
 import { api } from '../../config/api';
-const StatusButton = ({ currentDelivery, user, setCurrentDelivery }) => {
+const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
     const [status, setStatus] = useState();
     const [error, setError] = useState();
 
@@ -19,14 +18,24 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery }) => {
             return;
         }
         try {
-            await axios.put(api.IS_DELIVERYING(currentDelivery.id), {}, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            if (status === '3') {
+                await axios.put(api.IS_DELIVERYING(currentDelivery.id), { act }, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+            }
+            if (status === '4') {
+                await axios.put(api.COMPLETE(currentDelivery.id), { act }, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                }); 
+            }
+            
             window.location.reload();
         } catch (error) {
-            setError("Có lỗi xảy ra. Vui lòng thử lại sau");
+            setError(error.response.data.message);
         }
     }
 

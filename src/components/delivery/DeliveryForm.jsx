@@ -10,6 +10,7 @@ const DeliveryForm = ({
     currentOrder, 
     currentDelivery = null, setCurrentDelivery,
     currentDeliveryDetail = null, setCurrentDeliveryDetail,
+    act,
     user }) => {
 
     const [newDelivery, setNewDelivery] = useState({}); //1 delivery
@@ -112,7 +113,11 @@ const DeliveryForm = ({
                         />}
                 </div>
             </div>
-            {currentDelivery && <StatusButton setCurrentDelivery={setCurrentDelivery} currentDelivery={currentDelivery} user={user}/>}
+            {currentDelivery && <StatusButton 
+                setCurrentDelivery={setCurrentDelivery} 
+                currentDelivery={currentDelivery} user={user}
+                act={act}    
+            />}
 
             {currentOrder && <ProductTable
                 newDeliveryList={newDeliveryList}
@@ -123,7 +128,7 @@ const DeliveryForm = ({
                 currentDelivery={currentDelivery}
                 currentDeliveryDetail={currentDeliveryDetail}
                 setCurrentDeliveryDetail={setCurrentDeliveryDetail}
-                user={user}
+                user={user} act={act}
             />}
 
             {currentDelivery && <DriverInfo
