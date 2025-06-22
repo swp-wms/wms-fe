@@ -1,6 +1,7 @@
 import React, {useState,useEffect, use} from "react";
+import toast, { Toaster } from 'react-hot-toast';
 
-const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalBars, totalWeight }) => {
+const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBars, totalWeight, delivery, setDelivery }) => {
   // Handler for changing product fields (e.g. quantity)
   
   // useEffect(() => {
@@ -19,6 +20,21 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
   //     setSelectedProducts(Array.from(filtered.values()).sort((a,b) => a.trueId - b.trueId));
   //   } 
   // }, [selectedProducts, setSelectedProducts]);
+  console.log("Selected Products:", selectedProducts);
+
+  const isAddedToDelivery = (id) =>{
+    console.log("The id: ",id)
+    //find if the orderDetail with the given id is in the delivery 
+    delivery.some(
+      item => {
+        // item.id === id;
+        console.log("Item in delivery: ",item.deliverydetail.orderdetailid);
+        return item.orderdetailid === id;
+      }
+    );
+  }
+
+
   const handleProductFieldChange = (id, field, value) => {
     if (
       (field === "numberofbars" || field === "weight") &&
@@ -83,19 +99,25 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
    
   };
 
-  const deleteProduct = (id) =>{
-    const updatedProducts = selectedProducts.filter(product => product.trueId !== id).sort ((a,b) => {
-      if(a.trueId < b.trueId) return -1;
-      if(a.trueId > b.trueId) return 1;
-      return 0;
-    });
+  const deleteProduct = (item) =>{
+    if(isAddedToDelivery(item.id) ) {
+      toast.error("Không thể xóa sản phẩm đã được thêm vào đơn giao hàng");
+      return;
+    } else {
+      const updatedProducts = selectedProducts.filter(product => product.trueId !== item.trueId).sort ((a,b) => {
+        if(a.trueId < b.trueId) return -1;
+        if(a.trueId > b.trueId) return 1;
+        return 0;
+      });
+      
 
-    selectedProducts.forEach((product, index) =>{
-      if(product.trueId > id) 
-        product.trueId = product.trueId - 1; // Decrement trueId for products after the deleted one
-    });
+      selectedProducts.forEach((product, index) =>{
+        if(product.trueId > item.trueId) 
+          product.trueId = product.trueId - 1; // Decrement trueId for products after the deleted one
+      });
 
-    setSelectedProducts(updatedProducts);
+      setSelectedProducts(updatedProducts);
+    }
   }
 
   const addBlankProduct = () => {
@@ -223,7 +245,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
                   <svg xmlns="http://www.w3.org/2000/svg" 
                   viewBox="0 0 24 24" fill="currentColor" 
                   className="size-4 hover:cursor-pointer text-red-700"
-                  onClick={() => deleteProduct(product.trueId)}>
+                  onClick={() => deleteProduct(product)}>
                     <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z" clipRule="evenodd" />
                   </svg>
 
@@ -263,4 +285,4 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
   );
 };
 
-export default OrderTable;
+export default EditTable;

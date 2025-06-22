@@ -2,18 +2,33 @@ import React from "react";
 
 import {useState} from "react";
 import order from '../backendCalls/order';
-import { useParams,Link } from "react-router-dom";
-const OrderForm = () =>{
+import { useParams,Link,useNavigate } from "react-router-dom";
+import { getUser } from "../backendCalls/user";
+
+
+const OrderForm = ({user, setUser}) =>{
 const [orderDetail, setOrderDetail] = useState({});
+const navigate = useNavigate();
 
 const { id } = useParams();
 
   React.useEffect(() => {
+    if(!user){const getData = async () => {
+                  const response = await getUser();
+                  if (response.status!==200) {
+                    window.location.href = '/dang-nhap';
+                  }
+                  const user = response.data;
+                  setUser(user);
+                }
+                getData();
+              }
     const fetchOrderDetails = async () => {
       try {
         const response = await order.getOrderDetail(id);
-        console.log("Order Detail:", response);
-        setOrderDetail(response);
+        
+        setOrderDetail(response[0]);
+        
       } catch (error) {
         console.error("Error fetching order details:", error);
       }
@@ -29,6 +44,10 @@ const { id } = useParams();
       
     });
     return sum;
+  }
+
+  const handleEdit = () => {
+    navigate(`${window.location.pathname}/cap-nhat`, { state: { orderDetail, id } });
   }
     return(
       <>
@@ -84,7 +103,7 @@ const { id } = useParams();
             </div>
 
             {/* Right Column */}
-            <div className="col-span-6">
+            <div className="col-span-6 space-y-4">
             <div className="h-full bg-white border-2 border-gray-800 rounded-lg overflow-hidden">
               
               {/* Table */}
@@ -102,12 +121,12 @@ const { id } = useParams();
                     </tr>
                   </thead>
                   <tbody>
-                    {orderDetail?.detail?.map((item, index) => (
+                    {orderDetail?.orderdetail?.map((item, index) => (
                       <tr className="hover:bg-gray-50" key={index}>
                         <td className="border border-gray-800 px-2 py-2 text-xs text-black">{index + 1}</td>
-                        <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.name}</td>
-                        <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.namedetail}</td>
-                        <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.length}</td>
+                        <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.product.name}</td>
+                        <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.product.namedetail}</td>
+                        <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.product.catalog.length}</td>
                         <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.numberofbars}</td>
                         <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.weight}</td>
                         <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.note}</td>
@@ -115,8 +134,8 @@ const { id } = useParams();
                     ))}
                     <tr>
                       <td className="border border-gray-800 px-2 py-2 pl-15 text-xs font-bold text-black w-12" colSpan={4}>Tổng cộng</td>
-                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{total(orderDetail?.detail || [], 'numberofbars')}</td>
-                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{Number(total(orderDetail?.detail || [], 'weight')).toFixed(2)}</td>
+                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{total(orderDetail?.orderdetail || [], 'numberofbars')}</td>
+                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{Number(total(orderDetail?.orderdetail || [], 'weight')).toFixed(2)}</td>
                       <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12"></td>
 
                     </tr>
@@ -147,7 +166,7 @@ const { id } = useParams();
                     </svg>
                     Hủy đơn hàng
                   </button>
-                  <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg">
+                  <button onClick={handleEdit} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg">
                     <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>

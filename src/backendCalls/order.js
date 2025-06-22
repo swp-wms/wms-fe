@@ -60,9 +60,24 @@ const createImportOrder = async (orderData) => {
     }
 }
 
+const fetchDeliveryDetails = async (id) => {
+    try {
+        const response = await axios.get(`${api.GET_DELIVERY_DETAIL_FOR_UPDATE_ORDER}/${id}`,{
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching delivery details:", error);
+        throw error;
+    }
+}
+
 export default {
     getImportOrder,
     getExportOrder,
     getOrderDetail,
-    createImportOrder
+    createImportOrder,
+    fetchDeliveryDetails
 }

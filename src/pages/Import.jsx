@@ -92,20 +92,25 @@ const ImportOrder = ({user, setUser}) => {
                                         </svg>
 
 
-                                        <span className="text-[12px] font-medium text-gray-500">Số lượng</span>
+                                        <span className="text-[12px] font-medium text-gray-500">Số cây - Khối lượng</span>
                                     </div>
-                                    <p className="text-xs text-gray-800 font-medium pl-6">{total(order.orderdetail,"numberofbars")}</p>
+                                    <p className="text-xs text-gray-800 font-medium pl-6">{total(order.orderdetail,"numberofbars")} cây - {Number(total(order.orderdetail,"weight")).toFixed(1)} kg</p>
                                 </div>
 
                                 <div className="flex flex-col gap-1">
                                     <div className="flex items-center gap-1">
-                                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5 text-gray-500">
-                                        <path fillRule="evenodd" d="M10 2a.75.75 0 0 1 .75.75v.258a33.186 33.186 0 0 1 6.668.83.75.75 0 0 1-.336 1.461 31.28 31.28 0 0 0-1.103-.232l1.702 7.545a.75.75 0 0 1-.387.832A4.981 4.981 0 0 1 15 14c-.825 0-1.606-.2-2.294-.556a.75.75 0 0 1-.387-.832l1.77-7.849a31.743 31.743 0 0 0-3.339-.254v11.505a20.01 20.01 0 0 1 3.78.501.75.75 0 1 1-.339 1.462A18.558 18.558 0 0 0 10 17.5c-1.442 0-2.845.165-4.191.477a.75.75 0 0 1-.338-1.462 20.01 20.01 0 0 1 3.779-.501V4.509c-1.129.026-2.243.112-3.34.254l1.771 7.85a.75.75 0 0 1-.387.83A4.98 4.98 0 0 1 5 14a4.98 4.98 0 0 1-2.294-.556.75.75 0 0 1-.387-.832L4.02 5.067c-.37.07-.738.148-1.103.232a.75.75 0 0 1-.336-1.462 32.845 32.845 0 0 1 6.668-.829V2.75A.75.75 0 0 1 10 2ZM5 7.543 3.92 12.33a3.499 3.499 0 0 0 2.16 0L5 7.543Zm10 0-1.08 4.787a3.498 3.498 0 0 0 2.16 0L15 7.543Z" clipRule="evenodd" />
+                                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 text-gray-500">
+                                        <path fillRule="evenodd" d="M2.25 13.5a8.25 8.25 0 0 1 8.25-8.25.75.75 0 0 1 .75.75v6.75H18a.75.75 0 0 1 .75.75 8.25 8.25 0 0 1-16.5 0Z" clipRule="evenodd" />
+                                        <path fillRule="evenodd" d="M12.75 3a.75.75 0 0 1 .75-.75 8.25 8.25 0 0 1 8.25 8.25.75.75 0 0 1-.75.75h-7.5a.75.75 0 0 1-.75-.75V3Z" clipRule="evenodd" />
                                         </svg>
 
-                                        <span className="text-[12px] font-medium text-gray-500">Trọng lượng</span>
+
+
+                                        <span className="text-[12px] font-medium text-gray-500">Trạng thái</span>
                                     </div>
-                                    <p className="text-xs text-gray-800 font-medium pl-6">{Number(total(order.orderdetail,"weight")).toFixed(1)} kg</p>
+                                    <div className="flex w-full h-4 bg-gray-200 rounded-full overflow-hidden dark:bg-neutral-700" role="progressbar" aria-valuenow="{order.status.match(/(\d+(\.\d+)?)(?=%)/)[0]}" aria-valuemin="0" aria-valuemax="100">
+                                        <div className="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap dark:bg-blue-500 transition duration-500" style={{ width: "{order.status}" }}>{order.status}</div>
+                                    </div>
                                 </div>
                         <Link to={`/nhap-hang/${order.id}`} className="w-[80%] h-12 bg-white hover:bg-gray-100 border-2  border-gray-100 hover:border-gray-400  rounded-md flex gap-2 self-center justify-self-center  place-content-center justify-evenly content-around shadow-lg">
                             <FontAwesomeIcon className="h-full place-self-center text-[#1e1e1e]" icon={faArrowUpRightFromSquare} />

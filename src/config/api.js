@@ -14,6 +14,7 @@ export const api = {
     GET_EXPORT_ORDER: `${baseUrl}/orders/export`,
     GET_ORDER_DETAIL: `${baseUrl}/detail`,
     CREATE_ORDER: `${baseUrl}/orders/`,
+    GET_DELIVERY_DETAIL_FOR_UPDATE_ORDER: `${baseUrl}/orders/delivery`,
 
     //partner API
     GET_PARTNERS: `${baseUrl}/partners`,
