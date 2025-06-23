@@ -21,7 +21,7 @@ const sideElement = [
       icon: faShapes,
       path: "/tong-quan-kho",
       name: "Tổng quan kho",
-      allowed: [3, 4, 5]
+      allowed: [3, 4]
     },
     {
       id: 2,

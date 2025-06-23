@@ -4,14 +4,18 @@ import ProductTable from './ProductTable'
 import DriverInfo from './DriverInfo'
 import { useState } from 'react'
 import { handleApproveTruck, handleCreateDelivery } from '../../backendCalls/delivery'
-import { deliveryStatus } from '../../data/deliveryStatus'
+import StatusButton from './StatusButton'
 
-const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDetail = null, user }) => {
-    // const { deliverydate, deliverytime, gettime, getdate, note, listDeliveryDetail } = req.body;
+const DeliveryForm = ({ 
+    currentOrder, 
+    currentDelivery = null, setCurrentDelivery,
+    currentDeliveryDetail = null, setCurrentDeliveryDetail,
+    act,
+    user }) => {
 
-    const [newDelivery, setNewDelivery] = useState({});
+    const [newDelivery, setNewDelivery] = useState({}); //1 delivery
 
-    const [newDeliveryList, setNewDeliveryList] = useState([]);
+    const [newDeliveryList, setNewDeliveryList] = useState([]);  //product list of delivery
     const [error, setError] = useState();
 
     const createDelivery = async (e) => {
@@ -109,11 +113,11 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
                         />}
                 </div>
             </div>
-            {currentDelivery && <div className="flex justify-end">
-                <p
-                    className={`w-fit border-[1px] rounded-full py-2 mt-2 px-4 bg-[var(--fill-color)] border-black`}
-                >{(deliveryStatus.find(d => d.id === currentDelivery.deliverystatus)).name}</p>
-            </div>}
+            {currentDelivery && <StatusButton 
+                setCurrentDelivery={setCurrentDelivery} 
+                currentDelivery={currentDelivery} user={user}
+                act={act}    
+            />}
 
             {currentOrder && <ProductTable
                 newDeliveryList={newDeliveryList}
@@ -123,7 +127,8 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
                 setNewDelivery={setNewDelivery}
                 currentDelivery={currentDelivery}
                 currentDeliveryDetail={currentDeliveryDetail}
-                user={user}
+                setCurrentDeliveryDetail={setCurrentDeliveryDetail}
+                user={user} act={act}
             />}
 
             {currentDelivery && <DriverInfo
@@ -133,7 +138,7 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
 
             <p className="text-red-700 font-medium text-center my-2">{error}</p>
 
-            {!currentDelivery && user.roleid === 3 && <div className="absolute flex gap-3 bottom-[20px] right-[20px]">
+            {!currentDelivery && user.roleid === 3 && <div className="flex justify-end gap-3">
                 <button className='btn px-4 py-2' onClick={(e) => createDelivery(e)}>
                     <FontAwesomeIcon icon={faPlusCircle} className='mr-2' />
                     Thêm
@@ -143,14 +148,14 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
                     Hủy
                 </button>
             </div>}
-            {currentDelivery && currentDelivery.deliverystatus === '2' && user.roleid === 3 && <div className="absolute flex gap-3 bottom-[20px] right-[20px]">
+            {currentDelivery && currentDelivery.deliverystatus === '2' && user.roleid === 3 && <div className="flex justify-end gap-3">
                 <button className='btn px-4 py-2 '
-                    onClick={(e) => {handleApprove(e)}}>
+                    onClick={(e) => { handleApprove(e) }}>
                     <FontAwesomeIcon icon={faPlusCircle} className='mr-2' />
                     Duyệt
                 </button>
                 <button className='btn px-4 py-2 '
-                    onClick={(e) => {handleReject(e)}}
+                    onClick={(e) => { handleReject(e) }}
                 >
                     <FontAwesomeIcon icon={faCancel} className='mr-2' />
                     Từ chối

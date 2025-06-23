@@ -72,7 +72,7 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
       try{
         const response = await orderCalls.fetchDeliveryDetails(orderId);
         setDelivery(response);
-        console.log("Delivery Details:", response);
+        
       }catch(error){
         console.error("Error fetching delivery details:", error);
       }
@@ -81,48 +81,46 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
     fetchProducts();
     fetchDeliveryDetails();
     setSelectedPartner(orderDetail.partner || null);
-  setSelectedProducts(orderDetail?.orderdetail.map((item,index) => {
-      let obj = {
-        ...item,
-        ...item.product,
-        trueId : index+1}
-      return obj;
-  }));
+    setSelectedProducts(orderDetail.orderdetail.map((item,index) => {
+        console.log ("Item id: " ,item.id )
+        let obj = {
+          ...item,
+          orderdetailid:item.id,
+          ...item.product,
+          trueId : index+1}
+        return obj;
+    }));
 
-   
+  
   },[]);
 
+ 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedPartner || !selectedProducts || selectedProducts.length === 0) {
+      alert("Please select a partner and at least one product.");
+      return;
+    }
+    // Here you would typically send the order data to your backend
+    const orderData = {
+      
+      partnerid: selectedPartner?.id,
+      address: selectedPartner?.address,
+      note:"",
 
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (!selectedPartner || !selectedProducts || selectedProducts.length === 0) {
-//       alert("Please select a partner and at least one product.");
-//       return;
-//     }
-//     // Here you would typically send the order data to your backend
-//     const orderData = {
-//       type: "I",
-//       partnerid: selectedPartner?.id,
-//       address: selectedPartner?.address,
-//       totalbars: totalBars,
-//       totalweight: totalWeight,
-//       date: new Date().toISOString(),
-//       salesmanid: user.id,
-//       note:"",
-
-//       orderdetail: selectedProducts.map(product => ({
-//         productid: product?.id,
-//         numberofbars: product?.numberofbars,
-//         weight: product?.weight
+      orderdetail: selectedProducts.map(product => ({
+        id: product?.orderdetailid,
+        productid: product?.id,
+        numberofbars: product?.numberofbars,
+        weight: product?.weight
         
-//         }))
-//     };
-//     console.log("Order Data:", orderData);
-//     orderCalls.createImportOrder(orderData);
-//     setSelectedProducts([]);
-//     setSelectedPartner(null);
-//   };
+        }))
+    };
+    console.log("Order Data:", orderData);
+    orderCalls.updateOrder(orderId, orderData);
+    // setSelectedProducts([]);
+    // setSelectedPartner(null);
+  };
 
   // Calculate totals for selectedProducts
   const totalBars = selectedProducts.reduce((sum, item) => {
@@ -203,7 +201,7 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-                // onClick={handleSubmit}
+                onClick={handleSubmit}
                 disabled={
                   !selectedPartner ||
                   !selectedProducts ||
@@ -211,9 +209,10 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
                 }
 
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2 ">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3" />
                 </svg>
+
                 Lưu
               </button>
             </div>

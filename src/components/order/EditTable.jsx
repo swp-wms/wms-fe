@@ -20,22 +20,19 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
   //     setSelectedProducts(Array.from(filtered.values()).sort((a,b) => a.trueId - b.trueId));
   //   } 
   // }, [selectedProducts, setSelectedProducts]);
-  console.log("Selected Products:", selectedProducts);
+  
 
-  const isAddedToDelivery = (id) =>{
-    console.log("The id: ",id)
-    //find if the orderDetail with the given id is in the delivery 
-    delivery.some(
-      item => {
-        // item.id === id;
-        console.log("Item in delivery: ",item.deliverydetail.orderdetailid);
-        return item.orderdetailid === id;
-      }
+  const isAddedToDelivery = (id) => {
+    const orderDetailIds = delivery.flatMap(
+      order => order.deliverydetail.map(detail => detail.orderdetailid)
     );
-  }
+
+    return orderDetailIds.some(item => parseInt(item) === parseInt(id));
+  };
 
 
-  const handleProductFieldChange = (id, field, value) => {
+  const handleProductFieldChange = (product, field, value) => {
+    const id = product.trueId;
     if (
       (field === "numberofbars" || field === "weight") &&
       (isNaN(value) || value === '' || Number(value) < 0)
@@ -45,20 +42,32 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
     let updateProduct = selectedProducts.find(product => product.trueId === id);
     
     if(updateProduct)  {
-      updateProduct[field] = value;
       
-
+      
+//-----------------HANDLE NUMBER OF BARS AND WEIGHT-----------------
       if(field === "numberofbars") {
-        if(updateProduct.catalog?.type === "Thép Thanh") {
-          let w = (updateProduct.catalog?.weightperbundle / updateProduct.catalog?.barsperbundle) * value; // Assuming weight is calculated based on catalog length and number of bars
-          updateProduct.weight = w.toFixed(2); // Update weight based on number of bars
+        if(!updateProduct.hasOwnProperty('oldNumberOfBars')){
+          updateProduct.oldNumberOfBars = updateProduct.numberofbars;
         }
-        if(updateProduct.catalog?.type === "Thép Cuộn") {
-          let w = (updateProduct.catalog?.weightperroll * value);
-          updateProduct.weight = w.toFixed(2);
+        
+        
+        if (parseInt(value) < parseInt(updateProduct.oldNumberOfBars) && isAddedToDelivery(product.orderdetailid)) {
+          
+          toast.error("Không thể giảm số lượng sản phẩm đã được thêm vào đơn giao hàng")
+          return;
+        }else{
+
+          
+          if(updateProduct.catalog?.type === "Thép Thanh") {
+            let w = (updateProduct.catalog?.weightperbundle / updateProduct.catalog?.barsperbundle) * value; // Assuming weight is calculated based on catalog length and number of bars
+            updateProduct.weight = w.toFixed(2); // Update weight based on number of bars
+          }
+          if(updateProduct.catalog?.type === "Thép Cuộn") {
+            let w = (updateProduct.catalog?.weightperroll * value);
+            updateProduct.weight = w.toFixed(2);
+          }
         }
       }
-
       if(field === "name"){
         // let steelType = value.match("/(?<=CB)(D\d+)/");
 
@@ -68,7 +77,7 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
           if(foundProduct){
             updateProduct = foundProduct; // Update the product with the found one
             updateProduct.trueId = id; // Re attach trueId to the updated product
-            console.log(updateProduct);
+            
           }
         }
 
@@ -83,11 +92,12 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
           if(foundProduct){
             updateProduct = foundProduct; // Update the product with the found one
             updateProduct.trueId = id; // Re attach trueId to the updated product
-            console.log(updateProduct);
+            
           }
         }
 
       }
+      updateProduct[field] = value;
 
       setSelectedProducts((selectedProducts.filter(
         product => product.trueId !== id).concat(updateProduct)).sort((a, b) =>{
@@ -100,7 +110,7 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
   };
 
   const deleteProduct = (item) =>{
-    if(isAddedToDelivery(item.id) ) {
+    if(isAddedToDelivery(item.orderdetailid) ) {
       toast.error("Không thể xóa sản phẩm đã được thêm vào đơn giao hàng");
       return;
     } else {
@@ -159,54 +169,54 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
             </tr>
           </thead>
           <tbody>
-            {selectedProducts.map((product, index) => (
-              <tr key={product.trueId || index}>
-                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-4">{product.trueId}</td>
+            {selectedProducts.map((orderDetail, index) => (
+              <tr key={orderDetail.trueId || index}>
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-4">{orderDetail.trueId}</td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-16">
                     {/* <input
                       type="text"
                       className="w-full h-full focus:outline-none"
-                      value={product.name || ''}
-                      onChange={e => handleProductFieldChange(product.trueId, "name", e.target.value)}
+                      value={orderDetail.name || ''}
+                      onChange={e => handleProductFieldChange(orderDetail.trueId, "name", e.target.value)}
                     /> */}
-                    {product.name}
+                    {orderDetail.name}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
                     {/* <input
                       type="text"
                       className="w-full h-full focus:outline-none"
-                      value={product.brandname || ''}
-                      onChange={e => handleProductFieldChange(product.trueId, "brandname", e.target.value)}
+                      value={orderDetail.brandname || ''}
+                      onChange={e => handleProductFieldChange(orderDetail.trueId, "brandname", e.target.value)}
                     /> */}
-                    {product.brandname}
+                    {orderDetail.brandname}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
                   {/* <input
                     type="text"
                     className="w-full h-full focus:outline-none"
-                    value={product.namedetail || ''}
-                    onChange={e => handleProductFieldChange(product.trueId, "namedetail", e.target.value)}
+                    value={orderDetail.namedetail || ''}
+                    onChange={e => handleProductFieldChange(orderDetail.trueId, "namedetail", e.target.value)}
                   /> */}
-                  {product.namedetail}
+                  {orderDetail.namedetail}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-9">
                   {/* <input
                     type="text"
                     className="w-full h-full focus:outline-none"
-                    value={product.catalog?.length || ''}
-                    onChange={e => handleProductFieldChange(product.trueId, "catalog.length", e.target.value)}
+                    value={orderDetail.catalog?.length || ''}
+                    onChange={e => handleProductFieldChange(orderDetail.trueId, "catalog.length", e.target.value)}
                   /> */}
-                  {product.catalog?.length}
+                  {orderDetail.catalog?.length}
                 </td>
                 <td className="border border-gray-800  py-2 text-xs text-black w-9">
                   <input
                     type="number"
-                    className="w-full h-full focus:outline-none"
-                    value={product.numberofbars || ''}
+                    className="w-full h-full focus:outline-none px-2 py-2"
+                    value={orderDetail.numberofbars || ''}
                     onChange={e => {
                         const val = e.target.value;
                         if (/^\d*$/.test(val)) { // Only allow non-negative integers
-                          handleProductFieldChange(product.trueId, "numberofbars", val === '' ? '' : Number(val));
+                          handleProductFieldChange(orderDetail, "numberofbars", val === '' ? '' : Number(val));
                         }
                       }}
                   />
@@ -214,12 +224,12 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
                 <td className="border border-gray-800  py-2 text-xs text-black w-9">
                   <input
                     type="number"
-                    className="w-full h-full focus:outline-none"
-                    value={product.weight || ''}
+                    className="w-full h-full focus:outline-none px-2 py-2"
+                    value={orderDetail.weight || ''}
                     onChange={e => {
                       const val = e.target.value;
                       if (/^\d*\.?\d*$/.test(val)) { // Only allow non-negative numbers
-                        handleProductFieldChange(product.trueId, "weight", val === '' ? '' : Number(val));
+                        handleProductFieldChange(orderDetail, "weight", val === '' ? '' : Number(val));
                       }
                     }}
                   />
@@ -227,13 +237,13 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
                   <input
                     type="text"
-                    className="w-full h-full focus:outline-none"
-                    value={product.note || ""}
-                    onChange={e => handleProductFieldChange(product.trueId, "note", e.target.value)}
+                    className="w-full h-full focus:outline-none "
+                    value={orderDetail.note || ""}
+                    onChange={e => handleProductFieldChange(orderDetail, "note", e.target.value)}
                   />
                 </td>
                 <td className="py-1 text-xs text-black flex flex-col gap-1 justify-items-center align-items-center" >
-                    <svg xmlns="http://www.w3.org/2000/svg" 
+           <svg xmlns="http://www.w3.org/2000/svg" 
                     viewBox="0 0 24 24" 
                     fill="currentColor" 
                     className="size-4">
@@ -245,9 +255,9 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
                   <svg xmlns="http://www.w3.org/2000/svg" 
                   viewBox="0 0 24 24" fill="currentColor" 
                   className="size-4 hover:cursor-pointer text-red-700"
-                  onClick={() => deleteProduct(product)}>
+                  onClick={() => deleteProduct(orderDetail)}>
                     <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z" clipRule="evenodd" />
-                  </svg>
+                </svg>
 
                   
                 </td>

@@ -1,4 +1,4 @@
-import React, {useState,useEffect, use} from "react";
+import React, {useState, useEffect} from "react";
 
 const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalBars, totalWeight }) => {
   // Handler for changing product fields (e.g. quantity)

@@ -74,10 +74,27 @@ const fetchDeliveryDetails = async (id) => {
     }
 }
 
+const updateOrder = async (id,data) =>{
+    try{
+    const response = await axios.put(`${api.UPDATE_ORDER(id)}`,data,{
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    console.log("Order updated successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating order:", error);
+    throw error;
+  }
+}
+
 export default {
     getImportOrder,
     getExportOrder,
     getOrderDetail,
     createImportOrder,
-    fetchDeliveryDetails
+    fetchDeliveryDetails,
+    updateOrder
 }

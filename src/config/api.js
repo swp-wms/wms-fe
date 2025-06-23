@@ -1,6 +1,7 @@
 const baseUrl = "http://localhost:3800";
 
 export const api = {
+
     LOGIN: `${baseUrl}/login`,
     LOGOUT: `${baseUrl}/logout`,
     REGISTER: `${baseUrl}/register`,
@@ -15,15 +16,19 @@ export const api = {
     GET_ORDER_DETAIL: `${baseUrl}/detail`,
     CREATE_ORDER: `${baseUrl}/orders/`,
     GET_DELIVERY_DETAIL_FOR_UPDATE_ORDER: `${baseUrl}/orders/delivery`,
+    UPDATE_ORDER: (orderid) => `${baseUrl}/orders/${orderid}`,
 
-    //partner API
-    GET_PARTNERS: `${baseUrl}/partners`,
-    ADD_PARTNER: `${baseUrl}/partners/`,
-
-    //product API
-    GET_PRODUCTS: `${baseUrl}/products`,
-    ADD_PRODUCT: `${baseUrl}/products`,
     GET_REMAIN_QUANTITY: (orderid) => `${baseUrl}/detail/${orderid}/remain`,
+    CHECK_COMPLETE: (orderid) => `${baseUrl}/orders/${orderid}/complete`,
+
+
+  //partner API
+  GET_PARTNERS: `${baseUrl}/partners`,
+  ADD_PARTNER: `${baseUrl}/partners/`,
+
+  //product API
+  GET_PRODUCTS: `${baseUrl}/products`,
+  ADD_PRODUCT: `${baseUrl}/products`,
 
 
   //warehouse API
@@ -35,23 +40,26 @@ export const api = {
   //export API
   GET_EXPORT: `${baseUrl}/warehouse/export`,
 
-    //otp api
-    GET_OTP: `${baseUrl}/reset-password/get-otp`,
-    VERIFY_OTP: `${baseUrl}/reset-password/verify-otp`,
+  //otp api
+  GET_OTP: `${baseUrl}/reset-password/get-otp`,
+  VERIFY_OTP: `${baseUrl}/reset-password/verify-otp`,
 
 
-    //catalog API
-    GET_CATALOGS: `${baseUrl}/catalog`,
-    ADD_CATALOG: `${baseUrl}/catalog`,
+  //catalog API
+  GET_CATALOGS: `${baseUrl}/catalog`,
+  ADD_CATALOG: `${baseUrl}/catalog`,
 
-    GET_IMPORT_DELIVERY: `${baseUrl}/delivery/import`,
-    GET_EXPORT_DELIVERY: `${baseUrl}/delivery/export`,
-    GET_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,
-    GET_DELIVERY_DETAIL: (deliveryid) => `${baseUrl}/delivery/${deliveryid}`,
-    CREATE_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,
-    ADD_TRUCK_FOR_DELIVERY: (deliveryid) => `${baseUrl}/delivery/${deliveryid}`,
-    APPROVE_TRUCK: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/approve`,
-
-
+  // DELIVERY API
+  GET_IMPORT_DELIVERY: `${baseUrl}/delivery/import`,
+  GET_EXPORT_DELIVERY: `${baseUrl}/delivery/export`,
+  GET_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,
+  GET_DELIVERY_DETAIL: (deliveryid) => `${baseUrl}/delivery/${deliveryid}`,
+  CREATE_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,
+  ADD_TRUCK_FOR_DELIVERY: (deliveryid) => `${baseUrl}/delivery/${deliveryid}`,
+  APPROVE_TRUCK: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/approve`,
+  IS_DELIVERYING: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/is-deliverying`,
+  COMPLETE: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/complete`,
+  NOT_ENOUGH_TRUCK: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/not-enough-truck`,
+  UPDATE_REAL_DELIVERY_DATA: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/real`,
 }
-    
+
