@@ -353,6 +353,9 @@ const UserInfo = () => {
                 </button>
               </div>
             </div>
+
+
+            
             {/* Div change password */}
             <div className={editPassWord ? "block" : "hidden"}>
               <div className="flex items-center gap-6">

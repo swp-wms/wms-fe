@@ -17,17 +17,17 @@ const AccountManage = () => {
     fullname: "",
     username: "",
     password: "",
-    role: "",
+    roleid: "",
   });
   const [isEditUpdating, setIsEditUpdating] = useState(false);
 
-  // New states for create user functionality
   const [showCreateModal, setShowCreateModal] = useState(false);
+
   const [createFormData, setCreateFormData] = useState({
     fullname: "",
     username: "",
     password: "",
-    role: "",
+    roleid: "",
   });
   const [isCreating, setIsCreating] = useState(false);
   const [emailError, setEmailError] = useState("");
@@ -91,6 +91,8 @@ const AccountManage = () => {
   const handleConfirmStatusChange = async () => {
     if (!selectedUser) return;
 
+    console.log("Selected User:", selectedUser);
+    
     setIsUpdating(true);
     try {
       const newStatus = selectedUser.status === "1" ? "0" : "1";
@@ -200,7 +202,7 @@ const AccountManage = () => {
       fullname: "",
       username: "",
       password: "",
-      role: "",
+      roleid: "",
     });
     setEmailError("");
     setShowCreateModal(true);
@@ -222,12 +224,14 @@ const AccountManage = () => {
   };
 
   const handleCreateUser = async () => {
-    // Validation
+    createFormData.roleid = getRoleIdFromName(createFormData.role);
+    console.log("Create Form Data:", createFormData);
+    
     if (
       !createFormData.fullname ||
       !createFormData.username ||
       !createFormData.password ||
-      !createFormData.role
+      !createFormData.roleid
     ) {
       alert("Vui lòng điền đầy đủ thông tin!");
       return;
@@ -244,7 +248,7 @@ const AccountManage = () => {
         fullname: createFormData.fullname,
         username: createFormData.username,
         password: createFormData.password,
-        role: getRoleIdFromName(createFormData.role),
+        roleid: getRoleIdFromName(createFormData.role),
       };
 
       const response = await createNewUser(newUserData);
@@ -279,7 +283,7 @@ const AccountManage = () => {
       fullname: "",
       username: "",
       password: "",
-      role: "",
+      roleid: "",
     });
     setEmailError("");
   };
@@ -427,8 +431,8 @@ const AccountManage = () => {
 
       {/* Confirmation Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-300 rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Xác nhận thay đổi trạng thái
             </h3>
@@ -481,8 +485,8 @@ const AccountManage = () => {
 
       {/* Edit Form */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 relative">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-200 rounded-lg p-6 max-w-4xl w-full mx-4 relative">
             <div className="flex items-start gap-8">
               {/* Avatar */}
               <div className="flex flex-col items-center gap-4">
@@ -603,8 +607,8 @@ const AccountManage = () => {
 
       {/* Create User Form */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 relative">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-200 rounded-lg p-6 max-w-4xl w-full mx-4 relative">
             <div className="flex items-start gap-8">
               {/* Avatar */}
               <div className="flex flex-col items-center gap-4">

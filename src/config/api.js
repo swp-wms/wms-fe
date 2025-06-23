@@ -3,10 +3,10 @@ const baseUrl = "http://localhost:3800";
 export const api = {
     LOGIN: `${baseUrl}/login`,
     LOGOUT: `${baseUrl}/logout`,
-    REGISTER: `${baseUrl}/register`,
+    REGISTER: `${baseUrl}/admin/register`,
 
     //user API
-    CREATE_USER: `${baseUrl}/users`,
+    // CREATE_USER: `${baseUrl}/users`,
     GET_ALL_USER: `${baseUrl}/users`,
     GET_USER: `${baseUrl}/users/me`,
     UPDATE_USER: (userid) => `${baseUrl}/users/${userid}`,
