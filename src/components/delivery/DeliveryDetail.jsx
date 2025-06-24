@@ -11,8 +11,7 @@ const DeliveryDetail = ({ delivery, setCurrentDelivery, currentDelivery }) => {
                 <p className="font-medium">{delivery.deliverydate}</p>
                 <p className='text-[10px]'>Code:{delivery.id}</p>
             </div>
-            {delivery.deliverystatus !== null && <FontAwesomeIcon icon={faCircle} className={`absolute top-[-5px] right-[-5px] 
-                ${(deliveryStatus.find(d => d.id === delivery.deliverystatus)).color}`} />}
+            {delivery.deliverystatus !== null && <FontAwesomeIcon color={`${(deliveryStatus.find(d => d.id === delivery.deliverystatus)).color}`} icon={faCircle} className={`absolute top-[-5px] right-[-5px]`} />}
         </div>
     )
 }

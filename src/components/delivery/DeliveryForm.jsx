@@ -6,8 +6,8 @@ import { useState } from 'react'
 import { handleApproveTruck, handleCreateDelivery } from '../../backendCalls/delivery'
 import StatusButton from './StatusButton'
 
-const DeliveryForm = ({ 
-    currentOrder, 
+const DeliveryForm = ({
+    currentOrder,
     currentDelivery = null, setCurrentDelivery,
     currentDeliveryDetail = null, setCurrentDeliveryDetail,
     act,
@@ -36,6 +36,17 @@ const DeliveryForm = ({
 
     }
 
+    const handleEmptyForm = (e) => {
+        e.preventDefault();
+        setNewDelivery({
+            gettime: '',
+            getdate: '',
+            deliverytime: '',
+            deliverydate: ''
+        });
+        setNewDeliveryList([]);
+    }
+
     const handleApprove = async (e) => {
         e.preventDefault();
         setError();
@@ -60,9 +71,9 @@ const DeliveryForm = ({
     }
     return (
         <form className='DeliveryForm overflow-y-scroll relative font-[500] text-[14px] bg-white h-[90%] shadow-[0_0_2px_#ccc] p-5'>
-            <div className="mb-3 flex justify-between">
-                <span>Mã đơn: {currentOrder.orderid}</span>
-                <span>Địa chỉ: {currentOrder.address}</span>
+            <div className="mb-3 flex">
+                <span className='flex-1'>Mã đơn: {currentOrder.orderid}</span>
+                <span className='flex-1'>Địa chỉ: {currentOrder.address}</span>
             </div>
             <div className="flex items-center justify-between">
                 <div className="">
@@ -72,6 +83,7 @@ const DeliveryForm = ({
                             onChange={(e) => {
                                 setNewDelivery({ ...newDelivery, getdate: e.target.value })
                             }}
+                            value={newDelivery.getdate}
                             required
                             className='border-[1px] border-[#aaa] rounded py-1 px-2 ml-2' type="date"
                         />}
@@ -83,6 +95,7 @@ const DeliveryForm = ({
                             onChange={(e) => {
                                 setNewDelivery({ ...newDelivery, gettime: e.target.value })
                             }}
+                            value={newDelivery.gettime}
                             required
                             className='border-[1px] w-[100px] border-[#aaa] rounded py-1 px-2 ml-2' type="text"
                         />}
@@ -97,6 +110,7 @@ const DeliveryForm = ({
                             onChange={(e) => {
                                 setNewDelivery({ ...newDelivery, deliverydate: e.target.value })
                             }}
+                            value={newDelivery.deliverydate}
                             required
                             className='border-[1px] border-[#aaa] rounded py-1 px-2 ml-2' type="date"
                         />}
@@ -108,15 +122,16 @@ const DeliveryForm = ({
                             onChange={(e) => {
                                 setNewDelivery({ ...newDelivery, deliverytime: e.target.value })
                             }}
+                            value={newDelivery.deliverytime}
                             required
                             className='border-[1px] w-[100px] border-[#aaa] rounded py-1 px-2 ml-2' type="text"
                         />}
                 </div>
             </div>
-            {currentDelivery && <StatusButton 
-                setCurrentDelivery={setCurrentDelivery} 
+            {currentDelivery && <StatusButton
+                setCurrentDelivery={setCurrentDelivery}
                 currentDelivery={currentDelivery} user={user}
-                act={act}    
+                act={act}
             />}
 
             {currentOrder && <ProductTable
@@ -143,8 +158,9 @@ const DeliveryForm = ({
                     <FontAwesomeIcon icon={faPlusCircle} className='mr-2' />
                     Thêm
                 </button>
-                <button className='btn px-4 py-2 '>
-                    <FontAwesomeIcon icon={faCancel} className='mr-2' />
+                <button type='button' className='btn px-4 py-2 '>
+                    <FontAwesomeIcon icon={faCancel} className='mr-2'
+                        onClick={(e) => handleEmptyForm(e)} />
                     Hủy
                 </button>
             </div>}

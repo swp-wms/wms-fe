@@ -18,20 +18,6 @@ const DeliverySchedule = ({ user, setUser }) => {
 
   useEffect(() => {
     const getData = async () => {
-      setDeliverySchedule([]);
-      setCurrentDelivery();
-      setCurrentDeliveryDetail();
-      if (currentOrder) {
-        const response = (await getDeliveriesForOrder(currentOrder.orderid)).data;
-        setDeliverySchedule(response.length > 0 ? response.sort((a, b) => new Date(a.deliverydate) - new Date(b.deliverydate)) : []);
-      }
-    }
-
-    getData();
-  }, [currentOrder, setCurrentOrder])
-
-  useEffect(() => {
-    const getData = async () => {
       if (currentDelivery) {
         const response = await getDeliveryDetail(currentDelivery.id);
         setCurrentDeliveryDetail(response.data);
@@ -67,7 +53,7 @@ const DeliverySchedule = ({ user, setUser }) => {
       }
       getData();
     }
-  }, []);
+  }, [currentOrder, setCurrentOrder]);
 
   return (
     <div className="DeliverySchedule fixed bottom-0 right-0 top-[80px] left-[23%]">
@@ -78,6 +64,7 @@ const DeliverySchedule = ({ user, setUser }) => {
             orders={orders} setOrders={setOrders}
             currentOrder={currentOrder}
             setCurrentOrder={setCurrentOrder}
+
             user={user}
           />}
         </div>

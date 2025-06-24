@@ -54,6 +54,7 @@ export const api = {
   APPROVE_TRUCK: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/approve`,
   IS_DELIVERYING: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/is-deliverying`,
   COMPLETE: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/complete`,
+  CANCEL_DELIVERY: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/cancel`,
   NOT_ENOUGH_TRUCK: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/not-enough-truck`,
   UPDATE_REAL_DELIVERY_DATA: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/real`,
 }

@@ -35,7 +35,7 @@ const DeliveryList = ({ deliverySchedule, currentOrder, currentDelivery, setCurr
           {deliveryStatus.map(status => {
             if (status.color) {
               return (
-                <p key={status.id} className={`${status.color} px-1`}>{status.name}</p>
+                <p key={status.id} style={{color: `${status.color}`}} className={`px-1`}>{status.name}</p>
               )
             }
           })}
