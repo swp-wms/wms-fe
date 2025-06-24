@@ -4,7 +4,7 @@ import DeliveryList from "../components/delivery/DeliveryList"
 import { getUser } from "../backendCalls/user";
 import DeliveryForm from "../components/delivery/DeliveryForm";
 import { useParams } from "react-router-dom";
-import { getAllExportDelivery, getAllImportDelivery, getDeliveriesForOrder, getDeliveryDetail } from "../backendCalls/delivery";
+import { getAllExportDelivery, getAllImportDelivery, getDeliveryDetail } from "../backendCalls/delivery";
 
 
 const DeliverySchedule = ({ user, setUser }) => {
@@ -61,8 +61,10 @@ const DeliverySchedule = ({ user, setUser }) => {
         <div className="flex-1 h-full">
           <h1 className="font-medium mb-2">Đơn {act === 'nhap' ? 'nhập' : 'xuất'} hàng</h1>
           {orders && <OrderList
-            orders={orders} setOrders={setOrders}
-            currentOrder={currentOrder}
+            setDeliverySchedule={setDeliverySchedule}
+            orders={orders} 
+            setCurrentDelivery={setCurrentDelivery}
+            setCurrentDeliveryDetail={setCurrentDeliveryDetail}
             setCurrentOrder={setCurrentOrder}
 
             user={user}
