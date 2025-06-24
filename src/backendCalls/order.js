@@ -82,7 +82,7 @@ const updateOrder = async (id,data) =>{
             'Content-Type': 'application/json'
         }
     });
-    console.log("Order updated successfully:", response.data);
+    console.log("Sended to backend successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error updating order:", error);

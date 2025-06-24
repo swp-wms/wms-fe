@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation,useNavigate } from "react-router-dom";
 import PartnerSearch from "../components/order/PartnerSearch";
 import ProductSearch from "../components/order/ProductSearch";
 import EditTable from "../components/order/EditTable";
@@ -8,6 +8,7 @@ import product from "../backendCalls/product";
 import { getUser } from "../backendCalls/user";
 import CompleteForm from "../components/order/partnerForm";
 import orderCalls from "../backendCalls/order";
+import toast from "react-hot-toast";
 
 const EditOrder = ({user, setUser}) => {
   
@@ -38,10 +39,12 @@ const EditOrder = ({user, setUser}) => {
 
 //---------------References---------------
 const location = useLocation();
+const navigate = useNavigate();
 const orderDetail = location.state?.orderDetail || null; // Get order details from the state if available
 const orderId = location.state?.id || null; // Get order ID from the state if available
   React.useEffect(() => {
-     if(!user){const getData = async () => {
+     if(!user){
+      const getData = async () => {
               const response = await getUser();
               if (response.status!==200) {
                 window.location.href = '/dang-nhap';
@@ -49,7 +52,8 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
               const user = response.data;
               setUser(user);
             }
-            getData();}
+            getData();
+     }
 
     const fetchPartners = async () => {
       try {
@@ -77,6 +81,21 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
         console.error("Error fetching delivery details:", error);
       }
     }
+
+   
+     const checkSalesmanId = () => {
+      if(orderDetail && user){
+        if(
+          user.role == 3 &&
+          user.id !== orderDetail.salesmanid
+        ){
+
+        }
+      }
+    }
+
+    checkSalesmanId();
+
     fetchPartners();
     fetchProducts();
     fetchDeliveryDetails();
@@ -91,6 +110,7 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
         return obj;
     }));
 
+
   
   },[]);
 
@@ -102,8 +122,8 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
       return;
     }
     // Here you would typically send the order data to your backend
-    const orderData = {
-      
+    const data = {
+      id: orderId,
       partnerid: selectedPartner?.id,
       address: selectedPartner?.address,
       note:"",
@@ -112,14 +132,19 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
         id: product?.orderdetailid,
         productid: product?.id,
         numberofbars: product?.numberofbars,
-        weight: product?.weight
+        weight: product?.weight,
+        note: product?.note || "",
         
         }))
     };
-    console.log("Order Data:", orderData);
-    orderCalls.updateOrder(orderId, orderData);
-    // setSelectedProducts([]);
-    // setSelectedPartner(null);
+    
+    const msg = await orderCalls.updateOrder(orderId, data);
+    toast.success(msg.message);
+
+    setSelectedProducts([]);
+    setSelectedPartner(null);
+    navigate(-1);
+   
   };
 
   // Calculate totals for selectedProducts
@@ -192,12 +217,12 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
             </div>
             {/* Bottom Buttons */}
             <div className="mt-5 flex gap-2 justify-end">
-              <Link to="/nhap-hang" className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm">
+              <button onClick={() => navigate(-1) } className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 Quay lại
-              </Link>
+              </button>
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
