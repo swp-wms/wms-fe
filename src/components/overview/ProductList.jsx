@@ -11,7 +11,7 @@ import {
 import { fetchProductCatalog } from "../../backendCalls/productCatalog";
 import ProductEdit from "./ProductEdit";
 
-const ITEMS_PER_PAGE = 15;
+const pagination_limit = 15;
 
 const ProductList = () => {
   const [productCatalog, setProductCatalog] = useState([]);
@@ -41,10 +41,10 @@ const ProductList = () => {
     reader.readAsArrayBuffer(file);
   };
 
-  const totalPages = Math.ceil(productCatalog.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(productCatalog.length / pagination_limit);
   const paginatedData = productCatalog.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    (currentPage - 1) * pagination_limit,
+    currentPage * pagination_limit
   );
 
   const handleSaveEdit = (updatedProduct) => {
@@ -95,7 +95,9 @@ const ProductList = () => {
           Trang {currentPage} / {totalPages}
         </span>
         <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           disabled={currentPage === totalPages}
           className="px-3 py-1 border rounded disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
         >
@@ -127,16 +129,26 @@ const TableList = ({ data, onEdit }) => {
             <th className="border border-black">Loại thép</th>
             <th className="border border-black">Mã thép</th>
             <th className="border border-black">Số lượng </th>
-            <th className="border border-black">Độ dài <br />(m)</th>
-            <th className="border border-black">Đơn trọng <br />(kg)</th>
-            <th className="border border-black py-2">Tổng khối lượng <br /> (kg)</th>
+            <th className="border border-black">
+              Độ dài <br />
+              (m)
+            </th>
+            <th className="border border-black">
+              Đơn trọng <br />
+              (kg)
+            </th>
+            <th className="border border-black py-2">
+              Tổng khối lượng <br /> (kg)
+            </th>
             <th className="border border-black">Ghi chú</th>
             <th className="border border-black">Tùy chọn</th>
           </tr>
         </thead>
         <tbody>
           {data.map((item, index) => {
-            const length = item.catalog ? item.catalog.length : item.length || 0;
+            const length = item.catalog
+              ? item.catalog.length
+              : item.length || 0;
             const weight = item.catalog
               ? item.catalog.weightperbundle / item.catalog.barsperbundle
               : item.weight || 0;
@@ -155,10 +167,15 @@ const TableList = ({ data, onEdit }) => {
                 <td className="border border-black">{item.totalbar}</td>
                 <td className="border border-black">{length}</td>
                 <td className="border border-black">{weight.toFixed(2)}</td>
-                <td className="border border-black">{totalWeight.toFixed(2)}</td>
+                <td className="border border-black">
+                  {totalWeight.toFixed(2)}
+                </td>
                 <td className="border border-black">{item.note}</td>
                 <td className="border border-black text-center py-1">
-                  <FontAwesomeIcon icon={faCircleMinus} className="px-2 text-red-600" />
+                  <FontAwesomeIcon
+                    icon={faCircleMinus}
+                    className="px-2 text-red-600"
+                  />
                   <FontAwesomeIcon
                     icon={faPenToSquare}
                     className="px-2 cursor-pointer"

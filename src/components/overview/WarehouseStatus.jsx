@@ -88,15 +88,18 @@ const WarehouseStatus = () => {
             Sức chứa kho còn lại ước tính: {15000000-(15000000 * estimated) / 100} kg 
           </span>
           
+          <div className="flex gap-2">
           <input
             type="date"
-            className="border rounded px-2 py-1 text-xs shadow-sm w-28"
+            className="border rounded px-2 py-1 text-sm shadow-sm w-32"
           />
+          <button className="shadow-btn rounded px-2.5 py-1.5 bg-red-700 text-white font-medium text-sm">Xem</button>
+          </div>
         </div>
         <div className="-translate-y-2">
           <WaterTank
             percentage={estimated}
-            weight={(15000 * estimated) / 100}
+            weight={(15000000 * estimated) / 100}
           />
         </div>
       </div>

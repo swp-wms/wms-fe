@@ -18,18 +18,15 @@ const ProductEdit = ({ product, onClose, onSave }) => {
   const validate = () => {
     const newErrors = {};
 
-    // Mã hàng hóa bắt buộc bắt đầu bằng "TD"
     if (!/^TD/.test(formData.name || "")) {
       newErrors.name = "Mã hàng hóa phải bắt đầu bằng 'TD'";
     }
 
-    // Tên hàng hóa phải theo định dạng: D10CB400V hoặc D12CB500T
     if (!/^Thép D\d{2}CB\d{3}[VT]$/.test(formData.namedetail || "")) {
       newErrors.namedetail =
         "Tên hàng hóa phải theo định dạng 'Thép DxxCBxxxV' hoặc 'Thép DxxCBxxxT', với x là chữ số";
     }
 
-    // Mã thép phải theo định dạng: D + 2 số, ví dụ D10
     if (!/^D\d{2}$/.test(formData.steeltype || "")) {
       newErrors.steeltype =
         "Mã thép phải theo định dạng Dxx, với x là chữ số";
@@ -59,7 +56,6 @@ const ProductEdit = ({ product, onClose, onSave }) => {
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="bg-white p-8 rounded-lg ms-[20%] shadow-xl border relative w-[60%]">
         <div className="space-y-3 text-sm grid grid-cols-3 gap-x-8">
-          {/* Mã hàng hóa */}
           <div>
             <label className="block mb-1 font-medium">Mã hàng hóa:</label>
             <input
@@ -76,7 +72,6 @@ const ProductEdit = ({ product, onClose, onSave }) => {
             )}
           </div>
 
-          {/* Tên hàng hóa */}
           <div>
             <label className="block mb-1 font-medium">Tên hàng hóa:</label>
             <input
@@ -93,7 +88,6 @@ const ProductEdit = ({ product, onClose, onSave }) => {
             )}
           </div>
 
-          {/* Tên nhà cung */}
           <div>
             <label className="block mb-1 font-medium">Tên nhà cung:</label>
             <input
@@ -124,7 +118,6 @@ const ProductEdit = ({ product, onClose, onSave }) => {
             </select>
           </div>
 
-          {/* Mã thép */}
           <div>
             <label className="block mb-1 font-medium">Mã thép:</label>
             <input
@@ -141,7 +134,6 @@ const ProductEdit = ({ product, onClose, onSave }) => {
             )}
           </div>
 
-          {/* Số lượng */}
           <div>
             <label className="block mb-1 font-medium">Số lượng:</label>
             <input
@@ -153,7 +145,6 @@ const ProductEdit = ({ product, onClose, onSave }) => {
             />
           </div>
 
-          {/* Độ dài */}
           <div>
             <label className="block mb-1 font-medium">Độ dài (m):</label>
             <input
@@ -165,7 +156,6 @@ const ProductEdit = ({ product, onClose, onSave }) => {
             />
           </div>
 
-          {/* Đơn trọng */}
           <div>
             <label className="block mb-1 font-medium">Đơn trọng (kg):</label>
             <input
@@ -177,7 +167,6 @@ const ProductEdit = ({ product, onClose, onSave }) => {
             />
           </div>
 
-          {/* Tổng khối lượng */}
           <div>
             <label className="block mb-1 font-medium">
               Tổng khối lượng (kg):
@@ -191,7 +180,6 @@ const ProductEdit = ({ product, onClose, onSave }) => {
             />
           </div>
 
-          {/* Ghi chú */}
           <div>
             <label className="block mb-1 font-medium">Ghi chú:</label>
             <input
@@ -204,14 +192,12 @@ const ProductEdit = ({ product, onClose, onSave }) => {
           </div>
         </div>
 
-        {/* Đóng popup */}
         <FontAwesomeIcon
           onClick={onClose}
           icon={faSquareXmark}
           className="absolute top-2 right-2 cursor-pointer text-red-700"
         />
 
-        {/* Nút hành động */}
         <div className="flex justify-end mt-6 gap-3">
           <button
             onClick={onClose}
