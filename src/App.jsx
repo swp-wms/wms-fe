@@ -20,7 +20,7 @@ import DeliverySchedule from "./pages/DeliverySchedule";
 import Profile from "./pages/Profile";
 import AdminPage from "./pages/AdminPage";
 
-import Error from "./pages/Error";
+import Error from "./pages/Error-404";
 
 
 function App() {
@@ -82,7 +82,7 @@ function App() {
           element={<AdminPage user={user} setUser={setUser} />}
         />
 
-        <Route path="/error" element={<Error />} />
+        <Route path="/error" element={<Error user={user} setUset={setUser} />} />
       </Routes>
     </div>
   );

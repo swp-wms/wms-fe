@@ -108,7 +108,7 @@ const ImportOrder = ({user, setUser}) => {
                                         <span className="text-[12px] font-medium text-gray-500">Trạng thái</span>
                                     </div>
                                     <div className="flex w-full h-4 bg-gray-200 rounded-full overflow-hidden dark:bg-neutral-700" role="progressbar" aria-valuenow="{order.status.match(/(\d+(\.\d+)?)(?=%)/)[0]}" aria-valuemin="0" aria-valuemax="100">
-                                        <div className="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap dark:bg-blue-500 transition duration-500" style={{ width: "{order.status}" }}>{order.status}</div>
+                                        <div className="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap dark:bg-blue-500 transition duration-500" style={{ width: order.status }}>{order.status}</div>
                                     </div>
                                 </div>
                         <Link to={`./${order.id}`} className="w-[80%] h-12 bg-white border-2 border-gray-100 rounded-md flex gap-2 self-center justify-self-center  place-content-center justify-evenly content-around shadow-lg">
