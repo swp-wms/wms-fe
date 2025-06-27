@@ -33,7 +33,7 @@ const { id } = useParams();
     return(
       <>
       {/* <Header /> */}
-      <div className="min-h-screen bg-[#fafafa] pt-22 pl-70 pr-5">
+      <div className="min-h-screen bg-[#fafafa] pt-25 pl-77 pr-5">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
             
@@ -96,8 +96,8 @@ const { id } = useParams();
                       <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Mã hàng</th>
                       <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black">Tên hàng hóa</th>
                       <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-16">Dài</th>
-                      <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Đơn trọng</th>
                       <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Số lượng</th>
+                      <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Khối lượng</th>
                       <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Ghi chú</th>
                     </tr>
                   </thead>
@@ -108,15 +108,15 @@ const { id } = useParams();
                         <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.name}</td>
                         <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.namedetail}</td>
                         <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.length}</td>
-                        <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.weight}</td>
                         <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.numberofbars}</td>
+                        <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.weight}</td>
                         <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.note}</td>
                       </tr>
                     ))}
                     <tr>
                       <td className="border border-gray-800 px-2 py-2 pl-15 text-xs font-bold text-black w-12" colSpan={4}>Tổng cộng</td>
-                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{(e) => sum(orderDetail?.detail, 'weight')}</td>
-                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{(e) => sum(orderDetail?.detail, 'numberofbars')}</td>
+                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{total(orderDetail?.detail || [], 'numberofbars')}</td>
+                      <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{Number(total(orderDetail?.detail || [], 'weight')).toFixed(2)}</td>
                       <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12"></td>
 
                     </tr>

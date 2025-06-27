@@ -14,3 +14,16 @@ export const getRemainQuantityOfOrder = async (orderid) => {
         return error;
     }
 }
+
+export const checkCompleteOrder = async (orderid) => {
+    try {
+        const response = await axios.put(api.CHECK_COMPLETE(orderid), {}, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        return response;
+    } catch (error) {
+        return error;
+    }
+}

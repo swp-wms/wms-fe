@@ -11,12 +11,14 @@ import ViewOrder from "./pages/OrderForm";
 import Header from "./components/common/header";
 
 import FormTemplate from "./components/order/partnerForm";
+
 import Delivery from "./pages/Delivery";
 import OverviewPage from "./pages/OverviewPage";
 import Statistic from "./pages/Statistic";
 import DeliverySchedule from "./pages/DeliverySchedule";
 import Profile from "./pages/Profile";
 import AdminPage from "./pages/AdminPage";
+
 
 
 function App() {
@@ -32,7 +34,7 @@ function App() {
 
         <Route path="/quen-mat-khau" element={<ForgotPassword />} />
         <Route path="/nhap-hang" element={<ImportOrder setUser={setUser} user={user}  />} />
-        <Route path='/xuat-hang' element={<ExportOrder />} />
+        <Route path='/xuat-hang' element={<ExportOrder setUser={setUser} user={user}/>} />
         <Route
           path="/nhap-hang/tao-don-nhap-hang"
           element={<CreateImportOrder setUser={setUser} user={user} />}

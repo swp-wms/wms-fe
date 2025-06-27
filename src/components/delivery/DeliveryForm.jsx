@@ -4,14 +4,18 @@ import ProductTable from './ProductTable'
 import DriverInfo from './DriverInfo'
 import { useState } from 'react'
 import { handleApproveTruck, handleCreateDelivery } from '../../backendCalls/delivery'
-import { deliveryStatus } from '../../data/deliveryStatus'
+import StatusButton from './StatusButton'
 
-const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDetail = null, user }) => {
-    // const { deliverydate, deliverytime, gettime, getdate, note, listDeliveryDetail } = req.body;
+const DeliveryForm = ({
+    currentOrder,
+    currentDelivery = null, setCurrentDelivery,
+    currentDeliveryDetail = null, setCurrentDeliveryDetail,
+    act,
+    user }) => {
 
-    const [newDelivery, setNewDelivery] = useState({});
+    const [newDelivery, setNewDelivery] = useState({}); //1 delivery
 
-    const [newDeliveryList, setNewDeliveryList] = useState([]);
+    const [newDeliveryList, setNewDeliveryList] = useState([]);  //product list of delivery
     const [error, setError] = useState();
 
     const createDelivery = async (e) => {
@@ -30,6 +34,17 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
             setError('Trừ ghi chú, bạn cần điền hết các trường yêu cầu.\n Số lượng và khối lượng phải lớn hơn 0.');
         }
 
+    }
+
+    const handleEmptyForm = (e) => {
+        e.preventDefault();
+        setNewDelivery({
+            gettime: '',
+            getdate: '',
+            deliverytime: '',
+            deliverydate: ''
+        });
+        setNewDeliveryList([]);
     }
 
     const handleApprove = async (e) => {
@@ -56,9 +71,9 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
     }
     return (
         <form className='DeliveryForm overflow-y-scroll relative font-[500] text-[14px] bg-white h-[90%] shadow-[0_0_2px_#ccc] p-5'>
-            <div className="mb-3 flex justify-between">
-                <span>Mã đơn: {currentOrder.orderid}</span>
-                <span>Địa chỉ: {currentOrder.address}</span>
+            <div className="mb-3 flex">
+                <span className='flex-1'>Mã đơn: {currentOrder.orderid}</span>
+                <span className='flex-1'>Địa chỉ: {currentOrder.address}</span>
             </div>
             <div className="flex items-center justify-between">
                 <div className="">
@@ -68,6 +83,7 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
                             onChange={(e) => {
                                 setNewDelivery({ ...newDelivery, getdate: e.target.value })
                             }}
+                            value={newDelivery.getdate}
                             required
                             className='border-[1px] border-[#aaa] rounded py-1 px-2 ml-2' type="date"
                         />}
@@ -79,6 +95,7 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
                             onChange={(e) => {
                                 setNewDelivery({ ...newDelivery, gettime: e.target.value })
                             }}
+                            value={newDelivery.gettime}
                             required
                             className='border-[1px] w-[100px] border-[#aaa] rounded py-1 px-2 ml-2' type="text"
                         />}
@@ -93,6 +110,7 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
                             onChange={(e) => {
                                 setNewDelivery({ ...newDelivery, deliverydate: e.target.value })
                             }}
+                            value={newDelivery.deliverydate}
                             required
                             className='border-[1px] border-[#aaa] rounded py-1 px-2 ml-2' type="date"
                         />}
@@ -104,16 +122,17 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
                             onChange={(e) => {
                                 setNewDelivery({ ...newDelivery, deliverytime: e.target.value })
                             }}
+                            value={newDelivery.deliverytime}
                             required
                             className='border-[1px] w-[100px] border-[#aaa] rounded py-1 px-2 ml-2' type="text"
                         />}
                 </div>
             </div>
-            {currentDelivery && <div className="flex justify-end">
-                <p
-                    className={`w-fit border-[1px] rounded-full py-2 mt-2 px-4 bg-[var(--fill-color)] border-black`}
-                >{(deliveryStatus.find(d => d.id === currentDelivery.deliverystatus)).name}</p>
-            </div>}
+            {currentDelivery && <StatusButton
+                setCurrentDelivery={setCurrentDelivery}
+                currentDelivery={currentDelivery} user={user}
+                act={act}
+            />}
 
             {currentOrder && <ProductTable
                 newDeliveryList={newDeliveryList}
@@ -123,7 +142,8 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
                 setNewDelivery={setNewDelivery}
                 currentDelivery={currentDelivery}
                 currentDeliveryDetail={currentDeliveryDetail}
-                user={user}
+                setCurrentDeliveryDetail={setCurrentDeliveryDetail}
+                user={user} act={act}
             />}
 
             {currentDelivery && <DriverInfo
@@ -133,24 +153,25 @@ const DeliveryForm = ({ currentOrder, currentDelivery = null, currentDeliveryDet
 
             <p className="text-red-700 font-medium text-center my-2">{error}</p>
 
-            {!currentDelivery && user.roleid === 3 && <div className="absolute flex gap-3 bottom-[20px] right-[20px]">
+            {!currentDelivery && user.roleid === 3 && <div className="flex justify-end gap-3">
                 <button className='btn px-4 py-2' onClick={(e) => createDelivery(e)}>
                     <FontAwesomeIcon icon={faPlusCircle} className='mr-2' />
                     Thêm
                 </button>
-                <button className='btn px-4 py-2 '>
-                    <FontAwesomeIcon icon={faCancel} className='mr-2' />
+                <button type='button' className='btn px-4 py-2 '>
+                    <FontAwesomeIcon icon={faCancel} className='mr-2'
+                        onClick={(e) => handleEmptyForm(e)} />
                     Hủy
                 </button>
             </div>}
-            {currentDelivery && currentDelivery.deliverystatus === '2' && user.roleid === 3 && <div className="absolute flex gap-3 bottom-[20px] right-[20px]">
+            {currentDelivery && currentDelivery.deliverystatus === '2' && user.roleid === 3 && <div className="flex justify-end gap-3">
                 <button className='btn px-4 py-2 '
-                    onClick={(e) => {handleApprove(e)}}>
+                    onClick={(e) => { handleApprove(e) }}>
                     <FontAwesomeIcon icon={faPlusCircle} className='mr-2' />
                     Duyệt
                 </button>
                 <button className='btn px-4 py-2 '
-                    onClick={(e) => {handleReject(e)}}
+                    onClick={(e) => { handleReject(e) }}
                 >
                     <FontAwesomeIcon icon={faCancel} className='mr-2' />
                     Từ chối
