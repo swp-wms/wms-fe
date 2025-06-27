@@ -160,7 +160,7 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
 
   return (
     <div className="min-h-screen bg-[#fafafa] pt-25 pl-77 pr-5 ">
-      <div className="max-X`w-9xl mx-auto relative">
+      <div className="max-w-9xl mx-auto relative">
         {showForm && (
           <CompleteForm 
             activeTab={activeTab} 
