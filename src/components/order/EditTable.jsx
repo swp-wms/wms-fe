@@ -1,6 +1,7 @@
-import React, {useState, useEffect} from "react";
+import React, {useState,useEffect, use} from "react";
+import toast, { Toaster } from 'react-hot-toast';
 
-const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalBars, totalWeight }) => {
+const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBars, totalWeight, delivery, setDelivery }) => {
   // Handler for changing product fields (e.g. quantity)
   
   // useEffect(() => {
@@ -19,7 +20,19 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
   //     setSelectedProducts(Array.from(filtered.values()).sort((a,b) => a.trueId - b.trueId));
   //   } 
   // }, [selectedProducts, setSelectedProducts]);
-  const handleProductFieldChange = (id, field, value) => {
+  
+
+  const isAddedToDelivery = (id) => {
+    const orderDetailIds = delivery.flatMap(
+      order => order.deliverydetail.map(detail => detail.orderdetailid)
+    );
+
+    return orderDetailIds.some(item => parseInt(item) === parseInt(id));
+  };
+
+
+  const handleProductFieldChange = (product, field, value) => {
+    const id = product.trueId;
     if (
       (field === "numberofbars" || field === "weight") &&
       (isNaN(value) || value === '' || Number(value) < 0)
@@ -29,20 +42,32 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
     let updateProduct = selectedProducts.find(product => product.trueId === id);
     
     if(updateProduct)  {
-      updateProduct[field] = value;
       
-
+      
+//-----------------HANDLE NUMBER OF BARS AND WEIGHT-----------------
       if(field === "numberofbars") {
-        if(updateProduct.catalog?.type === "Thép Thanh") {
-          let w = (updateProduct.catalog?.weightperbundle / updateProduct.catalog?.barsperbundle) * value; // Assuming weight is calculated based on catalog length and number of bars
-          updateProduct.weight = w.toFixed(2); // Update weight based on number of bars
+        if(!updateProduct.hasOwnProperty('oldNumberOfBars')){
+          updateProduct.oldNumberOfBars = updateProduct.numberofbars;
         }
-        if(updateProduct.catalog?.type === "Thép Cuộn") {
-          let w = (updateProduct.catalog?.weightperroll * value);
-          updateProduct.weight = w.toFixed(2);
+        
+        
+        if (parseInt(value) < parseInt(updateProduct.oldNumberOfBars) && isAddedToDelivery(product.orderdetailid)) {
+          
+          toast.error("Không thể giảm số lượng sản phẩm đã được thêm vào đơn giao hàng")
+          return;
+        }else{
+
+          
+          if(updateProduct.catalog?.type === "Thép Thanh") {
+            let w = (updateProduct.catalog?.weightperbundle / updateProduct.catalog?.barsperbundle) * value; // Assuming weight is calculated based on catalog length and number of bars
+            updateProduct.weight = w.toFixed(2); // Update weight based on number of bars
+          }
+          if(updateProduct.catalog?.type === "Thép Cuộn") {
+            let w = (updateProduct.catalog?.weightperroll * value);
+            updateProduct.weight = w.toFixed(2);
+          }
         }
       }
-
       if(field === "name"){
         // let steelType = value.match("/(?<=CB)(D\d+)/");
 
@@ -52,7 +77,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
           if(foundProduct){
             updateProduct = foundProduct; // Update the product with the found one
             updateProduct.trueId = id; // Re attach trueId to the updated product
-            console.log(updateProduct);
+            
           }
         }
 
@@ -67,11 +92,12 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
           if(foundProduct){
             updateProduct = foundProduct; // Update the product with the found one
             updateProduct.trueId = id; // Re attach trueId to the updated product
-            console.log(updateProduct);
+            
           }
         }
 
       }
+      updateProduct[field] = value;
 
       setSelectedProducts((selectedProducts.filter(
         product => product.trueId !== id).concat(updateProduct)).sort((a, b) =>{
@@ -83,19 +109,25 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
    
   };
 
-  const deleteProduct = (id) =>{
-    const updatedProducts = selectedProducts.filter(product => product.trueId !== id).sort ((a,b) => {
-      if(a.trueId < b.trueId) return -1;
-      if(a.trueId > b.trueId) return 1;
-      return 0;
-    });
+  const deleteProduct = (item) =>{
+    if(isAddedToDelivery(item.orderdetailid) ) {
+      toast.error("Không thể xóa sản phẩm đã được thêm vào đơn giao hàng");
+      return;
+    } else {
+      const updatedProducts = selectedProducts.filter(product => product.trueId !== item.trueId).sort ((a,b) => {
+        if(a.trueId < b.trueId) return -1;
+        if(a.trueId > b.trueId) return 1;
+        return 0;
+      });
+      
 
-    selectedProducts.forEach((product, index) =>{
-      if(product.trueId > id) 
-        product.trueId = product.trueId - 1; // Decrement trueId for products after the deleted one
-    });
+      selectedProducts.forEach((product, index) =>{
+        if(product.trueId > item.trueId) 
+          product.trueId = product.trueId - 1; // Decrement trueId for products after the deleted one
+      });
 
-    setSelectedProducts(updatedProducts);
+      setSelectedProducts(updatedProducts);
+    }
   }
 
   const addBlankProduct = () => {
@@ -137,54 +169,54 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
             </tr>
           </thead>
           <tbody>
-            {selectedProducts.map((product, index) => (
-              <tr key={product.trueId || index}>
-                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-4">{product.trueId}</td>
+            {selectedProducts.map((orderDetail, index) => (
+              <tr key={orderDetail.trueId || index}>
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-4">{orderDetail.trueId}</td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-16">
                     {/* <input
                       type="text"
                       className="w-full h-full focus:outline-none"
-                      value={product.name || ''}
-                      onChange={e => handleProductFieldChange(product.trueId, "name", e.target.value)}
+                      value={orderDetail.name || ''}
+                      onChange={e => handleProductFieldChange(orderDetail.trueId, "name", e.target.value)}
                     /> */}
-                    {product.name}
+                    {orderDetail.name}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
                     {/* <input
                       type="text"
                       className="w-full h-full focus:outline-none"
-                      value={product.brandname || ''}
-                      onChange={e => handleProductFieldChange(product.trueId, "brandname", e.target.value)}
+                      value={orderDetail.brandname || ''}
+                      onChange={e => handleProductFieldChange(orderDetail.trueId, "brandname", e.target.value)}
                     /> */}
-                    {product.brandname}
+                    {orderDetail.brandname}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
                   {/* <input
                     type="text"
                     className="w-full h-full focus:outline-none"
-                    value={product.namedetail || ''}
-                    onChange={e => handleProductFieldChange(product.trueId, "namedetail", e.target.value)}
+                    value={orderDetail.namedetail || ''}
+                    onChange={e => handleProductFieldChange(orderDetail.trueId, "namedetail", e.target.value)}
                   /> */}
-                  {product.namedetail}
+                  {orderDetail.namedetail}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-9">
                   {/* <input
                     type="text"
                     className="w-full h-full focus:outline-none"
-                    value={product.catalog?.length || ''}
-                    onChange={e => handleProductFieldChange(product.trueId, "catalog.length", e.target.value)}
+                    value={orderDetail.catalog?.length || ''}
+                    onChange={e => handleProductFieldChange(orderDetail.trueId, "catalog.length", e.target.value)}
                   /> */}
-                  {product.catalog?.length}
+                  {orderDetail.catalog?.length}
                 </td>
                 <td className="border border-gray-800  py-2 text-xs text-black w-9">
                   <input
                     type="number"
-                    className="w-full h-full focus:outline-none"
-                    value={product.numberofbars || ''}
+                    className="w-full h-full focus:outline-none px-2 py-2"
+                    value={orderDetail.numberofbars || ''}
                     onChange={e => {
                         const val = e.target.value;
                         if (/^\d*$/.test(val)) { // Only allow non-negative integers
-                          handleProductFieldChange(product.trueId, "numberofbars", val === '' ? '' : Number(val));
+                          handleProductFieldChange(orderDetail, "numberofbars", val === '' ? '' : Number(val));
                         }
                       }}
                   />
@@ -192,12 +224,12 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
                 <td className="border border-gray-800  py-2 text-xs text-black w-9">
                   <input
                     type="number"
-                    className="w-full h-full focus:outline-none"
-                    value={product.weight || ''}
+                    className="w-full h-full focus:outline-none px-2 py-2"
+                    value={orderDetail.weight || ''}
                     onChange={e => {
                       const val = e.target.value;
                       if (/^\d*\.?\d*$/.test(val)) { // Only allow non-negative numbers
-                        handleProductFieldChange(product.trueId, "weight", val === '' ? '' : Number(val));
+                        handleProductFieldChange(orderDetail, "weight", val === '' ? '' : Number(val));
                       }
                     }}
                   />
@@ -205,13 +237,13 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
                   <input
                     type="text"
-                    className="w-full h-full focus:outline-none"
-                    value={product.note || ""}
-                    onChange={e => handleProductFieldChange(product.trueId, "note", e.target.value)}
+                    className="w-full h-full focus:outline-none "
+                    value={orderDetail.note || ""}
+                    onChange={e => handleProductFieldChange(orderDetail, "note", e.target.value)}
                   />
                 </td>
                 <td className="py-1 text-xs text-black flex flex-col gap-1 justify-items-center align-items-center" >
-                    <svg xmlns="http://www.w3.org/2000/svg" 
+           <svg xmlns="http://www.w3.org/2000/svg" 
                     viewBox="0 0 24 24" 
                     fill="currentColor" 
                     className="size-4">
@@ -223,9 +255,9 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
                   <svg xmlns="http://www.w3.org/2000/svg" 
                   viewBox="0 0 24 24" fill="currentColor" 
                   className="size-4 hover:cursor-pointer text-red-700"
-                  onClick={() => deleteProduct(product.trueId)}>
+                  onClick={() => deleteProduct(orderDetail)}>
                     <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z" clipRule="evenodd" />
-                  </svg>
+                </svg>
 
                   
                 </td>
@@ -263,4 +295,4 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
   );
 };
 
-export default OrderTable;
+export default EditTable;
