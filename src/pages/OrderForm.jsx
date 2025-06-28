@@ -42,7 +42,7 @@ const OrderForm = ({ user, setUser }) => {
           user.role == 3 &&
           user.id !== orderDetail.salesmanid
         ){
-
+          navigate(`${window.location.pathname}/error`, {state: {user,setUser}})
         }
       }
     }

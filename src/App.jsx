@@ -82,7 +82,7 @@ function App() {
           element={<AdminPage user={user} setUser={setUser} />}
         />
 
-        <Route path="/error" element={<Error user={user} setUset={setUser} />} />
+        <Route path="/error" element={<Error user={user} setUser={setUser} />} />
       </Routes>
     </div>
   );
