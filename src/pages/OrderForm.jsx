@@ -215,7 +215,7 @@ const OrderForm = ({ user, setUser }) => {
                   )}
 
                   {orderActiveTab ==="supplementorder" && (
-                    <SupplementOrderList className=" h-[90%] w-full bg-[#f3eaea] border-t-1 border-gray-400 " supplementList={supplementOrder || []} />
+                    <SupplementOrderList className=" h-[90%] w-full bg-[#ffffff] border-t-1 border-gray-400 " supplementList={supplementOrder || []} />
                   )}
 
                   {/* Empty table body area */}
@@ -232,7 +232,7 @@ const OrderForm = ({ user, setUser }) => {
             
           </div>
         </div>
-        <div className="flex flex-row gap-2 w-full mt-5 pb-30 mb-20">
+        <div className="flex flex-row gap-2 w-full mt-5  mb-20">
               <div className="basis-2/3  w-[60%]">              
                 {/* <SupplementOrderList className=" basis-2/3 w-[40%] bg-[#f3eaea] border-t-1 border-gray-400 fixed" supplementList={supplementOrder || []} /> */}
               </div>

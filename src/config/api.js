@@ -23,6 +23,7 @@ export const api = {
 
     GET_SUPPPLEMENT_ORDER: (orderid) =>`${baseUrl}/supplement/${orderid}`,
     ADD_SUPPLEMENT_ORDER: `${baseUrl}/supplement`,
+    GET_SUPPLEMENT_DETAIL_BY_ID: (id) => `${baseUrl}/supplement/detail/${id}`,
   //partner API
   GET_PARTNERS: `${baseUrl}/partners`,
   ADD_PARTNER: `${baseUrl}/partners/`,
