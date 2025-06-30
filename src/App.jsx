@@ -8,6 +8,7 @@ import ExportOrder from "./pages/Export";
 import CreateImportOrder from "./pages/CreateImportOrder";
 import CreateExportOrder from "./pages/CreateExportOrder";
 import ViewOrder from "./pages/OrderForm";
+import EditOrder from "./pages/EditOrder";
 import Header from "./components/common/header";
 
 import FormTemplate from "./components/order/partnerForm";
@@ -19,6 +20,8 @@ import DeliverySchedule from "./pages/DeliverySchedule";
 import Profile from "./pages/Profile";
 import AdminPage from "./pages/AdminPage";
 
+import Error404 from "./pages/Error-404";
+import Error403 from "./pages/Error-403";
 
 
 function App() {
@@ -44,10 +47,14 @@ function App() {
           path='/xuat-hang/tao-don-xuat-hang'
           element={<CreateExportOrder setUser={setUser} user={user} />}
         />
+        {/* View Order */}
+        <Route path="/nhap-hang/:id" element={<ViewOrder user={user} setUser={setUser} />} />
+        <Route path='/xuat-hang/:id' element={<ViewOrder user={user} setUser={setUser} />} />
 
-        <Route path="/nhap-hang/:id" element={<ViewOrder />} />
-        <Route path='/xuat-hang/:id' element={<ViewOrder />} />
-        
+        {/* Edit Order */}
+        <Route path="/nhap-hang/:id/cap-nhat" element={<EditOrder user={user} setUser={setUser} />} />
+        <Route path='/xuat-hang/:id/cap-nhat' element={<EditOrder user={user} setUser={setUser} />} />
+
         <Route
           path="/tong-quan-kho"
           element={<OverviewPage user={user} setUser={setUser} />}
@@ -75,6 +82,8 @@ function App() {
           path="/danh-sach-nguoi-dung"
           element={<AdminPage user={user} setUser={setUser} />}
         />
+        <Route path="/error403" element={<Error403 user={user} setUser={setUser} />} />
+        <Route path="/error404" element={<Error404 user={user} setUser={setUser} />} />
       </Routes>
     </div>
   );
