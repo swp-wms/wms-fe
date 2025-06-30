@@ -1,8 +1,18 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare, faSave, faBackward, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPenToSquare,
+  faSave,
+  faBackward,
+  faPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { getAllUserInfo, updateUserInfo, createNewUser } from "../../backendCalls/userInfo";
+import {
+  getAllUserInfo,
+  updateUserInfo,
+  createNewUser,
+} from "../../backendCalls/userInfo";
+import toast from "react-hot-toast";
 
 const AccountManage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,9 +30,7 @@ const AccountManage = () => {
     roleid: "",
   });
   const [isEditUpdating, setIsEditUpdating] = useState(false);
-
   const [showCreateModal, setShowCreateModal] = useState(false);
-
   const [createFormData, setCreateFormData] = useState({
     fullname: "",
     username: "",
@@ -91,8 +99,9 @@ const AccountManage = () => {
   const handleConfirmStatusChange = async () => {
     if (!selectedUser) return;
 
+    ////////////////////////////////////////////
     console.log("Selected User:", selectedUser);
-    
+
     setIsUpdating(true);
     try {
       const newStatus = selectedUser.status === "1" ? "0" : "1";
@@ -108,13 +117,13 @@ const AccountManage = () => {
             user.id === selectedUser.id ? { ...user, status: newStatus } : user
           )
         );
-        alert("Cập nhật trạng thái thành công!");
+        toast.success("Cập nhật trạng thái thành công!");
       } else {
-        alert("Có lỗi xảy ra khi cập nhật trạng thái!");
+        toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
       }
     } catch (error) {
       console.error("Error updating user status:", error);
-      alert("Có lỗi xảy ra khi cập nhật trạng thái!");
+      toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
     } finally {
       setIsUpdating(false);
       setShowConfirmModal(false);
@@ -172,11 +181,11 @@ const AccountManage = () => {
               : user
           )
         );
-        alert("Cập nhật thông tin thành công!");
+        toast.success("Cập nhật thông tin thành công!");
         setShowEditModal(false);
         setEditingUser(null);
       } else {
-        alert("Có lỗi xảy ra khi cập nhật thông tin!");
+        toast.error("Có lỗi xảy ra khi cập nhật thông tin!");
       }
     } catch (error) {
       console.error("Error updating user info:", error);
@@ -226,7 +235,7 @@ const AccountManage = () => {
   const handleCreateUser = async () => {
     createFormData.roleid = getRoleIdFromName(createFormData.role);
     console.log("Create Form Data:", createFormData);
-    
+
     if (
       !createFormData.fullname ||
       !createFormData.username ||
@@ -252,11 +261,15 @@ const AccountManage = () => {
       };
 
       const response = await createNewUser(newUserData);
-      {console.log("New User Data:", newUserData)}
-      {console.log("Response:", response)}
+      {
+        console.log("New User Data:", newUserData);
+      }
+      {
+        console.log("Response:", response);
+      }
 
       if (response.status === 200 || response.status === 201) {
-        // Refresh user list
+        // Refresh
         const getUsersResponse = await getAllUserInfo();
         if (getUsersResponse.status === 200) {
           setUsers(
@@ -308,7 +321,7 @@ const AccountManage = () => {
       {/* Search + Filter + Add */}
       <div className="flex items-center justify-between mb-6 gap-4">
         {/* Search */}
-        <div className="relative flex-1 max-w-md">
+        <div className="flex-1 max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FontAwesomeIcon
               icon={faMagnifyingGlass}
@@ -324,7 +337,7 @@ const AccountManage = () => {
           />
         </div>
 
-        {/* Position Filter */}
+        {/* Filter */}
         <div className="flex-shrink-0">
           <select
             value={selectedPosition}
@@ -340,7 +353,7 @@ const AccountManage = () => {
           </select>
         </div>
 
-        {/* Add Account Button */}
+        {/* Add */}
         <button
           onClick={handleCreateClick}
           className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -429,7 +442,7 @@ const AccountManage = () => {
         </table>
       </div>
 
-      {/* Confirmation Modal */}
+      {/* Confirmation */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-300 rounded-lg p-6 max-w-md w-full mx-4">
@@ -488,7 +501,6 @@ const AccountManage = () => {
         <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-200 rounded-lg p-6 max-w-4xl w-full mx-4 relative">
             <div className="flex items-start gap-8">
-              {/* Avatar */}
               <div className="flex flex-col items-center gap-4">
                 <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
                   <svg
@@ -504,7 +516,7 @@ const AccountManage = () => {
                   </svg>
                 </div>
 
-                {/* Role dropdown */}
+                {/* Role */}
                 <div className="w-40">
                   <select
                     value={editFormData.role}
@@ -523,7 +535,7 @@ const AccountManage = () => {
                 </div>
               </div>
 
-              {/* Form fields */}
+              {/* Data */}
               <div className="flex-1 space-y-4">
                 <div className="flex items-center gap-4">
                   <label className="w-32 text-sm font-medium text-gray-700">
@@ -581,7 +593,7 @@ const AccountManage = () => {
                 </div>
               </div>
 
-              {/* Action buttons */}
+              {/* Buttons */}
               <div className="flex flex-col gap-3">
                 <button
                   onClick={handleSaveEdit}
@@ -610,7 +622,6 @@ const AccountManage = () => {
         <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-200 rounded-lg p-6 max-w-4xl w-full mx-4 relative">
             <div className="flex items-start gap-8">
-              {/* Avatar */}
               <div className="flex flex-col items-center gap-4">
                 <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
                   <svg
@@ -645,7 +656,7 @@ const AccountManage = () => {
                 </div>
               </div>
 
-              {/* Form fields */}
+              {/* Data */}
               <div className="flex-1 space-y-4">
                 <div className="flex items-center gap-4">
                   <label className="w-32 text-sm font-medium text-gray-700">
@@ -653,7 +664,7 @@ const AccountManage = () => {
                   </label>
                   <input
                     type="text"
-                    value={createFormData.fullname}
+                    // value={createFormData.fullname}
                     onChange={(e) =>
                       handleCreateFormChange("fullname", e.target.value)
                     }
@@ -668,15 +679,15 @@ const AccountManage = () => {
                   </label>
                   <div className="flex-1">
                     <input
+                      placeholder="example@email.com"
                       type="email"
-                      value={createFormData.username}
+                      // value={createFormData.username}
                       onChange={(e) =>
                         handleCreateFormChange("username", e.target.value)
                       }
                       className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                         emailError ? "border-red-500" : "border-gray-300"
                       }`}
-                      placeholder="example@email.com"
                     />
                     {emailError && (
                       <p className="text-red-500 text-xs mt-1">{emailError}</p>
@@ -690,7 +701,7 @@ const AccountManage = () => {
                   </label>
                   <input
                     type="password"
-                    value={createFormData.password}
+                    // value={createFormData.password}
                     onChange={(e) =>
                       handleCreateFormChange("password", e.target.value)
                     }
@@ -700,7 +711,7 @@ const AccountManage = () => {
                 </div>
               </div>
 
-              {/* Action buttons */}
+              {/* Buttons */}
               <div className="flex flex-col gap-3">
                 <button
                   onClick={handleCreateUser}
