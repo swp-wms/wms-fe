@@ -86,10 +86,11 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
    
      const checkSalesmanId = () => {
       if(orderDetail && user){
-        
+        const userRole = user.role.rolename;
         console.log("user id: ", user.id);
         console.log("orderDetail.salesmanid: ", orderDetail.salesmanid);
-        if((allowedRoles.find(role => role ===user.role.rolename) &&user.id !== orderDetail.salesmanid) || !allowedRoles.find(role => role ===user.role.rolename)){
+        if((allowedRoles.find(role => role ===userRole) 
+          &&user.id !== orderDetail.salesmanid) || !allowedRoles.find(role => role === userRole)){
             navigate(`/error403`);
         }
       }

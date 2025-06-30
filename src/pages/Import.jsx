@@ -53,7 +53,7 @@ const ImportOrder = ({ user, setUser }) => {
         <div className="relative ml-75 pt-24">
 
             <div className="m-5 flex flex-wrap gap-7  ">
-                {user.role == 3 && (
+                {user.roleid == 3 && (
                     <Link to="./tao-don-nhap-hang" className=" group bg-gray-100 w-full sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex border-2 border-gray-200 rounded-md hover:bg-gray-300 hover:border-gray-400 items-center justify-center">
                         <FontAwesomeIcon className="w-full text-gray-400 transition-colors duration-200 group-hover:text-gray-600" icon={faFileCirclePlus} size="3x" />
                     </Link>

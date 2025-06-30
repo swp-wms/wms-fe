@@ -108,7 +108,14 @@ const CreateOrder = ({user, setUser}) => {
     const value = Number(item.weight);
     return !isNaN(value) ? sum + value : sum;
   }, 0);
-
+  let checkNumberOfBars = () => {
+    const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0 || product.numberofbars == null);
+      if(invalidProducts.length > 0) {
+        return false;
+      }
+      return true;
+            
+    };
   return (
     <div className="min-h-screen bg-[#fafafa] pt-25 pl-77 pr-5 ">
       <div className="max-X`w-9xl mx-auto relative">
@@ -178,7 +185,8 @@ const CreateOrder = ({user, setUser}) => {
                 disabled={
                   !selectedPartner ||
                   !selectedProducts ||
-                  selectedProducts.length === 0
+                  selectedProducts.length === 0||
+                  !checkNumberOfBars()
                 }
 
               >
