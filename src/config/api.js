@@ -1,22 +1,28 @@
 const baseUrl = "http://localhost:3800";
 
 export const api = {
-  LOGIN: `${baseUrl}/login`,
-  LOGOUT: `${baseUrl}/logout`,
-  REGISTER: `${baseUrl}/register`,
-  GET_USER: `${baseUrl}/users/me`,
-  UPDATE_USER: (userid) => `${baseUrl}/users/${userid}`,
-  FORGET_PASSWORD: `${baseUrl}/forget-password`,
-  RESET_PASSWORD: `${baseUrl}/reset-password`,
-  // Order API
-  GET_ORDERS: `${baseUrl}/orders`,
-  GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
-  GET_EXPORT_ORDER: `${baseUrl}/orders/export`,
-  GET_ORDER_DETAIL: `${baseUrl}/detail`,
-  CREATE_ORDER: `${baseUrl}/orders/`,
-  GET_REMAIN_QUANTITY: (orderid) => `${baseUrl}/detail/${orderid}/remain`,
-  CHECK_COMPLETE: (orderid) => `${baseUrl}/orders/${orderid}/complete`,
 
+    LOGIN: `${baseUrl}/login`,
+    LOGOUT: `${baseUrl}/logout`,
+    REGISTER: `${baseUrl}/register`,
+    GET_USER: `${baseUrl}/users/me`,
+    UPDATE_USER: (userid) => `${baseUrl}/users/${userid}`,
+    FORGET_PASSWORD: `${baseUrl}/forget-password`,
+    RESET_PASSWORD: `${baseUrl}/reset-password`,
+    // Order API
+    GET_ORDERS: `${baseUrl}/orders`,
+    GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
+    GET_EXPORT_ORDER: `${baseUrl}/orders/export`,
+    GET_ORDER_DETAIL: `${baseUrl}/detail`,
+    CREATE_ORDER: `${baseUrl}/orders/`,
+    GET_DELIVERY_DETAIL_FOR_UPDATE_ORDER: `${baseUrl}/orders/delivery`,
+    UPDATE_ORDER: (orderid) => `${baseUrl}/orders/${orderid}`,
+
+    GET_REMAIN_QUANTITY: (orderid) => `${baseUrl}/detail/${orderid}/remain`,
+    CHECK_COMPLETE: (orderid) => `${baseUrl}/orders/${orderid}/complete`,
+
+    GET_SUPPPLEMENT_ORDER: (orderid) =>`${baseUrl}/supplement/${orderid}`,
+    ADD_SUPPLEMENT_ORDER: `${baseUrl}/supplement`,
   //partner API
   GET_PARTNERS: `${baseUrl}/partners`,
   ADD_PARTNER: `${baseUrl}/partners/`,

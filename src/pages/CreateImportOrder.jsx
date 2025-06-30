@@ -67,6 +67,14 @@ const CreateOrder = ({user, setUser}) => {
     fetchPartners();
     fetchProducts();
   },[]);
+  let checkNumberOfBars = () => {
+            const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0 || product.numberofbars == null);
+            if(invalidProducts.length > 0) {
+              return false;
+            }
+            return true;
+            
+          };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -179,7 +187,8 @@ const CreateOrder = ({user, setUser}) => {
                 disabled={
                   !selectedPartner ||
                   !selectedProducts ||
-                  selectedProducts.length === 0
+                  selectedProducts.length === 0 ||
+                  !checkNumberOfBars()
                 }
 
               >
