@@ -4,7 +4,7 @@ import DeliveryList from "../components/delivery/DeliveryList"
 import { getUser } from "../backendCalls/user";
 import DeliveryForm from "../components/delivery/DeliveryForm";
 import { useParams } from "react-router-dom";
-import { getAllExportDelivery, getAllImportDelivery, getDeliveriesForOrder, getDeliveryDetail } from "../backendCalls/delivery";
+import { getAllExportDelivery, getAllImportDelivery, getDeliveryDetail } from "../backendCalls/delivery";
 
 
 const DeliverySchedule = ({ user, setUser }) => {
@@ -15,20 +15,6 @@ const DeliverySchedule = ({ user, setUser }) => {
   const [deliverySchedule, setDeliverySchedule] = useState([]);
   const [currentDelivery, setCurrentDelivery] = useState();
   const [currentDeliveryDetail, setCurrentDeliveryDetail] = useState();
-
-  useEffect(() => {
-    const getData = async () => {
-      setDeliverySchedule([]);
-      setCurrentDelivery();
-      setCurrentDeliveryDetail();
-      if (currentOrder) {
-        const response = (await getDeliveriesForOrder(currentOrder.orderid)).data;
-        setDeliverySchedule(response.length > 0 ? response.sort((a, b) => new Date(a.deliverydate) - new Date(b.deliverydate)) : []);
-      }
-    }
-
-    getData();
-  }, [currentOrder, setCurrentOrder])
 
   useEffect(() => {
     const getData = async () => {
@@ -67,7 +53,7 @@ const DeliverySchedule = ({ user, setUser }) => {
       }
       getData();
     }
-  }, []);
+  }, [currentOrder, setCurrentOrder]);
 
   return (
     <div className="DeliverySchedule fixed bottom-0 right-0 top-[80px] left-[23%]">
@@ -75,9 +61,12 @@ const DeliverySchedule = ({ user, setUser }) => {
         <div className="flex-1 h-full">
           <h1 className="font-medium mb-2">Đơn {act === 'nhap' ? 'nhập' : 'xuất'} hàng</h1>
           {orders && <OrderList
-            orders={orders} setOrders={setOrders}
-            currentOrder={currentOrder}
+            setDeliverySchedule={setDeliverySchedule}
+            orders={orders} 
+            setCurrentDelivery={setCurrentDelivery}
+            setCurrentDeliveryDetail={setCurrentDeliveryDetail}
             setCurrentOrder={setCurrentOrder}
+
             user={user}
           />}
         </div>

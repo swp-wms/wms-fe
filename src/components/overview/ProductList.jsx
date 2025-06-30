@@ -17,6 +17,7 @@ const ProductList = () => {
   const [productCatalog, setProductCatalog] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const getData = async () => {
@@ -41,12 +42,6 @@ const ProductList = () => {
     reader.readAsArrayBuffer(file);
   };
 
-  const totalPages = Math.ceil(productCatalog.length / ITEMS_PER_PAGE);
-  const paginatedData = productCatalog.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-
   const handleSaveEdit = (updatedProduct) => {
     setProductCatalog((prev) =>
       prev.map((item) =>
@@ -55,6 +50,19 @@ const ProductList = () => {
     );
     setEditingProduct(null);
   };
+
+  const filteredData = productCatalog.filter((item) => {
+    const name = item.name?.toLowerCase() || "";
+    const namedetail = item.namedetail?.toLowerCase() || "";
+    const search = searchTerm.toLowerCase();
+    return name.includes(search) || namedetail.includes(search);
+  });
+
+  const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <section>
@@ -65,8 +73,14 @@ const ProductList = () => {
             type="text"
             placeholder="Tìm kiếm mã hàng hóa, tên hàng hóa"
             className="outline-0 w-full"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
           />
         </div>
+
         <div className="flex gap-4">
           <label className="flex bg-white shadow-btn py-2 px-4 items-center gap-4 rounded-sm cursor-pointer">
             <FontAwesomeIcon icon={faArrowUpFromBracket} />
@@ -74,7 +88,7 @@ const ProductList = () => {
             <input type="file" className="hidden" onChange={handleFileUpload} />
           </label>
 
-          <div className="flex bg-white shadow-btn py-2 px-4 items-center gap-4 rounded-sm">
+          <div className="flex bg-white shadow-btn py-2 px-4 items-center gap-4 rounded-sm" onClick={editingProduct}>
             <FontAwesomeIcon icon={faSquarePlus} />
             <span className="font-medium">Thêm hàng hóa</span>
           </div>
@@ -95,7 +109,9 @@ const ProductList = () => {
           Trang {currentPage} / {totalPages}
         </span>
         <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           disabled={currentPage === totalPages}
           className="px-3 py-1 border rounded disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
         >
@@ -127,16 +143,26 @@ const TableList = ({ data, onEdit }) => {
             <th className="border border-black">Loại thép</th>
             <th className="border border-black">Mã thép</th>
             <th className="border border-black">Số lượng </th>
-            <th className="border border-black">Độ dài <br />(m)</th>
-            <th className="border border-black">Đơn trọng <br />(kg)</th>
-            <th className="border border-black py-2">Tổng khối lượng <br /> (kg)</th>
+            <th className="border border-black">
+              Độ dài <br />
+              (m)
+            </th>
+            <th className="border border-black">
+              Đơn trọng <br />
+              (kg)
+            </th>
+            <th className="border border-black py-2">
+              Tổng khối lượng <br /> (kg)
+            </th>
             <th className="border border-black">Ghi chú</th>
             <th className="border border-black">Tùy chọn</th>
           </tr>
         </thead>
         <tbody>
           {data.map((item, index) => {
-            const length = item.catalog ? item.catalog.length : item.length || 0;
+            const length = item.catalog
+              ? item.catalog.length
+              : item.length || 0;
             const weight = item.catalog
               ? item.catalog.weightperbundle / item.catalog.barsperbundle
               : item.weight || 0;
@@ -155,10 +181,11 @@ const TableList = ({ data, onEdit }) => {
                 <td className="border border-black">{item.totalbar}</td>
                 <td className="border border-black">{length}</td>
                 <td className="border border-black">{weight.toFixed(2)}</td>
-                <td className="border border-black">{totalWeight.toFixed(2)}</td>
+                <td className="border border-black">
+                  {totalWeight.toFixed(2)}
+                </td>
                 <td className="border border-black">{item.note}</td>
                 <td className="border border-black text-center py-1">
-                  <FontAwesomeIcon icon={faCircleMinus} className="px-2 text-red-600" />
                   <FontAwesomeIcon
                     icon={faPenToSquare}
                     className="px-2 cursor-pointer"

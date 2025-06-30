@@ -136,3 +136,15 @@ export const handleUpdateRealData = async (deliveryid, realData, act) => {
         return error;
     }
 }
+export const handleCancelDelivery = async (deliveryid) => {
+    try {
+        const response = await axios.put(api.CANCEL_DELIVERY(deliveryid), {}, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        return response;
+    } catch (error) {
+        return error;
+    }
+}
