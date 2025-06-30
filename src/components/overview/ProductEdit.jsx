@@ -5,6 +5,7 @@ import {
   faSquareXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 const ProductEdit = ({ product, onClose, onSave }) => {
   const [formData, setFormData] = useState({ ...product });
@@ -15,24 +16,28 @@ const ProductEdit = ({ product, onClose, onSave }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const notify = () => toast.error("Vui lòng nhập lại thông tin");
+
   const validate = () => {
     const newErrors = {};
 
     // Mã hàng hóa bắt buộc bắt đầu bằng "TD"
     if (!/^TD/.test(formData.name || "")) {
       newErrors.name = "Mã hàng hóa phải bắt đầu bằng 'TD'";
+      notify();
     }
 
     // Tên hàng hóa phải theo định dạng: D10CB400V hoặc D12CB500T
     if (!/^Thép D\d{2}CB\d{3}[VT]$/.test(formData.namedetail || "")) {
       newErrors.namedetail =
         "Tên hàng hóa phải theo định dạng 'Thép DxxCBxxxV' hoặc 'Thép DxxCBxxxT', với x là chữ số";
+      notify();
     }
 
     // Mã thép phải theo định dạng: D + 2 số, ví dụ D10
     if (!/^D\d{2}$/.test(formData.steeltype || "")) {
-      newErrors.steeltype =
-        "Mã thép phải theo định dạng Dxx, với x là chữ số";
+      newErrors.steeltype = "Mã thép phải theo định dạng Dxx, với x là chữ số";
+      notify();
     }
 
     setErrors(newErrors);
@@ -42,6 +47,7 @@ const ProductEdit = ({ product, onClose, onSave }) => {
   const handleSave = () => {
     if (validate()) {
       onSave(formData);
+      toast.success("Lưu thông tin thành công");
     }
   };
 
@@ -89,7 +95,9 @@ const ProductEdit = ({ product, onClose, onSave }) => {
               }`}
             />
             {errors.namedetail && (
-              <p className="text-red-500 text-[10px] mt-1">{errors.namedetail}</p>
+              <p className="text-red-500 text-[10px] mt-1">
+                {errors.namedetail}
+              </p>
             )}
           </div>
 
@@ -137,7 +145,9 @@ const ProductEdit = ({ product, onClose, onSave }) => {
               }`}
             />
             {errors.steeltype && (
-              <p className="text-red-500 text-[10px] mt-1">{errors.steeltype}</p>
+              <p className="text-red-500 text-[10px] mt-1">
+                {errors.steeltype}
+              </p>
             )}
           </div>
 
@@ -187,7 +197,7 @@ const ProductEdit = ({ product, onClose, onSave }) => {
               name="totalweight"
               value={totalWeight.toFixed(2)}
               readOnly
-              className="w-full border px-2 py-1 rounded bg-gray-100"
+              className="w-full border px-2 py-1 rounded bg-gray-100 cursor-not-allowed"
             />
           </div>
 

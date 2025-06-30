@@ -17,3 +17,19 @@ export const fetchWarehouses = async () => {
         throw error; 
     }
 }
+
+export const fetchWarehousesByDate = async (delivery_date) => {
+    try {
+        const response = await axios.get(`${api.GET_WAREHOUSE_BY_DATE(delivery_date)}`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouses:", error);
+        throw error; 
+    }
+}
+
