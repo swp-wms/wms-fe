@@ -3,11 +3,13 @@ import { getRemainQuantityOfOrder } from "../../backendCalls/orderDetail";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRemove, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { handleUpdateRealData } from "../../backendCalls/delivery";
+import toast from "react-hot-toast";
 
 const ProductTable = ({
     currentOrder,
     currentDelivery, currentDeliveryDetail,
-    setCurrentDeliveryDetail,
+    setCurrentDeliveryDetail, setCurrentDelivery,
+    deliverySchedule, setDeliverySchedule,
     user, act,
     newDeliveryList, setNewDeliveryList
 }) => {
@@ -38,7 +40,10 @@ const ProductTable = ({
         try {
             await handleUpdateRealData(currentDelivery.id, realData, act);
             setError();
-            window.location.reload();
+            // window.location.reload();
+            setCurrentDelivery({...currentDelivery, deliverystatus: currentDelivery.deliverystatus === '4' ? '5' : '4'});
+            setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: currentDelivery.deliverystatus === '4' ? '5' : '4' } : delivery));
+            toast.success('Xác nhận thành công.');
         } catch (error) {
             console.log(error);
 
@@ -298,7 +303,7 @@ const ProductTable = ({
                         }
                         {!currentDelivery > 0 &&
                             <>
-                                <td className='text-center'>Tổng: {totalQuantity}kg</td>
+                                <td className='text-center'>Tổng: {totalQuantity}</td>
                                 <td className='text-center'>Tổng: {totalWeight.toFixed(2)}kg</td>
                             </>
                         }
