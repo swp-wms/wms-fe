@@ -5,7 +5,7 @@ import { api } from '../../config/api';
 import { handleCancelDelivery } from '../../backendCalls/delivery';
 import toast from 'react-hot-toast';
 const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
-    const notify = () => toast("Chuyển trạng thái thành công.");
+    const notify = () => toast.success("Chuyển trạng thái thành công.");
 
     const [status, setStatus] = useState();
     const [error, setError] = useState();
@@ -28,7 +28,8 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 });
-                setCurrentDelivery({...currentDelivery, deliverystatus: '4'});
+                setCurrentDelivery({ ...currentDelivery, deliverystatus: '4' });
+                notify();
             }
             if (status === '4') {
                 await axios.put(api.COMPLETE(currentDelivery.id), { act }, {
@@ -36,8 +37,9 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 });
+                setCurrentDelivery({ ...currentDelivery, deliverystatus: '5' });
+                notify();
             }
-            notify();
         } catch (error) {
             setError(error.response.data.message);
         }
