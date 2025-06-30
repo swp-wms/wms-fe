@@ -40,6 +40,7 @@ const EditOrder = ({user, setUser}) => {
 //---------------References---------------
 const location = useLocation();
 const navigate = useNavigate();
+const allowedRoles = ["Salesman"];
 const orderDetail = location.state?.orderDetail || null; // Get order details from the state if available
 const orderId = location.state?.id || null; // Get order ID from the state if available
   React.useEffect(() => {
@@ -85,11 +86,11 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
    
      const checkSalesmanId = () => {
       if(orderDetail && user){
-        if(
-          user.role == 3 &&
-          user.id !== orderDetail.salesmanid
-        ){
-
+        
+        console.log("user id: ", user.id);
+        console.log("orderDetail.salesmanid: ", orderDetail.salesmanid);
+        if((allowedRoles.find(role => role ===user.role.rolename) &&user.id !== orderDetail.salesmanid) || !allowedRoles.find(role => role ===user.role.rolename)){
+            navigate(`/error403`);
         }
       }
     }

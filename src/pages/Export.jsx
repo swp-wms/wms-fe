@@ -50,12 +50,13 @@ const ImportOrder = ({user, setUser}) => {
         <>
           
             <div className="bg-[#fafafa] ml-75 pt-24">
-
+                
                 <div className="m-5 flex flex-wrap gap-7">
+                    {user.role == 3 && (
                     <Link to="./tao-don-xuat-hang" className="group bg-gray-100 w-full sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex border-2 border-gray-200 rounded-md hover:bg-gray-300 hover:border-gray-400 items-center justify-center">
                         <FontAwesomeIcon className="w-full text-gray-400 transition-colors duration-200 group-hover:text-gray-600" icon={faFileCirclePlus} size="3x"/>
                     </Link>
-
+                    )}
                     {orders.map((order) => (
                     <div key={order.id}  className=" space-y-2 bg-white w-full pb-4 sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex flex-col border-2 border-[#1e1e1e] justify-evenly rounded-md p-4 ">
                           <div className="flex flex-col gap-1">

@@ -20,7 +20,8 @@ import DeliverySchedule from "./pages/DeliverySchedule";
 import Profile from "./pages/Profile";
 import AdminPage from "./pages/AdminPage";
 
-import Error from "./pages/Error-404";
+import Error404 from "./pages/Error-404";
+import Error403 from "./pages/Error-403";
 
 
 function App() {
@@ -81,8 +82,8 @@ function App() {
           path="/danh-sach-nguoi-dung"
           element={<AdminPage user={user} setUser={setUser} />}
         />
-
-        <Route path="/error" element={<Error user={user} setUser={setUser} />} />
+        <Route path="/error403" element={<Error403 user={user} setUser={setUser} />} />
+        <Route path="/error404" element={<Error404 user={user} setUser={setUser} />} />
       </Routes>
     </div>
   );

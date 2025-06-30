@@ -1,24 +1,37 @@
 import React, {useState, useEffect} from "react";
+import { toast } from "react-hot-toast";
 
 const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalBars, totalWeight }) => {
   // Handler for changing product fields (e.g. quantity)
   
-  // useEffect(() => {
+  useEffect(() => {
 
-  //   const filtered = new Map();
-  //   if(selectedProducts.length > 1) {
-  //     selectedProducts.forEach((item,index) => {
-  //       const key =`${item.name}-${item.brandname}`;
-  //       if(filtered.has(key)){
-  //         filtered.set(key,{...selectedProducts[index],numberofbars: item.numberofbars + 1}); 
-  //       } else {
-  //         filtered.set(key,{...selectedProducts[index]}); 
-  //       }
-  //     })
+    // const filtered = new Map();
+    // if(selectedProducts.length > 1) {
+    //   selectedProducts.forEach((item,index) => {
+    //     const key =`${item.name}-${item.brandname}`;
+    //     if(filtered.has(key)){
+    //       filtered.set(key,{...selectedProducts[index],numberofbars: item.numberofbars + 1}); 
+    //     } else {
+    //       filtered.set(key,{...selectedProducts[index]}); 
+    //     }
+    //   })
 
-  //     setSelectedProducts(Array.from(filtered.values()).sort((a,b) => a.trueId - b.trueId));
-  //   } 
-  // }, [selectedProducts, setSelectedProducts]);
+    //   setSelectedProducts(Array.from(filtered.values()).sort((a,b) => a.trueId - b.trueId));
+    // } 
+
+  const checkNumberOfBars = () => {
+    const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0);
+    if(invalidProducts.length > 0) {
+      toast.error("Số lượng hàng hóa mỗi loại phải lớn hơn 0");
+      return false;
+    }
+    return true;
+    
+  }
+  checkNumberOfBars();
+
+  }, [selectedProducts, setSelectedProducts]);
   const handleProductFieldChange = (id, field, value) => {
     if (
       (field === "numberofbars" || field === "weight") &&

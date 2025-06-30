@@ -21,7 +21,8 @@ export const api = {
     GET_REMAIN_QUANTITY: (orderid) => `${baseUrl}/detail/${orderid}/remain`,
     CHECK_COMPLETE: (orderid) => `${baseUrl}/orders/${orderid}/complete`,
 
-
+    GET_SUPPPLEMENT_ORDER: (orderid) =>`${baseUrl}/supplement/${orderid}`,
+    ADD_SUPPLEMENT_ORDER: `${baseUrl}/supplement`,
   //partner API
   GET_PARTNERS: `${baseUrl}/partners`,
   ADD_PARTNER: `${baseUrl}/partners/`,
