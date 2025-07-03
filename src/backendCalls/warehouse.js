@@ -33,3 +33,33 @@ export const fetchWarehousesByDate = async (delivery_date) => {
     }
 }
 
+export const fetchWeightByBrand = async () => {
+    try {
+        const response = await axios.get(`${api.GET_WEIGHT_BY_BRANDNAME}`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouses:", error);
+        throw error; 
+    }
+}
+
+export const fetchWeightByPartner = async () => {
+    try {
+        const response = await axios.get(`${api.GET_WEIGHT_BY_PARTNER}`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouses:", error);
+        throw error; 
+    }
+}
+

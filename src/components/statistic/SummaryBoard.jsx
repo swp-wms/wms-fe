@@ -12,6 +12,10 @@ import {
 } from "chart.js";
 import { fetchImportWarehouses } from "../../backendCalls/import";
 import { fetchExportWarehouses } from "../../backendCalls/export";
+import {
+  fetchWeightByBrand,
+  fetchWeightByPartner,
+} from "../../backendCalls/warehouse";
 
 ChartJS.register(
   ArcElement,
@@ -55,6 +59,8 @@ const SummaryBoard = () => {
   const [exportWeight, setExportWeight] = useState(0);
   const [exportBarsPercent, setExportBarsPercent] = useState(0);
   const [exportWeightPercent, setExportWeightPercent] = useState(0);
+  const [weightBrands, setWeightBrands] = useState([]);
+  const [weightPartners, setWeightPartners] = useState([]);
 
   useEffect(() => {
     const getData = async () => {
@@ -77,6 +83,34 @@ const SummaryBoard = () => {
     };
     getData();
   }, []);
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetchWeightByBrand();
+      console.log(response);
+      setWeightBrands(response);
+    };
+    getData();
+  }, []);
+
+  const doughnutData = {
+    labels: weightBrands.map((item) => item.brandname),
+    values: weightBrands.map((item) => item.total_weight),
+  };
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetchWeightByPartner();
+      console.log(response);
+      setWeightPartners(response);
+    };
+    getData();
+  });
+
+  const barData = {
+    labels: weightPartners.map((item) => item.name),
+    values: weightPartners.map((item) => item.total_weight),
+  };
 
   return (
     <>
@@ -103,9 +137,9 @@ const SummaryBoard = () => {
         />
       </div>
       <div className="flex gap-14">
-        <DoughnutChart />
+        <DoughnutChart chartData={doughnutData} />
         <div className="bg-white shadow-btn rounded-lg w-full flex justify-center">
-          <BarChart />
+          <BarChart chartData={barData}/>
         </div>
       </div>
     </>
@@ -133,23 +167,12 @@ const Board = ({ number, title, status }) => {
   );
 };
 
-const BarChart = () => {
+const BarChart = ({ chartData }) => {
   return (
     <div className="w-full scale-90 ms-2">
       <Bar
         data={{
-          labels: [
-            "Công ty thép Đức Anh",
-            "Công ty TNHH thép Hòa Phát Hưng Yên",
-            "Công ty TNHH thép Kyoei Việt Nam",
-            "Công ty CP Tập Đoàn VAS Nghi Sơn",
-            "Công ty Cổ phần thép Việt Ý",
-            "Công Ty TNHH sản xuất và kinh doanh Thép Việt Đức",
-            "Công ty cổ phần thép Việt Nhật",
-            "Công ty TNHH Thép Tung Ho Việt Nam",
-            "Thép Tung Dịch Hai Duong",
-            "Công ty thép Đức Anh ProMax",
-          ],
+          labels: chartData.labels,
           datasets: [
             {
               label: "Khối lượng thép (kg)",
@@ -165,7 +188,7 @@ const BarChart = () => {
                 "gray",
                 "black",
               ],
-              data: [2478, 5267, 734, 784, 433, 1104, 675, 979, 406, 509],
+              data: chartData.values,
             },
           ],
         }}
@@ -184,25 +207,22 @@ const BarChart = () => {
   );
 };
 
-const DoughnutChart = () => {
+const DoughnutChart = ({ chartData }) => {
+  const data = {
+    labels: chartData.labels,
+    datasets: [
+      {
+        label: "Khối lượng (kg)",
+        backgroundColor: ["#3195ff", "#3cba9f", "pink", "#c45850"],
+        data: chartData.values,
+      },
+    ],
+  };
+
   return (
     <div className="bg-white shadow-btn py-4 px-5 rounded-lg">
       <Doughnut
-        data={{
-          labels: [
-            "Thép Việt Mỹ (thanh)",
-            "Thép Hóa Phát (thanh)",
-            "Thép Việt Mỹ (cuộn)",
-            "Thép Hòa Phát (cuộn)",
-          ],
-          datasets: [
-            {
-              label: "Khối lượng (kg)",
-              backgroundColor: ["#3195ff", "#3cba9f", "pink", "#c45850"],
-              data: [2478, 734, 784, 433],
-            },
-          ],
-        }}
+        data={data}
         options={{
           responsive: true,
           plugins: {
@@ -213,8 +233,6 @@ const DoughnutChart = () => {
               text: "Biểu đồ thống kê tổng khối lượng thép",
             },
           },
-          width: 400,
-          height: 400,
         }}
       />
     </div>

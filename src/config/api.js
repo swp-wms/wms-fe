@@ -35,6 +35,8 @@ export const api = {
   //warehouse API
   GET_WAREHOUSE: `${baseUrl}/warehouse`,
   GET_WAREHOUSE_BY_DATE: (createdate) => `${baseUrl}/warehouse/future/${createdate}`,
+  GET_WEIGHT_BY_BRANDNAME:`${baseUrl}/warehouse/brandname`,
+  GET_WEIGHT_BY_PARTNER:`${baseUrl}/warehouse/partner`,
 
   //import API
   GET_IMPORT: `${baseUrl}/warehouse/import`,
