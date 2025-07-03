@@ -61,7 +61,7 @@ const SupplementOrderList = ({ supplementList, className = "" }) => {
                     <span class="px-2 py-1 bg-gray-100 text-green-700 text-xs font-medium rounded-full">
                       {supplementType.find((s) => s.code === item.type)?.name}
                     </span>
-                    <span class="text-sm text-slate-500">bởi Nguyễn Văn A</span>
+                    <span class="text-sm text-slate-500">bởi {item.creator.fullname}</span>
                   </div>
                 </div>
 
@@ -144,29 +144,34 @@ const SupplementOrderList = ({ supplementList, className = "" }) => {
                 </button>
                 <h2 className="text-lg font-bold mb-4">Chi tiết đơn bù</h2>
                 <h4 className="font-bold mb-4">Ngày tạo: <span className="font-normal">{activeSupplementOrder.createdate}</span> </h4>
-                <h4 className="font-bold">
+                <h4 className="font-bold mb-4">Người tạo: <span className="font-normal">{activeSupplementOrder.creator.fullname}</span> </h4>
+                <h4 className="font-bold mb-4">
                   Loại đơn: 
                   <span className="font-normal">
                     {supplementType.find((s) => s.code === activeSupplementOrder.type)?.name}
                   </span>
                 </h4>
-                <div className="flex gap-4">
-                  <h4 className="font-medium">Ghi chú:</h4>
+                <div className="mb-4 flex gap-4">
+                  <h4 className="font-bold">Lý do:</h4>
 
                   <textarea
                     rows={6}
                     className="flex-1 border border-gray-400 rounded  mb-3 px-2 py-2 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ghi chú ..."
+                    placeholder="Lý do ..."
                     value={activeSupplementOrder.note || ""}
                     onChange={(e) => setOrderNote(e.target.value)}
+                    readOnly
                   />
                 </div>
 
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-gray-100">
-                      <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">
+                      <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-8">
                         STT
+                      </th>
+                      <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">
+                        Tên hãng
                       </th>
                       <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">
                         Mã hàng
@@ -174,13 +179,13 @@ const SupplementOrderList = ({ supplementList, className = "" }) => {
                       <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black">
                         Tên hàng hóa
                       </th>
-                      <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-16">
+                      <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-8">
                         Dài
                       </th>
-                      <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">
+                      <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-10">
                         Số lượng
                       </th>
-                      <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">
+                      <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-10">
                         Khối lượng
                       </th>
                       <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">
@@ -193,6 +198,9 @@ const SupplementOrderList = ({ supplementList, className = "" }) => {
                       <tr className="hover:bg-gray-50" key={index}>
                         <td className="border border-gray-800 px-2 py-2 text-xs text-black">
                           {index + 1}
+                        </td>
+                        <td className="border border-gray-800 px-2 py-2 text-xs text-black">
+                          {item.product.brandname}
                         </td>
                         <td className="border border-gray-800 px-2 py-2 text-xs text-black">
                           {item.product.name}
@@ -217,7 +225,7 @@ const SupplementOrderList = ({ supplementList, className = "" }) => {
                     <tr>
                       <td
                         className="border border-gray-800 px-2 py-2 pl-15 text-xs font-bold text-black w-12"
-                        colSpan={4}
+                        colSpan={5}
                       >
                         Tổng cộng
                       </td>

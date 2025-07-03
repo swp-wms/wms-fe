@@ -70,8 +70,10 @@ const SupplementForm = ({
         numberofbars: product?.numberofbars,
         weight: product?.weight,
       })),
+      totalWeight: totalWeight,
+      totalBars: totalBars,
     };
-
+    
     const response = await supplement.addSupplementOrder(supplementOrder);
     console.log("Response from supplement order:", response);
     if (response.success) {
@@ -143,11 +145,11 @@ const SupplementForm = ({
             totalWeight={totalWeight}
           />
           <div className="flex gap-4">
-            
+            <h4 className="font-bold text-l pl-4">Lý do:</h4>
             <textarea
               rows={6}
-              className="flex-1 border border-gray-400 rounded mx-4 mb-3 px-2 py-2 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ghi chú ..."
+              className="flex-1 border border-gray-400 rounded mx-4 ml-0 mb-3 px-2 py-2 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Lý do ..."
               onChange={(e) => setOrderNote(e.target.value)}
             />
           </div>
