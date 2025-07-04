@@ -29,7 +29,38 @@ const addCatalog = async (catalog) => {
         throw error;
     }
 }
+
+const fetchCatalogBrands = async () => {
+    try {
+        const response = await axios.get(`${api.GET_CATALOG_BRANDS}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        return response;    
+    }
+    catch( error ){
+        console.error("Error fetching catalog brands:", error);
+        throw error;
+    }
+}
+
+const fetchCatalogPrimaryKeys = async() =>{
+    try {
+        const response = await axios.get(`${api.GET_CATALOG_PRIMARY_KEY}`,{
+            headers:{
+                Authorization : `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        return response;
+    }catch(error){
+        console.error("Error fetching:", error);
+        throw error;
+    }
+}
 export default {
     fetchCatalog,
-    addCatalog
+    addCatalog,
+    fetchCatalogBrands,
+    fetchCatalogPrimaryKeys
 }

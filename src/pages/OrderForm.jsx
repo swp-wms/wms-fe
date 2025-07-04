@@ -32,6 +32,9 @@ const OrderForm = ({ user, setUser }) => {
       }
       getData();
     }
+  }, [user, setUser]);
+
+  useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
         const response = await order.getOrderDetail(id);
@@ -43,6 +46,8 @@ const OrderForm = ({ user, setUser }) => {
       }
     };
     fetchOrderDetails();
+  }, [id, user]);
+
 
   //   if(user){
   //   const checkSalesmanId = () => {
@@ -57,6 +62,7 @@ const OrderForm = ({ user, setUser }) => {
   //   }
   //   checkSalesmanId();
   // }
+  useEffect(() => {
     const getSupplementOrder = async () =>{
       try{
         const response = await supplement.getSupplementByOrderId(id);

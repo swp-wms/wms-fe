@@ -5,7 +5,8 @@ import {
   faChartSimple,
   faTruckFast,
   faFile,
-  faShapes
+  faShapes,
+  faBookOpenReader
 } from "@fortawesome/free-solid-svg-icons";
 
 const sideElement = [
@@ -63,7 +64,14 @@ const sideElement = [
       path: "/danh-sach-nguoi-dung",
       name: "Danh sách người dùng",
       allowed: [1]
+    }, {
+      id: 8,
+      icon: faBookOpenReader,
+      path: "/danh-muc",
+      "name": "Danh mục thép",
+      allowed: [3]
     }
+    
   ];
   
   export default sideElement
