@@ -73,6 +73,7 @@ const updateCatalog = async (catalog) => {
         return result;
     }catch(error){
         console.log("Exception:", error);
+        throw error;
 
     }
 }

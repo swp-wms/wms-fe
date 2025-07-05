@@ -11,6 +11,7 @@ const Catalog = ({user, setUser}) => {
     const [showCatalogForm, setShowCatalogForm] = useState(false);
     const [catalogDataEdit, setCatalogDataEdit] = useState([]);
     const [showEditForm, setShowEditForm] = useState(false);
+    const [refresh, setRefresh] = useState(false);
     useEffect(() => {
         console.log("Current user:", user);
         if (user == null) {
@@ -36,7 +37,7 @@ const Catalog = ({user, setUser}) => {
             }
         };
         fetchBrands();
-      }, [catalogData]);
+      }, [refresh]);
 
     useEffect(() => {
         const fetchData = async () =>{
@@ -51,7 +52,7 @@ const Catalog = ({user, setUser}) => {
 
         };
         fetchData();
-      }, [catalogData]);
+      }, [refresh]);
 
     const toggleEdit=() => {
         setShowEditForm(!showEditForm);
@@ -105,6 +106,7 @@ const Catalog = ({user, setUser}) => {
             if (response.status == 201 || response.status == 200) {
                 setCatalogData(response.data);
                 setShowEditForm(false);
+                setRefresh(!refresh);
                 toast.success("Lưu thay đổi thành công");
             } else {
                 console.error("Error to save catalog changes", response);
@@ -178,7 +180,9 @@ const Catalog = ({user, setUser}) => {
             {showCatalogForm && ( 
                 <CatalogForm 
                     setShowForm={setShowCatalogForm}
-                    setCatalogData={setCatalogData} />
+                    setCatalogData={setCatalogData}
+                    refresh={refresh}
+                    setRefresh={setRefresh} />
                 )}
 
             <div className="grid grid-cols-2 gap-4 shadow-sm border border-gray-200 overflow-hidden">

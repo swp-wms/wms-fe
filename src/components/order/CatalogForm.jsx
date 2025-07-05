@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 export const CatalogForm = ({
   setShowForm,
   setCatalogData,
+  refresh,
+  setRefresh,
 
 }) => {
   const [catalogPrimaryKeys, setCatalogPrimaryKeys] = useState([]);
@@ -310,7 +312,7 @@ export const CatalogForm = ({
           <div className="space-y-4">
         {catalogFieldRight.map( (field, i) => (
                 <div className="space-y-2" key={i}>
-                  <label className="flex flex-rowtext-sm font-bold text-gray-800 ">
+                  <label className="flex flex-row text-sm font-bold text-gray-800 ">
                     {field.label}
 
                     {formErrors && formErrors[field.name] && (
@@ -331,7 +333,7 @@ export const CatalogForm = ({
               <button
                 type="submit"
                 className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-                onClick={handleSubmit}
+                onClick={() => {handleSubmit(); setRefresh(!refresh)}}
                 // disabled={
                 //   !selectedProducts ||
                 //   selectedProducts.length === 0 ||
