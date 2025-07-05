@@ -52,6 +52,8 @@ export const api = {
   //catalog API
   GET_CATALOGS: `${baseUrl}/catalog`,
   ADD_CATALOG: `${baseUrl}/catalog`,
+  GET_CATALOG_BRANDS: `${baseUrl}/catalog/brands`,
+  GET_CATALOG_PRIMARY_KEY: `${baseUrl}/catalog/keys`,
 
   // DELIVERY API
   GET_IMPORT_DELIVERY: `${baseUrl}/delivery/import`,
