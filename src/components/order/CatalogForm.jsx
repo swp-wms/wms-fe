@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import catalog from "../../backendCalls/catalog";
 import toast from "react-hot-toast";
+
 export const CatalogForm = ({
   setShowForm,
   setCatalogData,
@@ -73,7 +74,8 @@ export const CatalogForm = ({
         break;
 
       case "type":
-        if (!value.trim() === "#") return "Bắt buộc";
+        if (value === "" || value === null || value.trim() === "#") return "Bắt buộc";
+        
         break;
 
       case "weightperbundle":
@@ -84,7 +86,7 @@ export const CatalogForm = ({
             return "Phải là số thực dương";
         }
         break;
-      case "weightperoll":
+      case "weightperroll":
         // Only required if type is "Thép Cuộn"
         if (catalog.type === "Thép Cuộn") {
           if (value === "" || value === null) return "Bắt buộc cho Thép Cuộn";
@@ -92,6 +94,7 @@ export const CatalogForm = ({
             return "Phải là số thực dương";
         }
         break;
+       
     }
   };
 
@@ -101,9 +104,10 @@ export const CatalogForm = ({
 
     Object.keys(initialCatalogErrors).map((key) =>{
       const error = validateCatalogField(key,formData[key],formData);
-      if(error) errors[key] = error;
+      if(error) isValid = false;
+      errors[key] = error;
       console.log("add catalog error: ",error);
-      isValid = false;
+      
       });
       if(!isValid)
         toast.error("Vui lòng kiểm tra lại thông tin nhập vào");
@@ -116,7 +120,7 @@ export const CatalogForm = ({
     const {name,value} = e.target;
     let updateCatalog = {...formData, [name]: value};
 
-    if((name ==="type" ||name === "brandname")&& updateCatalog.steeltype.toLowerCase().trim() !=="" && updateCatalog.brandname.toLowerCase().trim() !== ""){
+    if((name ==="steeltype" ||name === "brandname")&& updateCatalog.steeltype.toLowerCase().trim() !=="" && updateCatalog.brandname.toLowerCase().trim() !== ""){
       
         const findkey = catalogPrimaryKeys.find((item ) => (
           item.brandname === updateCatalog.brandname &&
@@ -127,6 +131,11 @@ export const CatalogForm = ({
           toast.error("Đã tồn tại danh mục thép này");
         }
     }
+
+    if(updateCatalog.length && updateCatalog.barsperbundle && updateCatalog.weightperbundle){
+      const weightPerMeter = (updateCatalog.weightperbundle / updateCatalog.barsperbundle / updateCatalog.length).toFixed(3);
+      updateCatalog.weightpermeter = weightPerMeter;
+    }
     setFormData(updateCatalog);
 
     //***************************VALIDATE ON CHANGE*****************************//
@@ -136,11 +145,19 @@ export const CatalogForm = ({
     setFormErrors((prev) => ({ ...prev, [name]: errorMsg }));
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
     if (validate()) {
-      toast.success("Thêm thành công");
-      setCatalogData((prev) => [...prev, formData]);
-      setShowForm(false);
+        const result = await catalog.addCatalog(formData);
+        if (result && result.status == 201) {
+          toast.success("Thêm thành công");
+          setCatalogData((prev) => [...prev, formData]);
+          setShowForm(false);
+        } else {
+          console.error("Error adding catalog:", result && result.error);
+          toast.error("Thêm thất bại");
+        }
+      
     }
   }
 
@@ -202,7 +219,7 @@ export const CatalogForm = ({
       type: "select",
       name: "type",
       options: [
-        { value: "", label: "Chọn loại thép" },
+        { value: "#", label: "Chọn loại thép" },
         { value: "Thép Thanh", label: "Thép Thanh" },
         { value: "Thép Cuộn", label: "Thép Cuộn" },
       ],
@@ -311,16 +328,10 @@ export const CatalogForm = ({
           </div>
         </div>
          <div className="mt-5 flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Quay lại
-              </button>
               <button
-                type="button"
+                type="submit"
                 className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-                onClick={(e) => handleSubmit(e)}
+                onClick={handleSubmit}
                 // disabled={
                 //   !selectedProducts ||
                 //   selectedProducts.length === 0 ||
@@ -333,6 +344,7 @@ export const CatalogForm = ({
                 </svg>
                 Tạo đơn bù
               </button>
+              
               </div>
       </form>
       </div>

@@ -58,9 +58,28 @@ const fetchCatalogPrimaryKeys = async() =>{
         throw error;
     }
 }
+const updateCatalog = async (catalog) => {
+    try{
+        const result = await axios.put(`${api.ADD_CATALOG}`,catalog,{
+            headers:{
+                Authorization : `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+        if(result.error){
+            console.log("Error:", result.error);
+            return result;
+        }
+        
+        return result;
+    }catch(error){
+        console.log("Exception:", error);
+
+    }
+}
 export default {
     fetchCatalog,
     addCatalog,
     fetchCatalogBrands,
-    fetchCatalogPrimaryKeys
+    fetchCatalogPrimaryKeys,
+    updateCatalog
 }
