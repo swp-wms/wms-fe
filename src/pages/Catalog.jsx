@@ -104,7 +104,7 @@ const Catalog = ({user, setUser}) => {
             const response = await catalog.updateCatalog(catalogDataEdit);
             // Adjust according to your backend response structure
             if (response.status == 201 || response.status == 200) {
-                setCatalogData(response.data);
+                
                 setShowEditForm(false);
                 setRefresh(!refresh);
                 toast.success("Lưu thay đổi thành công");

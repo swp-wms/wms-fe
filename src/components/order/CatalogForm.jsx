@@ -104,7 +104,7 @@ export const CatalogForm = ({
     let errors = {};
     let isValid = true;
 
-    Object.keys(initialCatalogErrors).map((key) =>{
+    Object.keys(initialCatalogErrors).forEach((key) =>{
       const error = validateCatalogField(key,formData[key],formData);
       if(error) isValid = false;
       errors[key] = error;
@@ -153,8 +153,9 @@ export const CatalogForm = ({
         const result = await catalog.addCatalog(formData);
         if (result && result.status == 201) {
           toast.success("Thêm thành công");
-          setCatalogData((prev) => [...prev, formData]);
+          
           setShowForm(false);
+          setRefresh(!refresh);
         } else {
           console.error("Error adding catalog:", result && result.error);
           toast.error("Thêm thất bại");
@@ -333,7 +334,7 @@ export const CatalogForm = ({
               <button
                 type="submit"
                 className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-                onClick={() => {handleSubmit(); setRefresh(!refresh)}}
+                onClick={() => {handleSubmit()}}
                 // disabled={
                 //   !selectedProducts ||
                 //   selectedProducts.length === 0 ||
