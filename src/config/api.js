@@ -36,6 +36,8 @@ export const api = {
   //warehouse API
   GET_WAREHOUSE: `${baseUrl}/warehouse`,
   GET_WAREHOUSE_BY_DATE: (createdate) => `${baseUrl}/warehouse/future/${createdate}`,
+  GET_WEIGHT_BY_BRANDNAME:`${baseUrl}/warehouse/brandname`,
+  GET_WEIGHT_BY_PARTNER:`${baseUrl}/warehouse/partner`,
 
   //import API
   GET_IMPORT: `${baseUrl}/warehouse/import`,
@@ -51,6 +53,8 @@ export const api = {
   //catalog API
   GET_CATALOGS: `${baseUrl}/catalog`,
   ADD_CATALOG: `${baseUrl}/catalog`,
+  GET_CATALOG_BRANDS: `${baseUrl}/catalog/brands`,
+  GET_CATALOG_PRIMARY_KEY: `${baseUrl}/catalog/keys`,
 
   // DELIVERY API
   GET_IMPORT_DELIVERY: `${baseUrl}/delivery/import`,

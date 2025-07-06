@@ -39,7 +39,7 @@ const DeliverySchedule = ({ user, setUser }) => {
     }
 
     getData();
-  }, []);
+  }, [deliverySchedule, setDeliverySchedule]);
 
   useEffect(() => {
     if (!user) {
@@ -83,6 +83,8 @@ const DeliverySchedule = ({ user, setUser }) => {
             setCurrentDelivery={setCurrentDelivery}
             currentDeliveryDetail={currentDeliveryDetail}
             setCurrentDeliveryDetail={setCurrentDeliveryDetail}
+            setDeliverySchedule={setDeliverySchedule}
+            deliverySchedule={deliverySchedule}
             user={user}
             act={act}
           /> : (

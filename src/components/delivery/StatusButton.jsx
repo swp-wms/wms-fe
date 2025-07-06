@@ -4,7 +4,7 @@ import axios from 'axios';
 import { api } from '../../config/api';
 import { handleCancelDelivery } from '../../backendCalls/delivery';
 import toast from 'react-hot-toast';
-const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
+const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act, deliverySchedule, setDeliverySchedule }) => {
     const notify = () => toast.success("Chuyển trạng thái thành công.");
 
     const [status, setStatus] = useState();
@@ -29,6 +29,7 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
                     }
                 });
                 setCurrentDelivery({ ...currentDelivery, deliverystatus: '4' });
+                setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '4' } : delivery));
                 notify();
             }
             if (status === '4') {
@@ -38,6 +39,7 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
                     }
                 });
                 setCurrentDelivery({ ...currentDelivery, deliverystatus: '5' });
+                setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '5' } : delivery));
                 notify();
             }
         } catch (error) {
@@ -54,7 +56,9 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
             }
 
             await handleCancelDelivery(currentDelivery.id);
-            window.location.reload();
+            setCurrentDelivery({ ...currentDelivery, deliverystatus: '0' });
+            setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '0' } : delivery));
+            toast.success('Hủy vận chuyển thành công.');
         } catch (error) {
             setError(error.response.data.message);
         }

@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from "react";
 import { toast } from "react-hot-toast";
+import order from "../../backendCalls/order";
 
-const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalBars, totalWeight }) => {
+const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalBars, totalWeight, orderType }) => {
   // Handler for changing product fields (e.g. quantity)
   
   useEffect(() => {
@@ -44,6 +45,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
     if(updateProduct)  {
       updateProduct[field] = value;
       
+      if(orderType == "supplement") {}
 
       if(field === "numberofbars") {
         if(updateProduct.catalog?.type === "Thép Thanh") {

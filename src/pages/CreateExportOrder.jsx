@@ -27,7 +27,7 @@ const CreateOrder = ({user, setUser}) => {
   const [productFilteredSuggestions, setProductFilteredSuggestions] = useState([]);
   const [inputpartner, setInputpartner] = useState("");
   const [inputProduct, setInputProduct] = useState("");
-
+  const type = "order";
   //-- ACTIVE TAB
   const [activeTab, setActiveTab] = useState('partner'); // state to manage active tab
   const [showForm, setShowForm] = useState(false)
@@ -168,6 +168,7 @@ const CreateOrder = ({user, setUser}) => {
                 setActiveTab={setActiveTab}
                 totalBars={totalBars}
                 totalWeight={totalWeight}
+                orderType={orderType}
               />
             </div>
             {/* Bottom Buttons */}

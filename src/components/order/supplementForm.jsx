@@ -16,13 +16,13 @@ const SupplementForm = ({
 }) => {
   const [selectedProducts, setSelectedProducts] = useState([]); // store products that are added to the order
   const [productList, setProductList] = useState([]);
-  const [productFilteredSuggestions, setProductFilteredSuggestions] = useState(
-    []
-  );
+  const [productFilteredSuggestions, setProductFilteredSuggestions] = useState([]);
   const [inputProduct, setInputProduct] = useState("");
   const [activeTab, setActiveTab] = useState("partner");
   const [type, setType] = useState(); // default type is "I" for nhập bù
   const [orderNote, setOrderNote] = useState("");
+  const orderType = "supplement"; // type of order, can be "supplement" or "order"
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -143,6 +143,7 @@ const SupplementForm = ({
             setActiveTab={setActiveTab}
             totalBars={totalBars}
             totalWeight={totalWeight}
+            orderType={orderType}
           />
           <div className="flex gap-4">
             <h4 className="font-bold text-l pl-4">Lý do:</h4>
