@@ -61,8 +61,16 @@ return (
                     {/* Left Column */}
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
-                          MÃ DOANH NGHIỆP
+                        <label className="text-sm font-bold text-gray-800 flex">
+                          <div className="flex items-center w-auto">
+                            MÃ DOANH NGHIỆP
+                          </div>
+                          {partnerErrors.id && (
+                            <div className="w-auto inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                              {partnerErrors.id}
+                              </div>
+                          )}
+                        
                         </label>
                         <input
                           type="text"
@@ -71,12 +79,12 @@ return (
                           onChange={handleChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {partnerErrors.id && (<div className="text-red-500 text-xs mt-1">{partnerErrors.id}</div>)}
-                      </div>
+                        </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
-                          Địa chỉ:
+                        <label className="text-sm font-bold text-gray-800  flex">
+                          <div className="">Địa chỉ:</div>
+                          {partnerErrors.address && (<div className="w-[60%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">{partnerErrors.address}</div>)}
                         </label>
                         <input
                           type="text"
@@ -85,12 +93,12 @@ return (
                           onChange={handleChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {partnerErrors.address && (<div className="text-red-500 text-xs mt-1">{partnerErrors.address}</div>)}
-                      </div>
+                        </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
-                          Số điện thoại:
+                        <label className="text-sm font-bold text-gray-800  flex">
+                          <div className="w-auto">Số điện thoại:</div>
+                          {partnerErrors.phonenumber && (<div className="w-auto inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">{partnerErrors.phonenumber}</div>)}
                         </label>
                         <input
                           type="tel"
@@ -99,12 +107,11 @@ return (
                           onChange={handleChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {partnerErrors.phonenumber && (<div className="text-red-500 text-xs mt-1">{partnerErrors.phonenumber}</div>)}
                       </div>
-
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
-                          Email:
+                        <label className="text-sm font-bold text-gray-800  flex">
+                          <div className="w-auto">Email:</div>
+                          {partnerErrors.email && (<div className="w-auto inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">{partnerErrors.email}</div>)}
                         </label>
                         <input
                           type="email"
@@ -113,15 +120,14 @@ return (
                           onChange={handleChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {partnerErrors.email && (<div className="text-red-500 text-xs mt-1">{partnerErrors.email}</div>)}
                       </div>
                     </div>
-
                     {/* Right Column */}
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
-                          TÊN DOANH NGHIỆP
+                        <label className="text-sm font-bold text-gray-800  flex">
+                          <div className="w-auto">TÊN DOANH NGHIỆP</div>
+                          {partnerErrors.name && (<div className="w-auto inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">{partnerErrors.name}</div>)}
                         </label>
                         <input
                           type="text"
@@ -130,12 +136,12 @@ return (
                           onChange={handleChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {partnerErrors.name && (<div className="text-red-500 text-xs mt-1">{partnerErrors.name}</div>)}
-                      </div>
+                        </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
-                          Mã số thuế:
+                        <label className="text-sm font-bold text-gray-800  flex">
+                          <div className="w-auto">Mã số thuế:</div>
+                          {partnerErrors.taxcode && (<div className="w-auto inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">{partnerErrors.taxcode}</div>)}
                         </label>
                         <input
                           type="text"
@@ -144,12 +150,11 @@ return (
                           onChange={handleChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {partnerErrors.taxcode && (<div className="text-red-500 text-xs mt-1">{partnerErrors.taxcode}</div>)}
                       </div>
-
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
-                          Số tài khoản:
+                        <label className="text-sm font-bold text-gray-800  flex">
+                          <div className="w-auto">Số tài khoản:</div>
+                          {partnerErrors.bankaccount && (<div className="w-auto inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">{partnerErrors.bankaccount}</div>)}
                         </label>
                         <input
                           type="text"
@@ -158,13 +163,12 @@ return (
                           onChange={handleChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {partnerErrors.bankaccount && (<div className="text-red-500 text-xs mt-1">{partnerErrors.bankaccount}</div>)}
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
-                          Tên ngân hàng:
-                        </label>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-bold text-gray-800  flex">
+                            <div className="w-auto">Tên ngân hàng:</div>
+                            {partnerErrors.bankname && (<div className="w-auto inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">{partnerErrors.bankname}</div>)}
+                          </label>
                         <input
                           type="text"
                           name="bankname"
@@ -172,13 +176,13 @@ return (
                           onChange={handleChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {partnerErrors.bankname && (<div className="text-red-500 text-xs mt-1">{partnerErrors.bankname}</div>)}
+                        
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-800 uppercase">
+                    <label className="text-sm font-bold text-gray-800  flex">
                       Ghi chú:
                     </label>
                     <textarea
@@ -202,8 +206,13 @@ return (
                     {/* Left Column */}
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="static text-sm font-bold text-gray-800  flex">
                           MÃ HÀNG
+                          {productErrors.name && (
+                          <div className="w-[80%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {productErrors.name}
+                          </div>
+                        )}
                         </label>
                         <input
                           type="text"
@@ -212,17 +221,18 @@ return (
                           onChange={handleProductChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {productErrors.name && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {productErrors.name}
-                          </div>
-                        )}
 
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           TÊN HÃNG
+                          {productErrors.brandname && (
+                          <div className="w-[80%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {productErrors.brandname}
+                          </div>
+                        )}
+
                         </label>
                         <input
                           type="text"
@@ -231,17 +241,17 @@ return (
                           onChange={handleProductChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {productErrors.brandname && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {productErrors.brandname}
-                          </div>
-                        )}
-
+                      
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           TÊN HÀNG HÓA
+                          {productErrors.namedetail && (
+                          <div className="w-[80%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {productErrors.namedetail}
+                          </div>
+                        )}
                         </label>
                         <input
                           type="text"
@@ -250,16 +260,17 @@ return (
                           onChange={handleProductChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {productErrors.namedetail && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {productErrors.namedetail}
-                          </div>
-                        )}
+                      
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           DÀI:
+                          {catalogErrors.length && (
+                          <div className="w-[80%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {catalogErrors.length}
+                          </div>
+                        )}
                         </label>
                         <input
                           type="text"
@@ -268,17 +279,16 @@ return (
                           onChange={handleCatalogChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {catalogErrors.length && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {catalogErrors.length}
-                          </div>
-                        )}
-
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           TIÊU CHUẨN: 
+                          {catalogErrors.standard && (
+                          <div className="w-[80%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {catalogErrors.standard}
+                          </div>
+                        )}
                         </label>
                         <input
                           type="text"
@@ -287,15 +297,16 @@ return (
                           onChange={handleCatalogChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {catalogErrors.standard && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {catalogErrors.standard}
-                          </div>
-                        )}
+                        
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           TÊN NHÀ CUNG CẤP:
+                           {productErrors.partnerid && (
+                          <div className="w-[60%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {productErrors.partnerid}
+                          </div>
+                        )}
                         </label>
                         <select className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                           name="partnerid"
@@ -308,15 +319,11 @@ return (
                             </option>
                           ))}
                         </select>
-                        {productErrors.partnerid && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {productErrors.partnerid}
-                          </div>
-                        )}
+                       
                         </div>
 
                       {/* <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           SỐ LƯỢNG:
                         </label>
                         <input
@@ -331,8 +338,13 @@ return (
                     {/* Right Column */}
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           TIÊU CHUẨN: 
+                          {catalogErrors.standard && (
+                          <div className="w-[80%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {catalogErrors.standard}
+                          </div>
+                        )}
                         </label>
                         <input
                           type="text"
@@ -341,15 +353,15 @@ return (
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                           name="standard"
                         />
-                        {catalogErrors.standard && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {catalogErrors.standard}
-                          </div>
-                        )}
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           QĐ CÂY/BÓ:
+                          {catalogErrors.barsperbundle && (
+                          <div className="w-[70%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {catalogErrors.barsperbundle}
+                          </div>
+                        )}
                         </label>
                         <input
                           type="text"
@@ -358,16 +370,16 @@ return (
                           onChange={handleCatalogChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {catalogErrors.barsperbundle && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {catalogErrors.barsperbundle}
-                          </div>
-                        )}
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           KG/M:
+                          {catalogErrors.weightpermeter && (
+                          <div className="w-[79%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {catalogErrors.weightpermeter}
+                          </div>
+                        )}
                         </label>
                         <input
                           type="text"
@@ -376,16 +388,16 @@ return (
                           onChange={handleCatalogChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {catalogErrors.weightpermeter && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {catalogErrors.weightpermeter}
-                          </div>
-                        )}
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           LOẠI THÉP:
+                          {productErrors.type && (
+                          <div className="w-[80%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {productErrors.type}
+                          </div>
+                        )}
                         </label>
                         <select
                           type="text"
@@ -398,15 +410,15 @@ return (
                           <option value="Thép Thanh">Thép Thanh</option>
                           <option value="Thép Cuộn">Thép Cuộn</option>
                         </select>
-                        {productErrors.type && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {productErrors.type}
-                          </div>
-                        )}
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           KHỐI LƯỢNG BÓ:
+                          {catalogErrors.weightperbundle && (
+                          <div className="w-[65%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {catalogErrors.weightperbundle}
+                          </div>
+                        )}
                         </label>
                         <input
                           type="text"
@@ -415,16 +427,16 @@ return (
                           onChange={handleCatalogChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {catalogErrors.weightperbundle && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {catalogErrors.weightperbundle}
-                          </div>
-                        )}
                       </div> 
                       
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-800 uppercase">
+                        <label className="text-sm font-bold text-gray-800  flex">
                           KHỐI LƯỢNG CUỘN:
+                          {catalogErrors.weightperroll && (
+                          <div className="w-[60%] inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
+                            {catalogErrors.weightperroll}
+                          </div>
+                        )}
                         </label>
                         <input
                           type="text"
@@ -433,18 +445,13 @@ return (
                           onChange={handleCatalogChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
-                        {catalogErrors.weightperroll && (
-                          <div className="text-red-500 text-xs mt-1">
-                            {catalogErrors.weightperroll}
-                          </div>
-                        )}
                       </div>
                       
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-800 uppercase">
+                    <label className="text-sm font-bold text-gray-800  flex">
                       GHI CHÚ:
                     </label>
                     <textarea
