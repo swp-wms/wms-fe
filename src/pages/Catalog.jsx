@@ -201,7 +201,7 @@ const Catalog = ({user, setUser}) => {
                                             <th className="px-4 py-1 text-center border border-gray-400 font-medium text-gray-700" colSpan={4}>{brand.standard}</th>
                                         </tr>
                                         <tr>
-                                            <th className="px-4 py-3 text-center border border-gray-400 y-150 font-medium text-gray-700">Kg/m</th>
+                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Kg/m</th>
                                             <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Kg / cay bazem</th>
                                             <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Khối lượng bó bazem</th>
                                             {/* <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Dung sai %</th> */}
@@ -270,7 +270,7 @@ const Catalog = ({user, setUser}) => {
                                         {catalogData
                                             .filter(item => item.brandname === brand.brandname && item.standard === brand.standard)
                                             .map((item) => (
-                                                <tr key={item.id || item.steeltype} className="hover:bg-gray-50 border border-gray-400">
+                                                <tr key={item.id || item.steeltype} className="hover:bg-gray-200 border border-gray-400">
                                                     <td className="px-4 py-3 font-medium text-gray-900">{item.steeltype}</td>
                                                     <td className="px-4 py-3 text-gray-700 border border-gray-400">{item?.barsperbundle}</td>
                                                     <td className="px-4 py-3 text-gray-700 border border-gray-400">{(item?.weightperbundle / item?.barsperbundle / item?.length).toFixed(3)}</td>
