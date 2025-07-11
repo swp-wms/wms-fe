@@ -33,3 +33,19 @@ body {
 .btn {
     @apply shadow-[0_0_1.5px_#666] rounded hover:duration-200 hover:shadow-[0_0_2px_#555] hover:cursor-pointer hover:scale-[1.02] bg-white
 }
+
+.animation-grow-down {
+    animation: grow-down 0.2s linear;
+}
+
+@keyframes grow-down {
+    from {
+        opacity: 0;
+        transform-origin: top left;
+        transform: scale(0);
+    } to {
+        transform-origin: top left;
+        opacity: 1;
+        transform: scale(1);
+    }
+}
