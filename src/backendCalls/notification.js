@@ -15,3 +15,18 @@ export const getAllNotifcations = async () => {
         console.log(error);
     }
 }
+
+export const handleSeenNotifcation = async (id) => {
+    try {
+        const response = await axios.post(api.SEEN_NOTIF(id), {}, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+
+        return response;
+    } catch (error) {
+        console.log(error);
+    }
+}
+

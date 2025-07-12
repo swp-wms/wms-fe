@@ -4,8 +4,6 @@ import { io } from "socket.io-client";
 const baseUrl = "http://localhost:3800";
 
 export const useSocket = (roleid) => {
-    console.log('use socket');
-
     const socketRef = useRef(null);
     const [isConnect, setIsConnect] = useState(false);
 
