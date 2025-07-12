@@ -23,6 +23,7 @@ import AdminPage from "./pages/AdminPage";
 import Error404 from "./pages/Error-404";
 import Error403 from "./pages/Error-403";
 
+import Catalog from "./pages/Catalog";
 
 function App() {
   const [user, setUser] = useState();
@@ -82,6 +83,9 @@ function App() {
           path="/danh-sach-nguoi-dung"
           element={<AdminPage user={user} setUser={setUser} />}
         />
+
+        <Route path="/danh-muc" element={<Catalog user={user} setUser={setUser} />} />
+
         <Route path="/error403" element={<Error403 user={user} setUser={setUser} />} />
         <Route path="/error404" element={<Error404 user={user} setUser={setUser} />} />
       </Routes>
