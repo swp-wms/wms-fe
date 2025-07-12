@@ -30,12 +30,14 @@ export const api = {
   //product API
   GET_PRODUCTS: `${baseUrl}/products`,
   ADD_PRODUCT: `${baseUrl}/products`,
+  UPDATE_PRODUCT: (productid) => `${baseUrl}/products/${productid}`,
 
 
   //warehouse API
   GET_WAREHOUSE: `${baseUrl}/warehouse`,
   GET_WAREHOUSE_BY_DATE: (createdate) => `${baseUrl}/warehouse/future/${createdate}`,
   GET_WEIGHT_BY_BRANDNAME:`${baseUrl}/warehouse/brandname`,
+  GET_WEIGHT_BY_TYPE:`${baseUrl}/warehouse/type`,
   GET_WEIGHT_BY_PARTNER:`${baseUrl}/warehouse/partner`,
 
   //import API

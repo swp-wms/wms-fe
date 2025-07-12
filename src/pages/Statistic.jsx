@@ -18,7 +18,7 @@ const Statistic = ({ user, setUser }) => {
     }
   }, []);
   return (
-    <section className="absolute mt-[10%] ms-[20%] px-14 z-[-1]"><SummaryBoard /></section>
+    <section className="absolute mt-[140px] ms-[20%] px-14 z-[-1] w-[80%]"><SummaryBoard /></section>
   );
 };
 

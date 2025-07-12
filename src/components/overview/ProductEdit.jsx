@@ -4,190 +4,160 @@ import {
   faSave,
   faSquareXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { updateProduct } from "../../backendCalls/product";
+import { fetchPartners } from "../../backendCalls/partner";
 
-const ProductEdit = ({ product, onClose, onSave }) => {
+const ProductEdit = ({ product, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({ ...product });
   const [errors, setErrors] = useState({});
+  const [partners, setPartners] = useState([]);
+
+  const notify = () => toast.error("Vui lòng nhập lại thông tin");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const notify = () => toast.error("Vui lòng nhập lại thông tin");
-
   const validate = () => {
     const newErrors = {};
-
-    // Mã hàng hóa bắt buộc bắt đầu bằng "TD"
-    if (!/^TD/.test(formData.name || "")) {
+    if (!/^TD/.test(formData.name || ""))
       newErrors.name = "Mã hàng hóa phải bắt đầu bằng 'TD'";
-      notify();
-    }
-
-    // Tên hàng hóa phải theo định dạng: D10CB400V hoặc D12CB500T
-    if (!/^Thép D\d{2}CB\d{3}[VT]$/.test(formData.namedetail || "")) {
-      newErrors.namedetail =
-        "Tên hàng hóa phải theo định dạng 'Thép DxxCBxxxV' hoặc 'Thép DxxCBxxxT', với x là chữ số";
-      notify();
-    }
-
-    // Mã thép phải theo định dạng: D + 2 số, ví dụ D10
-    if (!/^D\d{2}$/.test(formData.steeltype || "")) {
-      newErrors.steeltype = "Mã thép phải theo định dạng Dxx, với x là chữ số";
-      notify();
-    }
+    if (!/^Thép D\d{2}CB\d{3}[VT]$/.test(formData.namedetail || ""))
+      newErrors.namedetail = "Tên hàng hóa không đúng định dạng";
+    if (!/^D\d{2}$/.test(formData.steeltype || ""))
+      newErrors.steeltype = "Mã thép phải theo định dạng Dxx";
 
     setErrors(newErrors);
+    if (Object.keys(newErrors).length) notify();
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = () => {
-    if (validate()) {
-      onSave(formData);
-      toast.success("Lưu thông tin thành công");
+  const handleSave = async () => {
+    const loading = toast.loading("Đang lưu...");
+    if (!validate()) return toast.dismiss(loading);
+
+    try {
+      await updateProduct(formData.id, formData);
+      toast.success("Lưu thành công");
+      onUpdate?.(formData);
+      onClose();
+    } catch {
+      toast.error("Lưu thất bại");
+    } finally {
+      toast.dismiss(loading);
     }
   };
 
-  const length = formData.catalog
-    ? formData.catalog.length
-    : formData.length || 0;
-  const weight = formData.catalog
-    ? formData.catalog.weightperbundle / formData.catalog.barsperbundle
-    : formData.weight || 0;
-  const totalWeight = formData.catalog
-    ? formData.totalbar * weight
-    : formData.total || 0;
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetchPartners();
+      setPartners(response);
+      console.log(response);
+    };
+    getData();
+  }, []);
+
+  const length = formData.length || formData.catalog?.length || 0;
+  const weight =
+    formData.weight ||
+    formData.catalog?.weightperbundle / formData.catalog?.barsperbundle ||
+    0;
+  const totalWeight = (formData.totalbar || 0) * weight;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="bg-white p-8 rounded-lg ms-[20%] shadow-xl border relative w-[60%]">
+        <FontAwesomeIcon
+          onClick={onClose}
+          icon={faSquareXmark}
+          className="absolute top-2 right-2 cursor-pointer text-red-700"
+        />
+
         <div className="space-y-3 text-sm grid grid-cols-3 gap-x-8">
-          {/* Mã hàng hóa */}
-          <div>
-            <label className="block mb-1 font-medium">Mã hàng hóa:</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name || ""}
-              onChange={handleChange}
-              className={`w-full border px-2 py-1 rounded ${
-                errors.name ? "border-red-500" : ""
-              }`}
-            />
-            {errors.name && (
-              <p className="text-red-500 text-[10px] mt-1">{errors.name}</p>
-            )}
-          </div>
+          {[
+            { label: "Mã hàng hóa", name: "name", error: errors.name },
+            {
+              label: "Tên hàng hóa",
+              name: "namedetail",
+              error: errors.namedetail,
+            },
+            { label: "Tên nhà cung", name: "brandname" },
+            { label: "Mã thép", name: "steeltype", error: errors.steeltype },
+            { label: "Số lượng", name: "totalbar", type: "number" },
+            {
+              label: "Độ dài (m)",
+              name: "length",
+              type: "number",
+              value: length,
+            },
+            {
+              label: "Đơn trọng (kg)",
+              name: "weight",
+              type: "number",
+              value: weight.toFixed(2),
+            },
+            { label: "Ghi chú", name: "note" },
+          ].map(
+            ({
+              label,
+              name,
+              type = "text",
+              readOnly = false,
+              error,
+              value,
+            }) => (
+              <div key={name}>
+                <label className="block mb-1 font-medium">{label}:</label>
+                <input
+                  type={type}
+                  name={name}
+                  value={value ?? formData[name] ?? ""}
+                  onChange={handleChange}
+                  readOnly={readOnly}
+                  className={`w-full border px-2 py-1 rounded ${
+                    readOnly ? "bg-gray-100 cursor-not-allowed" : ""
+                  } ${error ? "border-red-500" : ""}`}
+                />
+                {error && (
+                  <p className="text-red-500 text-[10px] mt-1">{error}</p>
+                )}
+              </div>
+            )
+          )}
 
-          {/* Tên hàng hóa */}
           <div>
-            <label className="block mb-1 font-medium">Tên hàng hóa:</label>
-            <input
-              type="text"
-              name="namedetail"
-              value={formData.namedetail || ""}
-              onChange={handleChange}
-              className={`w-full border px-2 py-1 rounded ${
-                errors.namedetail ? "border-red-500" : ""
-              }`}
-            />
-            {errors.namedetail && (
-              <p className="text-red-500 text-[10px] mt-1">
-                {errors.namedetail}
-              </p>
-            )}
-          </div>
-
-          {/* Tên nhà cung */}
-          <div>
-            <label className="block mb-1 font-medium">Tên nhà cung:</label>
-            <input
-              type="text"
+            <label className="block mb-1 font-medium">Tên đối tác:</label>
+            <select
               name="brandname"
               value={formData.brandname || ""}
               onChange={handleChange}
               className="w-full border px-2 py-1 rounded"
-            />
+            >
+              <option value="" className="truncate">{product.partner.name}</option>
+              {partners.map((partner) => (
+                <option key={partner.id} value={partner.name}>
+                  {partner.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
             <label className="block mb-1 font-medium">Loại thép:</label>
             <select
               name="type"
-              value={formData.type || ""}
+              value={formData.type}
               onChange={handleChange}
-              className={`w-full border px-1 py-1 rounded`}
+              className="w-full border px-1 py-1 rounded"
             >
-              <option value={formData.type}>{formData.type}</option>
-              <option
-                value={
-                  formData.type === "Thép Thanh" ? "Thép Cuộn" : "Thép Thanh"
-                }
-              >
-                {formData.type === "Thép Thanh" ? "Thép Cuộn" : "Thép Thanh"}
-              </option>
+              <option value="Thép Thanh">Thép Thanh</option>
+              <option value="Thép Cuộn">Thép Cuộn</option>
             </select>
           </div>
 
-          {/* Mã thép */}
-          <div>
-            <label className="block mb-1 font-medium">Mã thép:</label>
-            <input
-              type="text"
-              name="steeltype"
-              value={formData.steeltype || ""}
-              onChange={handleChange}
-              className={`w-full border px-2 py-1 rounded ${
-                errors.steeltype ? "border-red-500" : ""
-              }`}
-            />
-            {errors.steeltype && (
-              <p className="text-red-500 text-[10px] mt-1">
-                {errors.steeltype}
-              </p>
-            )}
-          </div>
-
-          {/* Số lượng */}
-          <div>
-            <label className="block mb-1 font-medium">Số lượng:</label>
-            <input
-              type="number"
-              name="totalbar"
-              value={formData.totalbar || ""}
-              onChange={handleChange}
-              className="w-full border px-2 py-1 rounded"
-            />
-          </div>
-
-          {/* Độ dài */}
-          <div>
-            <label className="block mb-1 font-medium">Độ dài (m):</label>
-            <input
-              type="number"
-              name="length"
-              value={length || ""}
-              onChange={handleChange}
-              className="w-full border px-2 py-1 rounded"
-            />
-          </div>
-
-          {/* Đơn trọng */}
-          <div>
-            <label className="block mb-1 font-medium">Đơn trọng (kg):</label>
-            <input
-              type="number"
-              name="weight"
-              value={weight.toFixed(2)}
-              onChange={handleChange}
-              className="w-full border px-2 py-1 rounded"
-            />
-          </div>
-
-          {/* Tổng khối lượng */}
           <div>
             <label className="block mb-1 font-medium">
               Tổng khối lượng (kg):
@@ -200,42 +170,22 @@ const ProductEdit = ({ product, onClose, onSave }) => {
               className="w-full border px-2 py-1 rounded bg-gray-100 cursor-not-allowed"
             />
           </div>
-
-          {/* Ghi chú */}
-          <div>
-            <label className="block mb-1 font-medium">Ghi chú:</label>
-            <input
-              type="text"
-              name="note"
-              value={formData.note || ""}
-              onChange={handleChange}
-              className="w-full border px-2 py-1 rounded"
-            />
-          </div>
         </div>
 
-        {/* Đóng popup */}
-        <FontAwesomeIcon
-          onClick={onClose}
-          icon={faSquareXmark}
-          className="absolute top-2 right-2 cursor-pointer text-red-700"
-        />
-
-        {/* Nút hành động */}
         <div className="flex justify-end mt-6 gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer font-medium"
+            className="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300 font-medium"
           >
             <FontAwesomeIcon icon={faArrowRotateLeft} className="mr-2" />
-            <span>Quay lại</span>
+            Quay lại
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-1.5 rounded bg-red-700 text-white hover:bg-red-800 cursor-pointer font-medium"
+            className="px-4 py-1.5 rounded bg-red-700 text-white hover:bg-red-800 font-medium"
           >
             <FontAwesomeIcon icon={faSave} className="mr-2" />
-            <span>Lưu</span>
+            Lưu
           </button>
         </div>
       </div>

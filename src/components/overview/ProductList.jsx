@@ -5,7 +5,6 @@ import {
   faArrowUpFromBracket,
   faMagnifyingGlass,
   faSquarePlus,
-  faCircleMinus,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { fetchProductCatalog } from "../../backendCalls/productCatalog";
@@ -16,8 +15,9 @@ const ITEMS_PER_PAGE = 15;
 const ProductList = () => {
   const [productCatalog, setProductCatalog] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [open, setOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     const getData = async () => {
@@ -26,6 +26,51 @@ const ProductList = () => {
     };
     getData();
   }, []);
+
+  // Mở form sửa sản phẩm
+  const handleEdit = (product) => {
+    setSelectedProduct(product);
+    setOpen(true);
+  };
+
+  // Mở form thêm sản phẩm mới
+  const handleAddNew = () => {
+    const emptyProduct = {
+      id: null,
+      name: "",
+      namedetail: "",
+      brandname: "",
+      type: "Thép Thanh",
+      steeltype: "",
+      totalbar: 0,
+      length: 0,
+      weight: 0,
+      total: 0,
+      note: "",
+      catalog: null,
+    };
+    setSelectedProduct(emptyProduct);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleUpdateProduct = (updatedProduct) => {
+    setProductCatalog((prev) => {
+      const index = prev.findIndex((p) => p.id === updatedProduct.id);
+      // Nếu sản phẩm mới (chưa có id trong list), thêm vào
+      if (index === -1) {
+        return [...prev, updatedProduct];
+      }
+      // Nếu đã có, cập nhật
+      const updatedList = [...prev];
+      updatedList[index] = updatedProduct;
+      return updatedList;
+    });
+  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -42,15 +87,7 @@ const ProductList = () => {
     reader.readAsArrayBuffer(file);
   };
 
-  const handleSaveEdit = (updatedProduct) => {
-    setProductCatalog((prev) =>
-      prev.map((item) =>
-        item.id === updatedProduct.id ? updatedProduct : item
-      )
-    );
-    setEditingProduct(null);
-  };
-
+  // Search
   const filteredData = productCatalog.filter((item) => {
     const name = item.name?.toLowerCase() || "";
     const namedetail = item.namedetail?.toLowerCase() || "";
@@ -58,6 +95,7 @@ const ProductList = () => {
     return name.includes(search) || namedetail.includes(search);
   });
 
+  // Pagination
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -88,14 +126,20 @@ const ProductList = () => {
             <input type="file" className="hidden" onChange={handleFileUpload} />
           </label>
 
-          <div className="flex bg-white shadow-btn py-2 px-4 items-center gap-4 rounded-sm" onClick={editingProduct}>
+          <div
+            className="flex bg-white shadow-btn py-2 px-4 items-center gap-4 rounded-sm cursor-pointer"
+            onClick={handleAddNew}
+          >
             <FontAwesomeIcon icon={faSquarePlus} />
             <span className="font-medium">Thêm hàng hóa</span>
           </div>
         </div>
       </div>
 
-      <TableList data={paginatedData} onEdit={setEditingProduct} />
+      <TableList
+        data={paginatedData}
+        onEdit={handleEdit}
+      />
 
       <div className="flex justify-center mt-2 gap-2 mb-8">
         <button
@@ -119,18 +163,19 @@ const ProductList = () => {
         </button>
       </div>
 
-      {editingProduct && (
+      {open && selectedProduct && (
         <ProductEdit
-          product={editingProduct}
-          onClose={() => setEditingProduct(null)}
-          onSave={handleSaveEdit}
+          product={selectedProduct}
+          onClose={handleClose}
+          onUpdate={handleUpdateProduct}
         />
       )}
     </section>
   );
 };
 
-const TableList = ({ data, onEdit }) => {
+
+const TableList = ({ data, onEdit, setSelectedProduct }) => {
   return (
     <div className="mt-6">
       <table className="w-full border-collapse text-sm mb-12 text-center">
@@ -139,6 +184,7 @@ const TableList = ({ data, onEdit }) => {
             <th className="border border-black px-1">STT</th>
             <th className="border border-black px-1">Mã hàng hóa</th>
             <th className="border border-black">Tên hàng hóa</th>
+            <th className="border border-black">Tên đối tác</th>
             <th className="border border-black">Tên nhà cung</th>
             <th className="border border-black">Loại thép</th>
             <th className="border border-black">Mã thép</th>
@@ -173,14 +219,15 @@ const TableList = ({ data, onEdit }) => {
             return (
               <tr key={item.id || index}>
                 <td className="border border-black py-0.5">{index + 1}</td>
-                <td className="border border-black">{item.name}</td>
+                <td className="border border-black px-2">{item.name}</td>
                 <td className="border border-black">{item.namedetail}</td>
-                <td className="border border-black">{item.brandname}</td>
-                <td className="border border-black">{item.type}</td>
-                <td className="border border-black">{item.steeltype}</td>
-                <td className="border border-black">{item.totalbar}</td>
-                <td className="border border-black">{length}</td>
-                <td className="border border-black">{weight.toFixed(2)}</td>
+                <td className="border border-black px-2">{item.partner.name}</td>
+                <td className="border border-black px-2">{item.brandname}</td>
+                <td className="border border-black px-2">{item.type}</td>
+                <td className="border border-black px-2">{item.steeltype}</td>
+                <td className="border border-black px-2">{item.totalbar}</td>
+                <td className="border border-black px-2">{length}</td>
+                <td className="border border-black px-2">{weight.toFixed(2)}</td>
                 <td className="border border-black">
                   {totalWeight.toFixed(2)}
                 </td>
@@ -189,7 +236,9 @@ const TableList = ({ data, onEdit }) => {
                   <FontAwesomeIcon
                     icon={faPenToSquare}
                     className="px-2 cursor-pointer"
-                    onClick={() => onEdit(item)}
+                    onClick={() => {
+                      onEdit(item), setSelectedProduct(item);
+                    }}
                   />
                 </td>
               </tr>
