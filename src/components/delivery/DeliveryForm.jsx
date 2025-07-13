@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import ProductTable from './ProductTable'
 import DriverInfo from './DriverInfo'
 import { useState } from 'react'
-import { handleApproveTruck, handleCreateDelivery } from '../../backendCalls/delivery'
+import { getDeliveriesForOrder, handleApproveTruck, handleCreateDelivery } from '../../backendCalls/delivery'
 import StatusButton from './StatusButton'
 import DeliveryInfo from './DeliveryInfo'
 import toast from 'react-hot-toast'
@@ -39,7 +39,7 @@ const DeliveryForm = ({
             handleApproveTruck(currentDelivery.id, true);
             // window.location.reload();
             toast.success('Phê duyệt vận chuyển thành công.');
-            setCurrentDelivery({...currentDelivery, deliverystatus: '3'});
+            setCurrentDelivery({ ...currentDelivery, deliverystatus: '3' });
             setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '3' } : delivery));
         } catch (error) {
             setError(error.response.data.message);
@@ -52,7 +52,7 @@ const DeliveryForm = ({
             handleApproveTruck(currentDelivery.id, false);
             // window.location.reload();
             toast.success('Đã từ chối vận chuyển.');
-            setCurrentDelivery({...currentDelivery, deliverystatus: '-2'});
+            setCurrentDelivery({ ...currentDelivery, deliverystatus: '-2' });
             setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '-2' } : delivery));
         } catch (error) {
             setError(error.response.data.message);
@@ -74,13 +74,18 @@ const DeliveryForm = ({
 
             try {
                 const data = { ...newDelivery, listDeliveryDetail: newDeliveryList, deliverystatus: '1' };
-                const response = await handleCreateDelivery(currentOrder.orderid, data);
-               
+                await handleCreateDelivery(currentOrder.orderid, data);
+
+                // fetch delivery list after add new delivery
+                const response = (await getDeliveriesForOrder(currentOrder.orderid)).data;
+                setDeliverySchedule(response.length > 0 ? response.sort((a, b) => new Date(b.deliverydate) - new Date(a.deliverydate)) : []);
+
                 toast.success('Tạo đơn vận chuyển thành công.');
-                setDeliverySchedule([...deliverySchedule, data]);
                 handleEmptyForm(e);
             } catch (error) {
-                setError(error.response.data.message);
+                setError('Xảy ra lỗi. Vui lòng thử lại sau.');
+                console.log(error);
+                
             }
         } else {
             setError('Trừ ghi chú, bạn cần điền hết các trường yêu cầu.\n Số lượng và khối lượng phải lớn hơn 0.');
@@ -90,6 +95,7 @@ const DeliveryForm = ({
     return (
         <form className='DeliveryForm overflow-y-scroll relative font-[500] text-[14px] bg-white h-[90%] shadow-[0_0_2px_#ccc] p-5'>
             <DeliveryInfo
+                user={user}
                 currentOrder={currentOrder}
                 currentDelivery={currentDelivery}
                 newDelivery={newDelivery}
