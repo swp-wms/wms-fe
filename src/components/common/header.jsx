@@ -33,7 +33,7 @@ const NavBar = ({ user, data }) => {
   // on socket
 
   const handleNewNotification = useCallback((data) => {
-    setNotifs(prev => [...prev, data]);
+    setNotifs(prev => [data, ...prev]);
   }, []);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const NavBar = ({ user, data }) => {
       const response = await getAllNotifcations();
       console.log(response.data);
 
-      setNotifs(response.data);
+      setNotifs(response.data.sort((a, b) => b.id - a.id));
     }
 
     getData();

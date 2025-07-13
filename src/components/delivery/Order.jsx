@@ -10,7 +10,7 @@ const Order = ({ order, setCurrentOrder, user, setDeliverySchedule, setCurrentDe
             setCurrentOrder(order);
             const response = (await getDeliveriesForOrder(order.orderid)).data;
 
-            setDeliverySchedule(response.length > 0 ? response.sort((a, b) => new Date(a.deliverydate) - new Date(b.deliverydate)) : []);
+            setDeliverySchedule(response.length > 0 ? response.sort((a, b) => new Date(b.deliverydate) - new Date(a.deliverydate)) : []);
         } catch (error) {
             console.log(error);
         }
@@ -28,6 +28,7 @@ const Order = ({ order, setCurrentOrder, user, setDeliverySchedule, setCurrentDe
         <li className="flex hover:scale-[1.01] hover:cursor-pointer hover:shadow-[0_0_3px_#aaa] mb-2 relative justify-between px-4 border-[1.5px] rounded border-black items-center"
             onClick={fetchDeliveryList}
         >
+            <span className="absolute top-0 right-[10px] rounded-b-md text-sm font-semibold bg-[#ccc] p-2 shadow-[0_0_3px_#aaa]">{order.orderid}</span>
             <div style={{ width: `${Number(order.process).toFixed(2)}%` }} className={`percentage z-[-2] absolute top-0 bottom-0 left-0 bg-[var(--process-color)] transition-transform duration-300`}></div>
             <div style={{ width: `${Number(order.percent).toFixed(2)}%` }} className={`percentage z-[-2] absolute top-0 bottom-0 left-0 bg-[var(--fill-color)] transition-transform duration-300`}></div>
             <div className="">
