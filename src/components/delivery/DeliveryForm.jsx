@@ -98,6 +98,7 @@ const DeliveryForm = ({
                 user={user}
                 currentOrder={currentOrder}
                 currentDelivery={currentDelivery}
+                setCurrentDelivery={setCurrentDelivery}
                 newDelivery={newDelivery}
                 setNewDelivery={setNewDelivery}
             />
