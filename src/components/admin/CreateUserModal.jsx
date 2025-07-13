@@ -2,6 +2,7 @@ import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus, faBackward } from "@fortawesome/free-solid-svg-icons"
 import { createNewUser } from "../../backendCalls/userInfo"
+import toast from "react-hot-toast"
 
 const CreateUserModal = ({ onSuccess, onCancel }) => {
   const [createFormData, setCreateFormData] = useState({
@@ -51,12 +52,12 @@ const CreateUserModal = ({ onSuccess, onCancel }) => {
 
   const handleCreateUser = async () => {
     if (!createFormData.fullname || !createFormData.username || !createFormData.password || !createFormData.role) {
-      alert("Vui lòng điền đầy đủ thông tin!")
+      toast.error("Vui lòng điền đầy đủ thông tin!")
       return
     }
 
     if (!validateEmail(createFormData.username)) {
-      alert("Tên đăng nhập phải có định dạng email hợp lệ!")
+      toast.error("Tên đăng nhập phải có định dạng email hợp lệ!")
       return
     }
 
@@ -74,14 +75,14 @@ const CreateUserModal = ({ onSuccess, onCancel }) => {
       console.log("Response:", response)
 
       if (response.status === 200 || response.status === 201) {
-        alert("Tạo tài khoản thành công!")
+        toast.success("Tạo tài khoản thành công!")
         onSuccess()
       } else {
-        alert("Có lỗi xảy ra khi tạo tài khoản!")
+        toast.error("Có lỗi xảy ra khi tạo tài khoản!")
       }
     } catch (error) {
       console.error("Error creating user:", error)
-      alert("Có lỗi xảy ra khi tạo tài khoản!")
+      toast.error("Có lỗi xảy ra khi tạo tài khoản!")
     } finally {
       setIsCreating(false)
     }

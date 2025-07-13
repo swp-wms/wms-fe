@@ -5,7 +5,8 @@ import {
   faChartSimple,
   faTruckFast,
   faFile,
-  faShapes
+  faShapes,
+  faHandshake,
 } from "@fortawesome/free-solid-svg-icons";
 
 const sideElement = [
@@ -53,12 +54,19 @@ const sideElement = [
     },
     {
       id: 6,
+      icon: faHandshake,
+      path: "/thong-tin-doi-tac",
+      name: "Thông tin đối tác",
+      allowed: [3, 4, 5]
+    },
+    {
+      id: 7,
       icon: faFile,
       path: "/cac-loai-don-tu-khac",
       name: "Các loại đơn từ khác",
       allowed: [3, 4, 5]
     }, {
-      id: 7,
+      id: 8,
       icon: faFile,
       path: "/danh-sach-nguoi-dung",
       name: "Danh sách người dùng",
