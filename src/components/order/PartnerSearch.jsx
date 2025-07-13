@@ -32,6 +32,9 @@ const PartnerSearch = ({
   const handlePartnerInputChange = (e) => {
     const value = e.target.value;
     setInputpartner(value);
+    if(value.trim() === "") {
+      setSelectedPartner(null);
+    }
     const filteredSuggestions = partnerList.filter(
       partner =>
         partner.name.trim().toLowerCase().includes(value.toLowerCase().trim()) ||
@@ -44,6 +47,10 @@ const PartnerSearch = ({
     setInputpartner(partner.name || partner.id || "");
     setpartnerFilteredSuggestions([]);
     setSelectedPartner(partner);
+
+    setTimeout(() => {
+      console.log("Selected Partner: ", selectedPartner);
+    }, 500);
   };
 
   const handleKeyDown = (e) => {
@@ -54,7 +61,10 @@ const PartnerSearch = ({
       );
       if (matched) {
         setSelectedPartner(matched);
+        setpartnerFilteredSuggestions([]);
+      
       }
+      console.log("selectedPartner: ", selectedPartner);
     }
   };
 
@@ -103,7 +113,7 @@ const PartnerSearch = ({
         </div>
             <button className=" ml-1 size-9.5  aspect-square justify-center border border-gray-300 rounded text-sm bg-white hover:bg-gray-100 hover:border-gray-400 align-bottom "
             onClick={()=>setActiveTab('partner')}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 ml-1 text-gray-500" >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="c urrentColor" className="size-6 ml-1 text-gray-500" >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
           </button>

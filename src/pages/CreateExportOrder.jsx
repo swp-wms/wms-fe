@@ -20,6 +20,8 @@ const CreateOrder = ({user, setUser}) => {
   const [selectedProducts, setSelectedProducts] = useState([]); // store products that are added to the order
   const [selectedPartner, setSelectedPartner] = useState(null); // store selected partner details
 
+  const [formInitialData, setFormInitialData] = useState(null);
+
   const [partnerList, setPartnerList] = useState([]);
   const [productList, setProductList] = useState([]);
   const [focused, setFocused] = useState('');
@@ -116,13 +118,23 @@ const CreateOrder = ({user, setUser}) => {
       return true;
             
     };
+
+  const handleSetActiveTab = (tab, data = null) => {
+    setActiveTab(tab);
+  if (data) {
+    setFormInitialData(data);
+  } else {
+    setFormInitialData(null); // Reset when no data
+  }
+  
+};
   return (
     <div className="min-h-screen bg-[#fafafa] pt-25 pl-77 pr-5 ">
-      <div className="max-X`w-9xl mx-auto relative">
+      <div className="max-w-9xl mx-auto relative">
         {showForm && (
           <CompleteForm 
             activeTab={activeTab} 
-            setActiveTab={setActiveTab} 
+            setActiveTab={handleSetActiveTab} 
             setShowForm={setShowForm}
             partnerList={partnerList}
             selectedProducts={selectedProducts}
@@ -130,6 +142,7 @@ const CreateOrder = ({user, setUser}) => {
             setSelectedPartner={setSelectedPartner}
             setSelectedProducts={setSelectedProducts}
             productList={productList}
+            initialData={formInitialData}
           />
         )}
         <div className="grid grid-cols-5 :grid-cols-5 gap-4">
@@ -164,11 +177,12 @@ const CreateOrder = ({user, setUser}) => {
               <OrderTable
                 selectedProducts={selectedProducts}
                 setSelectedProducts={setSelectedProducts}
+                selectedPartner={selectedPartner}
                 productList={productList}
-                setActiveTab={setActiveTab}
+                
                 totalBars={totalBars}
                 totalWeight={totalWeight}
-                orderType={orderType}
+                setActiveTab={handleSetActiveTab}
               />
             </div>
             {/* Bottom Buttons */}

@@ -85,12 +85,47 @@ const isEmailValid = (email) => {
 
 
 
-export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, partnerList, setPartnerList, productList, selectedProducts, setSelectedProducts, selectedPartner, setSelectedPartner }) {
+export function usePartnerFormLogic({ 
+  activeTab, 
+  setActiveTab, 
+  setShowForm, 
+  partnerList, 
+  setPartnerList, 
+  productList, 
+  selectedProducts, 
+  setSelectedProducts, 
+  selectedPartner, 
+  setSelectedPartner, 
+  initialData = null
+}) {
+  
+  const getInitialProduct = () => {
+    if (initialData?.product) {
+      return {
+        ...initialProduct,
+        ...initialData.product
+      };
+    }
+    return initialProduct;
+  };
+
+  const getInitialCatalog = () => {
+    if (initialData?.catalog) {
+      return {
+        ...initialCatalog,
+        ...initialData.catalog
+      };
+    }
+    return initialCatalog;
+  };
+
+
+
   const [partner, setPartner] = useState(initialPartner);
   const [partnerErrors, setPartnerErrors] = useState(initialPartnerErrors);
 
-  const [product, setProduct] = useState(initialProduct);
-  const [catalog, setCatalog] = useState(initialCatalog);
+  const [product, setProduct] = useState(getInitialProduct());
+  const [catalog, setCatalog] = useState(getInitialCatalog());
   const [productErrors, setProductErrors] = useState(initialProductErrors);
   const [catalogErrors, setCatalogErrors] = useState(initialCatalogErrors);
   const [catalogList, setCatalogList] = useState([]);
@@ -124,6 +159,25 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
     fetchPartners();
 
   },[selectedProducts],selectedPartner);
+    useEffect(() => {
+    if (initialData) {
+      if (initialData.product) {
+        setProduct(prev => ({
+          ...prev,
+          ...initialData.product
+        }));
+      }
+      if (initialData.catalog) {
+        setCatalog(prev => ({
+          ...prev,
+          ...initialData.catalog
+        }));
+      }
+    }
+  }, [initialData]);
+
+  // ... rest of your existing logic
+
 
   useEffect(() => {
     if (activeTab === "product" && setShowForm) {
@@ -438,34 +492,60 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
           productCalls.addProduct(product);
           toast.success("Thêm sản phẩm thành công");
           setShowForm(false);
-          setSelectedProducts((prev) => [
-            ...prev,
-            {
-              ...product,
-              trueId: selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].id + 1,
-              catalog: catalog,
+          if(initialData !== null && selectedPartner.isfactory) {
+            // If initialData is provided, update the existing product
+            const updatedProducts = selectedProducts.map((p) =>
+              p.name === initialData.product.name ? 
+            { ...product, 
+                trueId: initialData.product.trueId,  // Keep the trueId from initialData
+                catalog: catalog,
+                partner: partner
+              } : p
+            );
+            setSelectedProducts(updatedProducts);
+            initialData = null; // Reset initialData after use
+          }else{
+            setSelectedProducts((prev) => [
+              ...prev,
+              {
+                ...product,
+                trueId: selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].trueId + 1,
+                catalog: catalog,
 
-            }
-          ])
+              }
+            ])
+          }
         }
 
         else {
           console.log("Catalog: ", catalog);
           catalogCalls.addCatalog(catalog)
             .then(() => {
-              console.log('add product:', product);
+              console.log('add product:', product); 
               productCalls.addProduct(product);
               toast.success("Thêm sản phẩm thành công");
               setShowForm(false);
-              setSelectedProducts((prev) => [
-                ...prev,
-                {
-                  ...product,
-                  trueId: selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].id + 1,
-                  catalog: catalog,
+             if(initialData !== null && selectedPartner.isfactory) {
+            // If initialData is provided, update the existing product
+            const updatedProducts = selectedProducts.map((p) =>
+              p.name === initialData.product.name ? 
+            { ...product, 
+                trueId: initialData.product.trueId,  // Keep the trueId from initialData
+                catalog: catalog,
+                partner:partner } : p
+            );
+            setSelectedProducts(updatedProducts);
+            initialData = null; // Reset initialData after use
+          }else{
+            setSelectedProducts((prev) => [
+              ...prev,
+              {
+                ...product,
+                trueId: selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].trueId + 1,
+                catalog: catalog,
                 }
               ]);
-            })
+            }})
             .catch((error) => {
               toast.error("Lỗi khi thêm sản phẩm");
               console.error(error);
@@ -483,6 +563,7 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
     catalog, setCatalog, catalogErrors, setCatalogErrors,
     catalogList, setCatalogList,
     handleChange, handleProductChange, handleCatalogChange, handleSubmit,
-    activeTab, setActiveTab, setShowForm, partnerList, setPartnerList, selectedProducts, selectedPartner, setSelectedProducts, setSelectedPartner
+    activeTab, setActiveTab, setShowForm, partnerList, setPartnerList, selectedProducts, selectedPartner, setSelectedProducts, setSelectedPartner,
+    initialData
   };
 }

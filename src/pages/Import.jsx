@@ -12,12 +12,12 @@ import { getUser } from "../backendCalls/user";
 
 
 const ImportOrder = ({ user, setUser }) => {
+    const [currentUser,setCurrentUser] = useState(user);
     const [orders, setOrders] = useState([]);
     const cancelledStatus = "Hủy";
 
     useEffect(() => {
-        if (!user) {
-            const getData = async () => {
+         const getData = async () => {
                 const response = await getUser();
                 if (response.status !== 200) {
                     window.location.href = '/dang-nhap';
@@ -25,8 +25,11 @@ const ImportOrder = ({ user, setUser }) => {
                 const user = response.data;
                 setUser(user);
             }
-            getData();
-        }
+      
+           
+            if(!user || user === null || user === undefined) {
+                getData();
+            }
 
         const fetchImportOrders = async () => {
             try {
@@ -35,9 +38,9 @@ const ImportOrder = ({ user, setUser }) => {
             } catch (error) {
                 console.error("Error fetching import orders:", error);
             }
-        };
+        };        
         fetchImportOrders();
-    }, []);
+    },[user,order]);
 
 
     const total = (array, criteria) => {
@@ -53,7 +56,8 @@ const ImportOrder = ({ user, setUser }) => {
         <div className="relative ml-75 pt-24">
 
             <div className="m-5 flex flex-wrap gap-7  ">
-                {user.roleid == 3 && (
+                
+                {user?.roleid == 3 && (
                     <Link to="./tao-don-nhap-hang" className=" group bg-gray-100 w-full sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex border-2 border-gray-200 rounded-md hover:bg-gray-300 hover:border-gray-400 items-center justify-center">
                         <FontAwesomeIcon className="w-full text-gray-400 transition-colors duration-200 group-hover:text-gray-600" icon={faFileCirclePlus} size="3x" />
                     </Link>
@@ -127,7 +131,7 @@ const ImportOrder = ({ user, setUser }) => {
                             )}
                             {order.status !== cancelledStatus && (
                             <div className="flex h-4 ml-[10%] w-[90%] bg-gray-200 rounded-full overflow-hidden dark:bg-neutral-700" role="progressbar" aria-valuenow="{order.status.match(/(\d+(\.\d+)?)(?=%)/)[0]}" aria-valuemin="0" aria-valuemax="100">
-                                <div className="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap dark:bg-blue-500 transition duration-500" style={{ width: order.status === "0%" ? "10%" : order.status }}>{order.status}</div>
+                                <div className="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap dark:bg-blue-500 transition duration-500" style={{ width: parseFloat(order.status).toFixed(0)  <=18 ? "18%" : `${parseFloat(order.status).toFixed(0)}%` }}>{order.status}%</div>
                             </div>
                             )}
                         </div>

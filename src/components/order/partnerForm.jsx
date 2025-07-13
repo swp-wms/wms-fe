@@ -4,7 +4,8 @@ const CompleteForm = (props) => {
   const {
     partner, partnerErrors, product, productErrors, catalog, catalogErrors, catalogList,
     handleChange, handleProductChange, handleCatalogChange, handleSubmit,
-    activeTab, setActiveTab, setShowForm, partnerList, setPartnerList,productList, selectedProducts, selectedPartner, setSelectedPartner, setSelectedProducts
+    activeTab, setActiveTab, setShowForm, partnerList, setPartnerList,productList, selectedProducts, selectedPartner, setSelectedPartner, setSelectedProducts,
+    initialData
   } = usePartnerFormLogic(props);
 
 return (
@@ -384,7 +385,7 @@ return (
                         <input
                           type="text"
                           name="weightpermeter"
-                          value={catalog.weightpermeter || ""}
+                          value={(catalog.weightperbundle/catalog.barsperbundle/catalog.length).toFixed(3) || ""}
                           onChange={handleCatalogChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />

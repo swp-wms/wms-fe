@@ -32,6 +32,8 @@ const addProduct = async(productInfo) => {
         throw error; // Re-throw the error for further handling
     }
 }
+
+
 export default {
     fetchProducts,
     addProduct

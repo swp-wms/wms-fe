@@ -31,7 +31,7 @@ export const api = {
   //product API
   GET_PRODUCTS: `${baseUrl}/products`,
   ADD_PRODUCT: `${baseUrl}/products`,
-
+  GET_PRODUCT_GENERAL :`${baseUrl}/orders/product_general`,
 
   //warehouse API
   GET_WAREHOUSE: `${baseUrl}/warehouse`,
