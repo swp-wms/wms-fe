@@ -1,18 +1,11 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPenToSquare,
-  faSave,
-  faBackward,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import {
-  getAllUserInfo,
-  updateUserInfo,
-  createNewUser,
-} from "../../backendCalls/userInfo";
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { getAllUserInfo, updateUserInfo } from "../../backendCalls/userInfo";
 import toast from "react-hot-toast";
+import EditUserModal from "./EditUserModal";
+import CreateUserModal from "./CreateUserModal";
 
 const AccountManage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,22 +16,7 @@ const AccountManage = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-  const [editFormData, setEditFormData] = useState({
-    fullname: "",
-    username: "",
-    password: "",
-    roleid: "",
-  });
-  const [isEditUpdating, setIsEditUpdating] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [createFormData, setCreateFormData] = useState({
-    fullname: "",
-    username: "",
-    password: "",
-    roleid: "",
-  });
-  const [isCreating, setIsCreating] = useState(false);
-  const [emailError, setEmailError] = useState("");
 
   useEffect(() => {
     const getData = async () => {
@@ -49,7 +27,6 @@ const AccountManage = () => {
           return;
         }
         const userData = response.data;
-
         console.log("API Response:", userData);
         if (userData && userData.length > 0) {
           console.log(
@@ -58,7 +35,6 @@ const AccountManage = () => {
             typeof userData[0].status
           );
         }
-
         setUsers(Array.isArray(userData) ? userData : []);
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -72,10 +48,8 @@ const AccountManage = () => {
     const matchesSearch =
       user?.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
       user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase());
-
     const matchesPosition =
       selectedPosition === "" || user?.role?.rolename === selectedPosition;
-
     return matchesSearch && matchesPosition;
   });
 
@@ -86,11 +60,6 @@ const AccountManage = () => {
     "System admin",
   ];
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const handleStatusClick = (user) => {
     setSelectedUser(user);
     setShowConfirmModal(true);
@@ -99,9 +68,7 @@ const AccountManage = () => {
   const handleConfirmStatusChange = async () => {
     if (!selectedUser) return;
 
-    ////////////////////////////////////////////
     console.log("Selected User:", selectedUser);
-
     setIsUpdating(true);
     try {
       const newStatus = selectedUser.status === "1" ? "0" : "1";
@@ -110,7 +77,6 @@ const AccountManage = () => {
         status: newStatus,
       };
       const response = await updateUserInfo(updatedUserData);
-
       if (response.status === 200) {
         setUsers((prevUsers) =>
           prevUsers.map((user) =>
@@ -138,182 +104,34 @@ const AccountManage = () => {
 
   const handleEditClick = (user) => {
     setEditingUser(user);
-    setEditFormData({
-      fullname: user.fullname || "",
-      username: user.username || "",
-      password: "",
-      role: user.role?.rolename || "",
-    });
     setShowEditModal(true);
   };
 
-  const handleEditFormChange = (field, value) => {
-    setEditFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleSaveEdit = async () => {
-    if (!editingUser) return;
-
-    setIsEditUpdating(true);
-    try {
-      const updatedUserData = {
-        ...editingUser,
-        fullname: editFormData.fullname,
-        username: editFormData.username,
-        ...(editFormData.password && { password: editFormData.password }),
-        role: getRoleIdFromName(editFormData.role),
-      };
-
-      const response = await updateUserInfo(updatedUserData);
-
-      if (response.status === 200) {
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user.id === editingUser.id
-              ? {
-                  ...user,
-                  ...updatedUserData,
-                  role: { ...user.role, rolename: editFormData.role },
-                }
-              : user
-          )
-        );
-        toast.success("Cập nhật thông tin thành công!");
-        setShowEditModal(false);
-        setEditingUser(null);
-      } else {
-        toast.error("Có lỗi xảy ra khi cập nhật thông tin!");
-      }
-    } catch (error) {
-      console.error("Error updating user info:", error);
-      alert("Có lỗi xảy ra khi cập nhật thông tin!");
-    } finally {
-      setIsEditUpdating(false);
-    }
-  };
-
-  const handleCancelEdit = () => {
+  const handleEditSuccess = (updatedUser) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
+    );
     setShowEditModal(false);
     setEditingUser(null);
-    setEditFormData({
-      fullname: "",
-      username: "",
-      password: "",
-      role: "",
-    });
   };
 
   const handleCreateClick = () => {
-    setCreateFormData({
-      fullname: "",
-      username: "",
-      password: "",
-      roleid: "",
-    });
-    setEmailError("");
     setShowCreateModal(true);
   };
 
-  const handleCreateFormChange = (field, value) => {
-    setCreateFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    if (field === "username") {
-      if (value && !validateEmail(value)) {
-        setEmailError("Tên đăng nhập phải có định dạng email hợp lệ");
-      } else {
-        setEmailError("");
-      }
-    }
-  };
-
-  const handleCreateUser = async () => {
-    createFormData.roleid = getRoleIdFromName(createFormData.role);
-    console.log("Create Form Data:", createFormData);
-
-    if (
-      !createFormData.fullname ||
-      !createFormData.username ||
-      !createFormData.password ||
-      !createFormData.roleid
-    ) {
-      alert("Vui lòng điền đầy đủ thông tin!");
-      return;
-    }
-
-    if (!validateEmail(createFormData.username)) {
-      alert("Tên đăng nhập phải có định dạng email hợp lệ!");
-      return;
-    }
-
-    setIsCreating(true);
+  const handleCreateSuccess = async () => {
+    // Refresh user list
     try {
-      const newUserData = {
-        fullname: createFormData.fullname,
-        username: createFormData.username,
-        password: createFormData.password,
-        roleid: getRoleIdFromName(createFormData.role),
-      };
-
-      const response = await createNewUser(newUserData);
-      {
-        console.log("New User Data:", newUserData);
-      }
-      {
-        console.log("Response:", response);
-      }
-
-      if (response.status === 200 || response.status === 201) {
-        // Refresh
-        const getUsersResponse = await getAllUserInfo();
-        if (getUsersResponse.status === 200) {
-          setUsers(
-            Array.isArray(getUsersResponse.data) ? getUsersResponse.data : []
-          );
-        }
-
-        alert("Tạo tài khoản thành công!");
-        setShowCreateModal(false);
-      } else {
-        alert("Có lỗi xảy ra khi tạo tài khoản!");
+      const getUsersResponse = await getAllUserInfo();
+      if (getUsersResponse.status === 200) {
+        setUsers(
+          Array.isArray(getUsersResponse.data) ? getUsersResponse.data : []
+        );
       }
     } catch (error) {
-      console.error("Error creating user:", error);
-      alert("Có lỗi xảy ra khi tạo tài khoản!");
-    } finally {
-      setIsCreating(false);
+      console.error("Error refreshing user data:", error);
     }
-  };
-
-  const handleCancelCreate = () => {
     setShowCreateModal(false);
-    setCreateFormData({
-      fullname: "",
-      username: "",
-      password: "",
-      roleid: "",
-    });
-    setEmailError("");
-  };
-
-  const getRoleIdFromName = (roleName) => {
-    switch (roleName) {
-      case "Salesman":
-        return 3;
-      case "Warehouse Keeper":
-        return 4;
-      case "Delivery Staff":
-        return 5;
-      case "System admin":
-        return 1;
-      default:
-        return null;
-    }
   };
 
   return (
@@ -336,7 +154,6 @@ const AccountManage = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-
         {/* Filter */}
         <div className="flex-shrink-0">
           <select
@@ -352,7 +169,6 @@ const AccountManage = () => {
             ))}
           </select>
         </div>
-
         {/* Add */}
         <button
           onClick={handleCreateClick}
@@ -442,7 +258,7 @@ const AccountManage = () => {
         </table>
       </div>
 
-      {/* Confirmation */}
+      {/* Status Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-300 rounded-lg p-6 max-w-md w-full mx-4">
@@ -496,243 +312,24 @@ const AccountManage = () => {
         </div>
       )}
 
-      {/* Edit Form */}
+      {/* Edit User Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-200 rounded-lg p-6 max-w-4xl w-full mx-4 relative">
-            <div className="flex items-start gap-8">
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
-                  <svg
-                    className="w-12 h-12 text-gray-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-
-                {/* Role */}
-                <div className="w-40">
-                  <select
-                    value={editFormData.role}
-                    onChange={(e) =>
-                      handleEditFormChange("role", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                  >
-                    <option value="">Chọn vị trí</option>
-                    {positions.map((position) => (
-                      <option key={position} value={position}>
-                        {position}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Data */}
-              <div className="flex-1 space-y-4">
-                <div className="flex items-center gap-4">
-                  <label className="w-32 text-sm font-medium text-gray-700">
-                    MÃ NHÂN VIÊN:
-                  </label>
-                  <input
-                    type="text"
-                    value={editingUser?.id || ""}
-                    disabled
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
-                  />
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <label className="w-32 text-sm font-medium text-gray-700">
-                    TÊN NHÂN VIÊN:
-                  </label>
-                  <input
-                    type="text"
-                    value={editFormData.fullname}
-                    onChange={(e) =>
-                      handleEditFormChange("fullname", e.target.value)
-                    }
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <label className="w-32 text-sm font-medium text-gray-700">
-                    TÊN ĐĂNG NHẬP:
-                  </label>
-                  <input
-                    type="text"
-                    value={editFormData.username}
-                    onChange={(e) =>
-                      handleEditFormChange("username", e.target.value)
-                    }
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <label className="w-32 text-sm font-medium text-gray-700">
-                    MẬT KHẨU:
-                  </label>
-                  <input
-                    type="password"
-                    value={editFormData.password}
-                    onChange={(e) =>
-                      handleEditFormChange("password", e.target.value)
-                    }
-                    placeholder="Để trống nếu không muốn thay đổi"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={handleSaveEdit}
-                  disabled={isEditUpdating}
-                  className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 min-w-[100px]"
-                >
-                  <FontAwesomeIcon icon={faSave} />
-                  <span>{isEditUpdating ? "Đang lưu..." : "Lưu"}</span>
-                </button>
-
-                <button
-                  onClick={handleCancelEdit}
-                  className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 min-w-[100px]"
-                >
-                  <FontAwesomeIcon icon={faBackward} />
-                  <span>Quay lại</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <EditUserModal
+          user={editingUser}
+          onSuccess={handleEditSuccess}
+          onCancel={() => {
+            setShowEditModal(false);
+            setEditingUser(null);
+          }}
+        />
       )}
 
-      {/* Create User Form */}
+      {/* Create User Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-200 rounded-lg p-6 max-w-4xl w-full mx-4 relative">
-            <div className="flex items-start gap-8">
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
-                  <svg
-                    className="w-12 h-12 text-gray-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-
-                {/* Roles */}
-                <div className="w-40">
-                  <select
-                    value={createFormData.role}
-                    onChange={(e) =>
-                      handleCreateFormChange("role", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                  >
-                    <option value="">Chọn vị trí</option>
-                    {positions.map((position) => (
-                      <option key={position} value={position}>
-                        {position}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Data */}
-              <div className="flex-1 space-y-4">
-                <div className="flex items-center gap-4">
-                  <label className="w-32 text-sm font-medium text-gray-700">
-                    TÊN NHÂN VIÊN:
-                  </label>
-                  <input
-                    type="text"
-                    // value={createFormData.fullname}
-                    onChange={(e) =>
-                      handleCreateFormChange("fullname", e.target.value)
-                    }
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Nhập tên nhân viên"
-                  />
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <label className="w-32 text-sm font-medium text-gray-700">
-                    TÊN ĐĂNG NHẬP:
-                  </label>
-                  <div className="flex-1">
-                    <input
-                      placeholder="example@email.com"
-                      type="email"
-                      // value={createFormData.username}
-                      onChange={(e) =>
-                        handleCreateFormChange("username", e.target.value)
-                      }
-                      className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        emailError ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
-                    {emailError && (
-                      <p className="text-red-500 text-xs mt-1">{emailError}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <label className="w-32 text-sm font-medium text-gray-700">
-                    MẬT KHẨU:
-                  </label>
-                  <input
-                    type="password"
-                    // value={createFormData.password}
-                    onChange={(e) =>
-                      handleCreateFormChange("password", e.target.value)
-                    }
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Nhập mật khẩu"
-                  />
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={handleCreateUser}
-                  disabled={isCreating || emailError}
-                  className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 min-w-[100px]"
-                >
-                  <FontAwesomeIcon icon={faPlus} />
-                  <span>{isCreating ? "Đang tạo..." : "Tạo"}</span>
-                </button>
-
-                <button
-                  onClick={handleCancelCreate}
-                  className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 min-w-[100px]"
-                >
-                  <FontAwesomeIcon icon={faBackward} />
-                  <span>Quay lại</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CreateUserModal
+          onSuccess={handleCreateSuccess}
+          onCancel={() => setShowCreateModal(false)}
+        />
       )}
     </div>
   );
