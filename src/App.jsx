@@ -18,8 +18,7 @@ import Statistic from "./pages/Statistic";
 import DeliverySchedule from "./pages/DeliverySchedule";
 import Profile from "./pages/Profile";
 import AdminPage from "./pages/AdminPage";
-
-
+import Partner from "./pages/Partner";
 
 function App() {
   const [user, setUser] = useState();
@@ -28,26 +27,31 @@ function App() {
     <div>
       {user && <Header user={user} setUser={setUser} />}
       <Routes>
-        
         <Route path="/" element={<Home setUser={setUser} user={user} />} />
         <Route path="/dang-nhap" element={<Login />} />
 
         <Route path="/quen-mat-khau" element={<ForgotPassword />} />
-        <Route path="/nhap-hang" element={<ImportOrder setUser={setUser} user={user}  />} />
-        <Route path='/xuat-hang' element={<ExportOrder setUser={setUser} user={user}/>} />
+        <Route
+          path="/nhap-hang"
+          element={<ImportOrder setUser={setUser} user={user} />}
+        />
+        <Route
+          path="/xuat-hang"
+          element={<ExportOrder setUser={setUser} user={user} />}
+        />
         <Route
           path="/nhap-hang/tao-don-nhap-hang"
           element={<CreateImportOrder setUser={setUser} user={user} />}
         />
-        <Route path='/doi-tac' element={<FormTemplate />} />
+        <Route path="/doi-tac" element={<FormTemplate />} />
         <Route
-          path='/xuat-hang/tao-don-xuat-hang'
+          path="/xuat-hang/tao-don-xuat-hang"
           element={<CreateExportOrder setUser={setUser} user={user} />}
         />
 
         <Route path="/nhap-hang/:id" element={<ViewOrder />} />
-        <Route path='/xuat-hang/:id' element={<ViewOrder />} />
-        
+        <Route path="/xuat-hang/:id" element={<ViewOrder />} />
+
         <Route
           path="/tong-quan-kho"
           element={<OverviewPage user={user} setUser={setUser} />}
@@ -57,14 +61,14 @@ function App() {
           element={<Statistic user={user} setUser={setUser} />}
         />
 
-        <Route path="/ke-hoach-van-chuyen" element={<Delivery
-          setUser={setUser}
-          user={user}
-        />} />
-        <Route path="/ke-hoach-van-chuyen/:act" element={<DeliverySchedule
-          setUser={setUser}
-          user={user}
-        />} />
+        <Route
+          path="/ke-hoach-van-chuyen"
+          element={<Delivery setUser={setUser} user={user} />}
+        />
+        <Route
+          path="/ke-hoach-van-chuyen/:act"
+          element={<DeliverySchedule setUser={setUser} user={user} />}
+        />
 
         <Route
           path="/thong-tin-ca-nhan"
@@ -74,6 +78,11 @@ function App() {
         <Route
           path="/danh-sach-nguoi-dung"
           element={<AdminPage user={user} setUser={setUser} />}
+        />
+
+        <Route
+          path="/thong-tin-doi-tac"
+          element={<Partner user={user} setUser={setUser} />}
         />
       </Routes>
     </div>

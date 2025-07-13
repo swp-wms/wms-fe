@@ -57,7 +57,7 @@ const sideElement = [
       icon: faHandshake,
       path: "/thong-tin-doi-tac",
       name: "Thông tin đối tác",
-      allowed: [3, 4, 5]
+      allowed: [3]
     },
     {
       id: 7,
