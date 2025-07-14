@@ -2,11 +2,12 @@ import { faCancel, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import ProductTable from './ProductTable'
 import DriverInfo from './DriverInfo'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getDeliveriesForOrder, handleApproveTruck, handleCreateDelivery } from '../../backendCalls/delivery'
 import StatusButton from './StatusButton'
 import DeliveryInfo from './DeliveryInfo'
 import toast from 'react-hot-toast'
+import { getUser } from '../../backendCalls/user'
 
 const DeliveryForm = ({
     setIsChangePercent,
@@ -15,7 +16,7 @@ const DeliveryForm = ({
     currentDeliveryDetail = null, setCurrentDeliveryDetail,
     deliverySchedule, setDeliverySchedule,
     act,
-    user }) => {
+    user, setUser }) => {
 
     const [newDelivery, setNewDelivery] = useState({}); //1 delivery
 
@@ -97,14 +98,14 @@ const DeliveryForm = ({
 
     return (
         <form className='DeliveryForm overflow-y-scroll relative font-[500] text-[14px] bg-white h-[90%] shadow-[0_0_2px_#ccc] p-5'>
-            <DeliveryInfo
+            {user && <DeliveryInfo
                 user={user}
                 currentOrder={currentOrder}
                 currentDelivery={currentDelivery}
                 setCurrentDelivery={setCurrentDelivery}
                 newDelivery={newDelivery}
                 setNewDelivery={setNewDelivery}
-            />
+            />}
             {currentDelivery && <StatusButton
                 setIsChangePercent={setIsChangePercent}
                 setCurrentDelivery={setCurrentDelivery}
@@ -114,7 +115,7 @@ const DeliveryForm = ({
                 setDeliverySchedule={setDeliverySchedule}
             />}
 
-            {currentOrder && <ProductTable
+            {user && currentOrder && <ProductTable
                 setIsChangePercent={setIsChangePercent}
                 newDeliveryList={newDeliveryList}
                 setNewDeliveryList={setNewDeliveryList}
@@ -128,7 +129,7 @@ const DeliveryForm = ({
                 user={user} act={act}
             />}
 
-            {currentDelivery && <DriverInfo
+            {user && currentDelivery && <DriverInfo
                 setIsChangePercent={setIsChangePercent}
                 currentDelivery={currentDelivery}
                 setCurrentDelivery={setCurrentDelivery}
@@ -139,7 +140,7 @@ const DeliveryForm = ({
 
             <p className="text-red-700 font-medium text-center my-2">{error}</p>
 
-            {!currentDelivery && user.roleid === 3 && <div className="flex justify-end gap-3">
+            {!currentDelivery && user && user.roleid === 3 && <div className="flex justify-end gap-3">
                 <button className='btn px-4 py-2' onClick={(e) => createDelivery(e)}>
                     <FontAwesomeIcon icon={faPlusCircle} className='mr-2' />
                     Thêm
@@ -150,7 +151,7 @@ const DeliveryForm = ({
                     Hủy
                 </button>
             </div>}
-            {currentDelivery && currentDelivery.deliverystatus === '2' && user.roleid === 3 && <div className="flex justify-end gap-3">
+            {currentDelivery && currentDelivery.deliverystatus === '2' && user && user.roleid === 3 && <div className="flex justify-end gap-3">
                 <button className='btn px-4 py-2 '
                     onClick={(e) => { handleApprove(e) }}>
                     <FontAwesomeIcon icon={faPlusCircle} className='mr-2' />

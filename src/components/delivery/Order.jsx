@@ -2,6 +2,7 @@ import { faStickyNote } from "@fortawesome/free-regular-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { checkCompleteOrder } from "../../backendCalls/orderDetail"
 import { getDeliveriesForOrder } from "../../backendCalls/delivery"
+import { Link } from "react-router-dom"
 const Order = ({ order, setCurrentOrder, user, setDeliverySchedule, setCurrentDelivery, setCurrentDeliveryDetail }) => {
     const fetchDeliveryList = async () => {
         try {
@@ -25,7 +26,7 @@ const Order = ({ order, setCurrentOrder, user, setDeliverySchedule, setCurrentDe
         }
     }
     return (
-        <li className="flex hover:scale-[1.01] hover:cursor-pointer hover:shadow-[0_0_3px_#aaa] mb-2 relative justify-between px-4 border-[1.5px] rounded border-black items-center"
+        <Link to={`/ke-hoach-van-chuyen/${window.location.pathname.split('/')[2]}/${order.orderid}`} className="flex hover:scale-[1.01] hover:cursor-pointer hover:shadow-[0_0_3px_#aaa] mb-2 relative justify-between px-4 border-[1.5px] rounded border-black items-center"
             onClick={fetchDeliveryList}
         >
             <span className="absolute top-0 right-[10px] rounded-b-md text-sm font-semibold bg-[#ccc] p-2 shadow-[0_0_3px_#aaa]">{order.orderid}</span>
@@ -44,7 +45,7 @@ const Order = ({ order, setCurrentOrder, user, setDeliverySchedule, setCurrentDe
                     >Xong</button>
                 }
             </div>
-        </li>
+        </Link>
     )
 }
 

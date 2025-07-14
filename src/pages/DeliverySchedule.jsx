@@ -29,6 +29,8 @@ const DeliverySchedule = ({ user, setUser }) => {
   }, [currentDelivery, setCurrentDelivery])
 
   const getOrderList = async () => {
+    console.log('run');
+
     if (act === 'nhap') {
       const response = await getAllImportDelivery();
       const orderList = response.data;
@@ -62,10 +64,10 @@ const DeliverySchedule = ({ user, setUser }) => {
 
   useEffect(() => {
     getOrderList();
-  }, [isChangePercent, setIsChangePercent]);
+  }, [isChangePercent, setIsChangePercent, orderId, deliveryId]);
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !user.roleid) {
       const getData = async () => {
         const response = await getUser();
         if (response.status !== 200) {
@@ -76,61 +78,64 @@ const DeliverySchedule = ({ user, setUser }) => {
       }
       getData();
     }
-  }, [currentOrder, setCurrentOrder]);
+  }, []);
 
   return (
-    <div className="DeliverySchedule fixed bottom-0 right-0 top-[80px] left-[23%]">
-      <div className="w-full h-5/6 p-[20px] flex">
-        <div className="flex-1 h-full">
-          <h1 className="font-medium mb-2">Đơn {act === 'nhap' ? 'nhập' : 'xuất'} hàng</h1>
-          {orders && <OrderList
-            setDeliverySchedule={setDeliverySchedule}
-            orders={orders}
-            setCurrentDelivery={setCurrentDelivery}
-            setCurrentDeliveryDetail={setCurrentDeliveryDetail}
-            setCurrentOrder={setCurrentOrder}
+    <>
+      {user && <div className="DeliverySchedule fixed bottom-0 right-0 top-[80px] left-[23%]">
+        <div className="w-full h-5/6 p-[20px] flex">
+          <div className="flex-1 h-full">
+            <h1 className="font-medium mb-2">Đơn {act === 'nhap' ? 'nhập' : 'xuất'} hàng</h1>
+            {orders && <OrderList
+              setDeliverySchedule={setDeliverySchedule}
+              orders={orders}
+              setCurrentDelivery={setCurrentDelivery}
+              setCurrentDeliveryDetail={setCurrentDeliveryDetail}
+              setCurrentOrder={setCurrentOrder}
 
-            user={user}
-          />}
-        </div>
-        {/* table */}
-        <div className="flex-2 h-full ml-4">
-          <div className="flex justify-between">
-            {!currentDelivery && <h1 className="font-medium mb-2">Thêm xe</h1>}
-            {currentOrder && <h1 className="font-medium mb-2">{currentOrder.partnername}</h1>}
+              user={user}
+            />}
           </div>
+          {/* table */}
+          <div className="flex-2 h-full ml-4">
+            <div className="flex justify-between">
+              {!currentDelivery && <h1 className="font-medium mb-2">Thêm xe</h1>}
+              {currentOrder && <h1 className="font-medium mb-2">{currentOrder.partnername}</h1>}
+            </div>
 
-          {currentOrder ? <DeliveryForm
-            setIsChangePercent={setIsChangePercent}
+            {currentOrder ? <DeliveryForm
+              setIsChangePercent={setIsChangePercent}
+              currentOrder={currentOrder}
+              currentDelivery={currentDelivery}
+              setCurrentDelivery={setCurrentDelivery}
+              currentDeliveryDetail={currentDeliveryDetail}
+              setCurrentDeliveryDetail={setCurrentDeliveryDetail}
+              setDeliverySchedule={setDeliverySchedule}
+              deliverySchedule={deliverySchedule}
+              user={user}
+              setUser={setUser}
+              act={act}
+            /> : (
+              <div className="h-[90%] bg-white flex items-center justify-center text-[#999] rounded">
+                <h1 className="font-medium">Chưa đơn hàng nào được chọn.</h1>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="w-full h-1/6">
+          {currentOrder && <DeliveryList
+            user={user}
             currentOrder={currentOrder}
+            deliverySchedule={deliverySchedule}
+            setDeliverySchedule={setDeliverySchedule}
             currentDelivery={currentDelivery}
             setCurrentDelivery={setCurrentDelivery}
-            currentDeliveryDetail={currentDeliveryDetail}
             setCurrentDeliveryDetail={setCurrentDeliveryDetail}
-            setDeliverySchedule={setDeliverySchedule}
-            deliverySchedule={deliverySchedule}
-            user={user}
-            act={act}
-          /> : (
-            <div className="h-[90%] bg-white flex items-center justify-center text-[#999] rounded">
-              <h1 className="font-medium">Chưa đơn hàng nào được chọn.</h1>
-            </div>
-          )}
+          />}
         </div>
-      </div>
-
-      <div className="w-full h-1/6">
-        {currentOrder && <DeliveryList
-          user={user}
-          currentOrder={currentOrder}
-          deliverySchedule={deliverySchedule}
-          setDeliverySchedule={setDeliverySchedule}
-          currentDelivery={currentDelivery}
-          setCurrentDelivery={setCurrentDelivery}
-          setCurrentDeliveryDetail={setCurrentDeliveryDetail}
-        />}
-      </div>
-    </div>
+      </div>}
+    </>
   )
 }
 

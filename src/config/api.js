@@ -73,6 +73,7 @@ export const api = {
 
   //notification API
   GET_NOTIFS: `${baseUrl}/notification`,
-  SEEN_NOTIF: (notifId) => `${baseUrl}/notification/${notifId}`
+  GET_SEEN_NOTIF: (index) => `${baseUrl}/notification/seen/${index}`,
+  SEEN_NOTIF: (notifId) => `${baseUrl}/notification/${notifId}`,
 }
 

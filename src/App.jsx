@@ -32,13 +32,13 @@ function App() {
     <div>
       {user && <Header user={user} setUser={setUser} />}
       <Routes>
-        
+
         <Route path="/" element={<Home setUser={setUser} user={user} />} />
         <Route path="/dang-nhap" element={<Login />} />
 
         <Route path="/quen-mat-khau" element={<ForgotPassword />} />
-        <Route path="/nhap-hang" element={<ImportOrder setUser={setUser} user={user}  />} />
-        <Route path='/xuat-hang' element={<ExportOrder setUser={setUser} user={user}/>} />
+        <Route path="/nhap-hang" element={<ImportOrder setUser={setUser} user={user} />} />
+        <Route path='/xuat-hang' element={<ExportOrder setUser={setUser} user={user} />} />
         <Route
           path="/nhap-hang/tao-don-nhap-hang"
           element={<CreateImportOrder setUser={setUser} user={user} />}
@@ -69,11 +69,11 @@ function App() {
           setUser={setUser}
           user={user}
         />} />
-        <Route path="/ke-hoach-van-chuyen/:act" element={<DeliverySchedule
+        <Route path="/ke-hoach-van-chuyen/:act/:orderId/:deliveryId" element={<DeliverySchedule
           setUser={setUser}
           user={user}
         />} />
-        <Route path="/ke-hoach-van-chuyen/:act/:orderId/:deliveryId" element={<DeliverySchedule
+        <Route path="/ke-hoach-van-chuyen/:act/*" element={<DeliverySchedule
           setUser={setUser}
           user={user}
         />} />
