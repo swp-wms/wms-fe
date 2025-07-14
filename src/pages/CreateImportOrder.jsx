@@ -80,7 +80,7 @@ const CreateOrder = ({user, setUser}) => {
     };
     fetchPartners();
     fetchProducts();
-  },[productList]);
+  },[selectedProducts, selectedPartner]);
   let checkNumberOfBars = () => {
             const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0 || product.numberofbars == null);
             if(invalidProducts.length > 0) {
@@ -119,15 +119,15 @@ const CreateOrder = ({user, setUser}) => {
     setSelectedProducts([]);
     setSelectedPartner(null);
   };
-  const handleSetActiveTab = (tab, data = null) => {
-    setActiveTab(tab);
-  if (data) {
-    setFormInitialData(data);
-  } else {
-    setFormInitialData(null); // Reset when no data
-  }
-  setShowForm(true); // Show the form when tab is set
-};
+    const handleSetActiveTab = (tab, data = null) => {
+      setActiveTab(tab);
+      if (data) {
+        setFormInitialData(data);
+      } else {
+        setFormInitialData(null); // Reset when no data
+      }
+      setShowForm(true); // Show the form when tab is set
+    };
 
   // Calculate totals for selectedProducts
   const totalBars = selectedProducts.reduce((sum, item) => {

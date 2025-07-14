@@ -160,13 +160,23 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
     return !isNaN(value) ? sum + value : sum;
   }, 0);
 
+    const handleSetActiveTab = (tab, data = null) => {
+    setActiveTab(tab);
+    if (data) {
+      setFormInitialData(data);
+    } else {
+      setFormInitialData(null); // Reset when no data
+    }
+    setShowForm(true); // Show the form when tab is set
+  };
+
   return (
     <div className="min-h-screen bg-[#fafafa] pt-25 pl-77 pr-5 ">
       <div className="max-w-9xl mx-auto relative">
         {showForm && (
           <CompleteForm 
-            activeTab={activeTab} 
-            setActiveTab={setActiveTab} 
+            activeTab={activeTab}
+            setActiveTab={handleSetActiveTab}
             setShowForm={setShowForm}
             partnerList={partnerList}
             setPartnerList={setPartnerList}
@@ -174,6 +184,7 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
             selectedPartner={selectedPartner}
             setSelectedPartner={setSelectedPartner}
             setSelectedProducts={setSelectedProducts}
+            initialData={formInitialData}
             
           />
         )}
@@ -199,6 +210,7 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
               <ProductSearch
                 inputProduct={inputProduct}
                 setInputProduct={setInputProduct}
+                selectedPartner={selectedPartner}
                 productList={productList}
                 productFilteredSuggestions={productFilteredSuggestions}
                 setProductFilteredSuggestions={setProductFilteredSuggestions}
@@ -207,14 +219,24 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
                 setActiveTab={tab => {setActiveTab(tab); setShowForm(true);}}
               />
               <EditTable
+                // selectedProducts={selectedProducts}
+                // setSelectedProducts={setSelectedProducts}
+                // productList={productList}
+                // setActiveTab={setActiveTab}
+                // totalBars={totalBars}
+                // totalWeight={totalWeight}
+                // delivery={delivery}
+                // setDelivery={setDelivery}
+
                 selectedProducts={selectedProducts}
                 setSelectedProducts={setSelectedProducts}
+                selectedPartner={selectedPartner}
                 productList={productList}
-                setActiveTab={setActiveTab}
-                totalBars={totalBars}
-                totalWeight={totalWeight}
                 delivery={delivery}
                 setDelivery={setDelivery}
+                totalBars={totalBars}
+                totalWeight={totalWeight}
+                setActiveTab={handleSetActiveTab}
               />
             </div>
             {/* Bottom Buttons */}

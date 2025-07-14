@@ -14,7 +14,10 @@ import { getUser } from "../backendCalls/user";
 
 
 const ImportOrder = ({user, setUser}) => {
+    const [currentUser,setCurrentUser] = useState(user);
     const [orders, setOrders] = useState([]);
+    const cancelledStatus = "Hủy";
+    const finishedStatus = "XONG";
 
     useEffect(() => {
          if(!user){const getData = async () => {
@@ -25,7 +28,8 @@ const ImportOrder = ({user, setUser}) => {
                   const user = response.data;
                   setUser(user);
                 }
-                getData();}
+                getData();
+            }
 
         const fetchExportOrders = async () => {
             try {
@@ -52,13 +56,18 @@ const ImportOrder = ({user, setUser}) => {
             <div className="bg-[#fafafa] ml-75 pt-24">
                 
                 <div className="m-5 flex flex-wrap gap-7">
-                    {user.roleid == 3 && (
+                    {user?.roleid == 3 && (
                     <Link to="./tao-don-xuat-hang" className="group bg-gray-100 w-full sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex border-2 border-gray-200 rounded-md hover:bg-gray-300 hover:border-gray-400 items-center justify-center">
                         <FontAwesomeIcon className="w-full text-gray-400 transition-colors duration-200 group-hover:text-gray-600" icon={faFileCirclePlus} size="3x"/>
                     </Link>
                     )}
                     {orders.map((order) => (
                     <div key={order.id}  className=" space-y-2 bg-white w-full pb-4 sm:w-1/2 md:w-1/3 lg:w-1/5 h-[40vh] flex flex-col border-2 border-[#1e1e1e] justify-evenly rounded-md p-4 ">
+                        <div className="text-gray-700 text-sm font-medium relative">
+                                <div className="absolute top-0 right-0 bg-red-200 px-2 mt-1 border border-red-200 rounded-2xl">
+                                    Mã đơn:  <span className="font-bold">{order.id}</span>
+                                </div>
+                            </div>
                           <div className="flex flex-col gap-1">
                                     <div className="flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
@@ -108,9 +117,21 @@ const ImportOrder = ({user, setUser}) => {
 
                                         <span className="text-[12px] font-medium text-gray-500">Trạng thái</span>
                                     </div>
-                                    <div className="flex w-full h-4 bg-gray-200 rounded-full overflow-hidden dark:bg-neutral-700" role="progressbar" aria-valuenow="{order.status.match(/(\d+(\.\d+)?)(?=%)/)[0]}" aria-valuemin="0" aria-valuemax="100">
-                                        <div className="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap dark:bg-blue-500 transition duration-500" style={{ width: order.status }}>{order.status}</div>
-                                    </div>
+                                {order.status === cancelledStatus && (
+                                 <div className="bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-3 py-1 rounded-full text-sm font-medium inline-block">
+                                    Đơn hàng đã bị hủy
+                                </div>
+                                )}
+                                {order.status == finishedStatus && (
+                                 <div className="bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-3 py-1 rounded-full text-sm font-medium inline-block">
+                                    Đơn hàng đã hoàn thành
+                                </div>
+                                )}
+                                {order.status !== cancelledStatus && order.status !== finishedStatus && (
+                                <div className="flex h-4 ml-[10%] w-[90%] bg-gray-200 rounded-full overflow-hidden dark:bg-neutral-700" role="progressbar" aria-valuenow="{order.status.match(/(\d+(\.\d+)?)(?=%)/)[0]}" aria-valuemin="0" aria-valuemax="100">
+                                    <div className="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap transition duration-500" style={{ width: parseFloat(order.status).toFixed(0)  <=18 ? "18%" : `${parseFloat(order.status).toFixed(0)}%` }}>{parseFloat(order.status).toFixed(1)}%</div>
+                                </div>
+                                )}
                                 </div>
                         <Link to={`./${order.id}`} className="w-[80%] h-12 bg-white border-2 border-gray-100 rounded-md flex gap-2 self-center justify-self-center  place-content-center justify-evenly content-around shadow-lg">
                             <FontAwesomeIcon className="h-full place-self-center text-[#1e1e1e]" icon={faArrowUpRightFromSquare} />

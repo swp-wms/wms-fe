@@ -173,6 +173,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
   const handleAddProductToForm = () => {
     const initialData = {
       product: {
+        trueId: product.trueId,
         name: product.name || '',
         namedetail: product.namedetail || '',
         brandname: product.brandname || '',

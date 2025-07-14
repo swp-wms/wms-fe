@@ -73,12 +73,16 @@ const SupplementForm = ({
       totalWeight: totalWeight,
       totalBars: totalBars,
     };
-    
-    const response = await supplement.addSupplementOrder(supplementOrder);
-    console.log("Response from supplement order:", response);
-    if (response.success) {
-      toast.success("Tạo đơn bù thành công");
-      setSelectedProducts([]);
+    if(orderDetail.totalWeight < totalWeight){
+      toast.error(`Tổng trọng lượng đơn bù: ${totalWeight} kg không được lớn hơn tổng trọng lượng đơn hàng ${orderDetail.totalWeight} kg`);
+      return;
+    }else{
+      const response = await supplement.addSupplementOrder(supplementOrder);
+      console.log("Response from supplement order:", response);
+      if (response.success) {
+        toast.success("Tạo đơn bù thành công");
+        setSelectedProducts([]);
+      }
     }
   };
   return (
