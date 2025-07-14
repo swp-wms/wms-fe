@@ -73,6 +73,10 @@ function App() {
           setUser={setUser}
           user={user}
         />} />
+        <Route path="/ke-hoach-van-chuyen/:act/:orderId/:deliveryId" element={<DeliverySchedule
+          setUser={setUser}
+          user={user}
+        />} />
 
         <Route
           path="/thong-tin-ca-nhan"

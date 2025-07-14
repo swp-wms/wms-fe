@@ -6,6 +6,7 @@ import { handleUpdateRealData } from "../../backendCalls/delivery";
 import toast from "react-hot-toast";
 
 const ProductTable = ({
+    setIsChangePercent,
     currentOrder,
     currentDelivery, currentDeliveryDetail,
     setCurrentDeliveryDetail, setCurrentDelivery,
@@ -44,6 +45,7 @@ const ProductTable = ({
             setCurrentDelivery({ ...currentDelivery, deliverystatus: currentDelivery.deliverystatus === '4' ? '5' : '4' });
             setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: currentDelivery.deliverystatus === '4' ? '5' : '4' } : delivery));
             toast.success('Xác nhận thành công.');
+            setIsChangePercent(prev => !prev);
         } catch (error) {
             console.log(error);
 

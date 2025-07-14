@@ -4,17 +4,18 @@ import DeliveryList from "../components/delivery/DeliveryList"
 import { getUser } from "../backendCalls/user";
 import DeliveryForm from "../components/delivery/DeliveryForm";
 import { useParams } from "react-router-dom";
-import { getAllExportDelivery, getAllImportDelivery, getDeliveryDetail } from "../backendCalls/delivery";
+import { getAllExportDelivery, getAllImportDelivery, getDeliveriesForOrder, getDeliveryDetail } from "../backendCalls/delivery";
 
 
 const DeliverySchedule = ({ user, setUser }) => {
-  const { act } = useParams();
+  const { act, orderId, deliveryId } = useParams();
 
   const [orders, setOrders] = useState(); //list big order. load 1 time
   const [currentOrder, setCurrentOrder] = useState(); //hit 1 order, then load
   const [deliverySchedule, setDeliverySchedule] = useState([]);
   const [currentDelivery, setCurrentDelivery] = useState();
   const [currentDeliveryDetail, setCurrentDeliveryDetail] = useState();
+  const [isChangePercent, setIsChangePercent] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -27,19 +28,41 @@ const DeliverySchedule = ({ user, setUser }) => {
     getData();
   }, [currentDelivery, setCurrentDelivery])
 
-  useEffect(() => {
-    const getData = async () => {
-      if (act === 'nhap') {
-        const response = await getAllImportDelivery();        
-        setOrders(response.data);
-      } else if (act === 'xuat') {
-        const response = await getAllExportDelivery();
-        setOrders(response.data);
+  const getOrderList = async () => {
+    if (act === 'nhap') {
+      const response = await getAllImportDelivery();
+      const orderList = response.data;
+      setOrders(orderList);
+
+      if (orderId) {
+        setCurrentOrder(orderList.find((a) => a.orderid == orderId));
+      }
+    } else if (act === 'xuat') {
+      const response = await getAllExportDelivery();
+      const orderList = response.data;
+      setOrders(orderList);
+
+      if (orderId) {
+        setCurrentOrder(orderList.find((a) => a.orderid == orderId));
       }
     }
+    getDeliveryList();
+  }
 
-    getData();
-  }, [deliverySchedule, setDeliverySchedule]);
+  const getDeliveryList = async () => { //if the url have orderId and deliveryId
+    if (orderId && deliveryId) {
+      // load delivery schedule for order
+      const response = (await getDeliveriesForOrder(orderId)).data;
+      console.log(response);
+
+      setDeliverySchedule(response.length > 0 ? response.sort((a, b) => new Date(b.deliverydate) - new Date(a.deliverydate)) : []);
+      setCurrentDelivery(response.find((a) => a.id == deliveryId));
+    }
+  }
+
+  useEffect(() => {
+    getOrderList();
+  }, [isChangePercent, setIsChangePercent]);
 
   useEffect(() => {
     if (!user) {
@@ -62,7 +85,7 @@ const DeliverySchedule = ({ user, setUser }) => {
           <h1 className="font-medium mb-2">Đơn {act === 'nhap' ? 'nhập' : 'xuất'} hàng</h1>
           {orders && <OrderList
             setDeliverySchedule={setDeliverySchedule}
-            orders={orders} 
+            orders={orders}
             setCurrentDelivery={setCurrentDelivery}
             setCurrentDeliveryDetail={setCurrentDeliveryDetail}
             setCurrentOrder={setCurrentOrder}
@@ -78,6 +101,7 @@ const DeliverySchedule = ({ user, setUser }) => {
           </div>
 
           {currentOrder ? <DeliveryForm
+            setIsChangePercent={setIsChangePercent}
             currentOrder={currentOrder}
             currentDelivery={currentDelivery}
             setCurrentDelivery={setCurrentDelivery}

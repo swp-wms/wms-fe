@@ -4,7 +4,7 @@ import axios from 'axios';
 import { api } from '../../config/api';
 import { handleCancelDelivery } from '../../backendCalls/delivery';
 import toast from 'react-hot-toast';
-const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act, deliverySchedule, setDeliverySchedule }) => {
+const StatusButton = ({ setIsChangePercent, currentDelivery, user, setCurrentDelivery, act, deliverySchedule, setDeliverySchedule }) => {
     const notify = () => toast.success("Chuyển trạng thái thành công.");
 
     const [status, setStatus] = useState();
@@ -41,6 +41,7 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act, delivery
                 setCurrentDelivery({ ...currentDelivery, deliverystatus: '5' });
                 setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '5' } : delivery));
                 notify();
+                setIsChangePercent(prev => !prev);
             }
         } catch (error) {
             setError(error.response.data.message);
@@ -59,6 +60,7 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act, delivery
             setCurrentDelivery({ ...currentDelivery, deliverystatus: '0' });
             setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '0' } : delivery));
             toast.success('Hủy vận chuyển thành công.');
+            setIsChangePercent(prev => !prev);
         } catch (error) {
             setError(error.response.data.message);
         }

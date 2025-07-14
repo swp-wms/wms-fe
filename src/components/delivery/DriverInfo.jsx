@@ -4,7 +4,7 @@ import { useState } from "react"
 import { handleAddTruck, handleConfirmNotEnoughTruck } from "../../backendCalls/delivery";
 import toast from "react-hot-toast";
 
-const DriverInfo = ({ currentDelivery, setCurrentDelivery, user, deliverySchedule, setDeliverySchedule }) => {
+const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, user, deliverySchedule, setDeliverySchedule }) => {
     const [driver, setDriver] = useState({});
     const [error, setError] = useState();
     const [edit, setEdit] = useState(false); //set edit for delivery staff
@@ -55,7 +55,7 @@ const DriverInfo = ({ currentDelivery, setCurrentDelivery, user, deliverySchedul
             setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '-1' } : delivery));
 
             toast.success('Cập nhật trạng thái thành công.');
-
+            setIsChangePercent(prev => !prev);
         } catch (error) {
             setError(error);
         }

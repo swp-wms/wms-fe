@@ -9,6 +9,7 @@ import DeliveryInfo from './DeliveryInfo'
 import toast from 'react-hot-toast'
 
 const DeliveryForm = ({
+    setIsChangePercent,
     currentOrder,
     currentDelivery = null, setCurrentDelivery,
     currentDeliveryDetail = null, setCurrentDeliveryDetail,
@@ -54,6 +55,7 @@ const DeliveryForm = ({
             toast.success('Đã từ chối vận chuyển.');
             setCurrentDelivery({ ...currentDelivery, deliverystatus: '-2' });
             setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '-2' } : delivery));
+            setIsChangePercent(prev => !prev);
         } catch (error) {
             setError(error.response.data.message);
         }
@@ -81,11 +83,12 @@ const DeliveryForm = ({
                 setDeliverySchedule(response.length > 0 ? response.sort((a, b) => new Date(b.deliverydate) - new Date(a.deliverydate)) : []);
 
                 toast.success('Tạo đơn vận chuyển thành công.');
+                setIsChangePercent(prev => !prev);
                 handleEmptyForm(e);
             } catch (error) {
                 setError('Xảy ra lỗi. Vui lòng thử lại sau.');
                 console.log(error);
-                
+
             }
         } else {
             setError('Trừ ghi chú, bạn cần điền hết các trường yêu cầu.\n Số lượng và khối lượng phải lớn hơn 0.');
@@ -103,6 +106,7 @@ const DeliveryForm = ({
                 setNewDelivery={setNewDelivery}
             />
             {currentDelivery && <StatusButton
+                setIsChangePercent={setIsChangePercent}
                 setCurrentDelivery={setCurrentDelivery}
                 currentDelivery={currentDelivery} user={user}
                 act={act}
@@ -111,6 +115,7 @@ const DeliveryForm = ({
             />}
 
             {currentOrder && <ProductTable
+                setIsChangePercent={setIsChangePercent}
                 newDeliveryList={newDeliveryList}
                 setNewDeliveryList={setNewDeliveryList}
                 currentOrder={currentOrder}
@@ -124,6 +129,7 @@ const DeliveryForm = ({
             />}
 
             {currentDelivery && <DriverInfo
+                setIsChangePercent={setIsChangePercent}
                 currentDelivery={currentDelivery}
                 setCurrentDelivery={setCurrentDelivery}
                 user={user}

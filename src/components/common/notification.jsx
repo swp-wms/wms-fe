@@ -19,7 +19,7 @@ const Notification = ({ notifs, setNotifs }) => {
       <ul className="pb-2 px-2 text-[15px] overflow-y-scroll max-h-[280px]">
         {notifs.length > 0 ? notifs.map((notif, index) => (
           <div key={index} onClick={(e) => handleSeen(notif.id)} className="flex gap-3 justify-between items-start hover:bg-[#f9f9f9] hover:duration-100 cursor-pointer p-2 rounded-md">
-            <Link to={'/ke-hoach-van-chuyen'} className="block">
+            <Link to={notif.url} className="block">
               <p>{notif.message}</p>
               <p className="text-xs text-[#999]">{moment(notif.created_at).startOf('minute').fromNow()}</p>
             </Link>
