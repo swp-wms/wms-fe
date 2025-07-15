@@ -10,7 +10,6 @@ const PartnerManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const partnersPerPage = 5;
 
@@ -24,13 +23,10 @@ const PartnerManagement = () => {
 
   const loadPartners = async () => {
     try {
-      setLoading(true);
       const data = await partner.fetchPartners();
       setPartners(data);
     } catch (error) {
       console.error("Error loading partners:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -94,24 +90,12 @@ const PartnerManagement = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg">Đang tải...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="p-6 max-w-6xl mx-auto mt-20 ml-75">
       {/* SEARCH + FILTER + BUTTON */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         {/* SEARCH */}
-        <div className="relative flex-1">
-          <FontAwesomeIcon
-            icon={faSearch}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-          />
+        <div className="flex-1">
           <input
             type="text"
             placeholder="Tìm kiếm mã khách hàng, tên công ty"
@@ -122,7 +106,7 @@ const PartnerManagement = () => {
         </div>
 
         {/* FILTER */}
-        <div className="relative">
+        <div>
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
