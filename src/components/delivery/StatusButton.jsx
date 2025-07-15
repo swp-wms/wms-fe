@@ -4,8 +4,8 @@ import axios from 'axios';
 import { api } from '../../config/api';
 import { handleCancelDelivery } from '../../backendCalls/delivery';
 import toast from 'react-hot-toast';
-const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
-    const notify = () => toast("Chuyển trạng thái thành công.");
+const StatusButton = ({ setIsChangePercent, currentDelivery, user, setCurrentDelivery, act, deliverySchedule, setDeliverySchedule }) => {
+    const notify = () => toast.success("Chuyển trạng thái thành công.");
 
     const [status, setStatus] = useState();
     const [error, setError] = useState();
@@ -28,7 +28,9 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 });
-                setCurrentDelivery({...currentDelivery, deliverystatus: '4'});
+                setCurrentDelivery({ ...currentDelivery, deliverystatus: '4' });
+                setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '4' } : delivery));
+                notify();
             }
             if (status === '4') {
                 await axios.put(api.COMPLETE(currentDelivery.id), { act }, {
@@ -36,8 +38,11 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 });
+                setCurrentDelivery({ ...currentDelivery, deliverystatus: '5' });
+                setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '5' } : delivery));
+                notify();
+                setIsChangePercent(prev => !prev);
             }
-            notify();
         } catch (error) {
             setError(error.response.data.message);
         }
@@ -52,7 +57,10 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
             }
 
             await handleCancelDelivery(currentDelivery.id);
-            window.location.reload();
+            setCurrentDelivery({ ...currentDelivery, deliverystatus: '0' });
+            setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '0' } : delivery));
+            toast.success('Hủy vận chuyển thành công.');
+            setIsChangePercent(prev => !prev);
         } catch (error) {
             setError(error.response.data.message);
         }
@@ -62,9 +70,6 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
         <div className='StatusButton mt-3'>
             <p className='text-red-700'>{error}</p>
             {currentDelivery && <div className="button-status flex justify-between items-center">
-                {user.roleid === 3 && <button className='btn px-5 py-2'
-                    onClick={(e) => handleCancelADelivery(e)}
-                >Hủy vận chuyển</button>}
                 {status &&
                     <div>
                         <span>Trạng thái:</span>
@@ -78,6 +83,11 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act }) => {
                             className={`w-fit text-white cursor-pointer hover:scale-[1.02] ml-2 hover:shadow-[1px_1px_3px_#aaa] hover:duration-200 rounded-full py-2 px-4 shadow-[0_0_2px_#aaa]`}
                         >{(deliveryStatus.find(d => d.id === status)).name}</button>
                     </div>}
+                {user.roleid === 3 && Number(currentDelivery.deliverystatus) < 4 && Number(currentDelivery.deliverystatus) !== 0 &&
+                    <button className={`text-red-600 cursor-pointer hover:bg-red-600 hover:text-white hover:duration-200 rounded-full py-2 px-4 shadow-[0_0_4px_#a00000]`}
+                        onClick={(e) => handleCancelADelivery(e)}
+                    >Hủy vận chuyển</button>
+                }
             </div>}
         </div>
     )

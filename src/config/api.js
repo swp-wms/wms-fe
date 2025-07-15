@@ -3,26 +3,25 @@ const baseUrl = "http://localhost:3800";
 export const api = {
     LOGIN: `${baseUrl}/login`,
     LOGOUT: `${baseUrl}/logout`,
-    REGISTER: `${baseUrl}/admin/register`,
-
-    //user API
-    // CREATE_USER: `${baseUrl}/users`,
-    GET_ALL_USER: `${baseUrl}/users`,
+    REGISTER: `${baseUrl}/register`,
     GET_USER: `${baseUrl}/users/me`,
     UPDATE_USER: (userid) => `${baseUrl}/users/${userid}`,
     FORGET_PASSWORD: `${baseUrl}/forget-password`,
     RESET_PASSWORD: `${baseUrl}/reset-password`,
-
-
     // Order API
     GET_ORDERS: `${baseUrl}/orders`,
     GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
     GET_EXPORT_ORDER: `${baseUrl}/orders/export`,
     GET_ORDER_DETAIL: `${baseUrl}/detail`,
     CREATE_ORDER: `${baseUrl}/orders/`,
+    GET_DELIVERY_DETAIL_FOR_UPDATE_ORDER: `${baseUrl}/orders/delivery`,
+    UPDATE_ORDER: (orderid) => `${baseUrl}/orders/${orderid}`,
+
     GET_REMAIN_QUANTITY: (orderid) => `${baseUrl}/detail/${orderid}/remain`,
     CHECK_COMPLETE: (orderid) => `${baseUrl}/orders/${orderid}/complete`,
 
+    GET_SUPPPLEMENT_ORDER: (orderid) =>`${baseUrl}/supplement/${orderid}`,
+    ADD_SUPPLEMENT_ORDER: `${baseUrl}/supplement`,
   //partner API
   GET_PARTNERS: `${baseUrl}/partners`,
   ADD_PARTNER: `${baseUrl}/partners/`,
@@ -30,10 +29,15 @@ export const api = {
   //product API
   GET_PRODUCTS: `${baseUrl}/products`,
   ADD_PRODUCT: `${baseUrl}/products`,
+  UPDATE_PRODUCT: (productid) => `${baseUrl}/products/${productid}`,
 
 
   //warehouse API
   GET_WAREHOUSE: `${baseUrl}/warehouse`,
+  GET_WAREHOUSE_BY_DATE: (createdate) => `${baseUrl}/warehouse/future/${createdate}`,
+  GET_WEIGHT_BY_BRANDNAME:`${baseUrl}/warehouse/brandname`,
+  GET_WEIGHT_BY_TYPE:`${baseUrl}/warehouse/type`,
+  GET_WEIGHT_BY_PARTNER:`${baseUrl}/warehouse/partner`,
 
   //import API
   GET_IMPORT: `${baseUrl}/warehouse/import`,
@@ -49,6 +53,8 @@ export const api = {
   //catalog API
   GET_CATALOGS: `${baseUrl}/catalog`,
   ADD_CATALOG: `${baseUrl}/catalog`,
+  GET_CATALOG_BRANDS: `${baseUrl}/catalog/brands`,
+  GET_CATALOG_PRIMARY_KEY: `${baseUrl}/catalog/keys`,
 
   // DELIVERY API
   GET_IMPORT_DELIVERY: `${baseUrl}/delivery/import`,
@@ -63,5 +69,10 @@ export const api = {
   CANCEL_DELIVERY: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/cancel`,
   NOT_ENOUGH_TRUCK: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/not-enough-truck`,
   UPDATE_REAL_DELIVERY_DATA: (deliveryid) => `${baseUrl}/delivery/${deliveryid}/real`,
+
+  //notification API
+  GET_NOTIFS: `${baseUrl}/notification`,
+  GET_SEEN_NOTIF: (index) => `${baseUrl}/notification/seen/${index}`,
+  SEEN_NOTIF: (notifId) => `${baseUrl}/notification/${notifId}`,
 }
 

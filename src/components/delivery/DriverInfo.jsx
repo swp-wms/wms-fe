@@ -1,15 +1,18 @@
 import { faCancel, faPlusCircle } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { use, useState } from "react"
+import { useState } from "react"
 import { handleAddTruck, handleConfirmNotEnoughTruck } from "../../backendCalls/delivery";
+import toast from "react-hot-toast";
 
-const DriverInfo = ({ currentDelivery, user }) => {
+const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, user, deliverySchedule, setDeliverySchedule }) => {
     const [driver, setDriver] = useState({});
     const [error, setError] = useState();
     const [edit, setEdit] = useState(false); //set edit for delivery staff
 
     const addTruck = async (e) => {
         e.preventDefault();
+        console.log(currentDelivery.gettime);
+        
         try {
             if (!driver.drivername || !driver.drivercode || !driver.licenseplate || !driver.driverphonenumber) {
                 setError('Bạn cần điền đầy đủ thông tin tài xế.');
@@ -17,10 +20,24 @@ const DriverInfo = ({ currentDelivery, user }) => {
                 setError('Bạn cần điền đầy đủ thông tin tài xế.');
             } else if (!(/^\d+$/.test(driver.drivercode)) || !(/^\d+$/.test(driver.driverphonenumber)) || !(/^\d+$/.test(driver.drivercode))) {
                 setError('CCCD, GPLX và số điện thoại chỉ chứa số.');
+            } else if (!currentDelivery.deliverytime || !currentDelivery.gettime) {
+                setError('Thời gian bốc hàng và giao hàng cần được điền.');
             } else {
-                await handleAddTruck(currentDelivery.id, driver);
+                await handleAddTruck(currentDelivery.id, {...driver, deliverytime: currentDelivery.deliverytime, gettime: currentDelivery.gettime});
                 setError();
-                window.location.reload();
+                setCurrentDelivery({
+                    ...currentDelivery,
+                    drivername: driver.drivername,
+                    drivercode: driver.drivercode,
+                    licenseplate: driver.licenseplate,
+                    driverphonenumber: driver.driverphonenumber,
+                    deliverystatus: '2'
+                });
+
+                setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '2' } : delivery));
+
+                toast.success('Thêm tài xế thành công.');
+                setDriver({});
             }
         } catch (error) {
             console.log(error);
@@ -34,8 +51,11 @@ const DriverInfo = ({ currentDelivery, user }) => {
         try {
             await handleConfirmNotEnoughTruck(currentDelivery.id);
             setError();
-            window.location.reload();
+            // window.location.reload();
+            setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '-1' } : delivery));
 
+            toast.success('Cập nhật trạng thái thành công.');
+            setIsChangePercent(prev => !prev);
         } catch (error) {
             setError(error);
         }

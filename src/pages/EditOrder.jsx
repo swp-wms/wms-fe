@@ -1,14 +1,16 @@
 import React, { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation,useNavigate } from "react-router-dom";
 import PartnerSearch from "../components/order/PartnerSearch";
 import ProductSearch from "../components/order/ProductSearch";
-import OrderTable from "../components/order/OrderTable";
+import EditTable from "../components/order/EditTable";
 import partner from "../backendCalls/partner";
 import product from "../backendCalls/product";
 import { getUser } from "../backendCalls/user";
 import CompleteForm from "../components/order/partnerForm";
 import orderCalls from "../backendCalls/order";
-const CreateOrder = ({user, setUser}) => {
+import toast from "react-hot-toast";
+
+const EditOrder = ({user, setUser}) => {
   
 
   //------------------ USE STATE ------------------
@@ -19,6 +21,7 @@ const CreateOrder = ({user, setUser}) => {
   //--ORDER UTILITIES
   const [selectedProducts, setSelectedProducts] = useState([]); // store products that are added to the order
   const [selectedPartner, setSelectedPartner] = useState(null); // store selected partner details
+  const [delivery, setDelivery] = useState(null); // store delivery details if needed
 
   const [partnerList, setPartnerList] = useState([]);
   const [productList, setProductList] = useState([]);
@@ -32,12 +35,17 @@ const CreateOrder = ({user, setUser}) => {
   const [activeTab, setActiveTab] = useState('partner'); // state to manage active tab
   const [showForm, setShowForm] = useState(false)
 
-  //------------------ USE REF --------------------
-  const inputRef = useRef(null);
-  const dropdownRef = useRef(null);
+  
 
+//---------------References---------------
+const location = useLocation();
+const navigate = useNavigate();
+const allowedRoles = ["Salesman"];
+const orderDetail = location.state?.orderDetail || null; // Get order details from the state if available
+const orderId = location.state?.id || null; // Get order ID from the state if available
   React.useEffect(() => {
-     if(!user){const getData = async () => {
+     if(!user){
+      const getData = async () => {
               const response = await getUser();
               if (response.status!==200) {
                 window.location.href = '/dang-nhap';
@@ -45,7 +53,8 @@ const CreateOrder = ({user, setUser}) => {
               const user = response.data;
               setUser(user);
             }
-            getData();}
+            getData();
+     }
 
     const fetchPartners = async () => {
       try {
@@ -59,15 +68,55 @@ const CreateOrder = ({user, setUser}) => {
       try {
         const response = await product.fetchProducts();
         setProductList(response);
-        console.log("Product List:", response);
+
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
+    const fetchDeliveryDetails = async () => {
+      try{
+        const response = await orderCalls.fetchDeliveryDetails(orderId);
+        setDelivery(response);
+        
+      }catch(error){
+        console.error("Error fetching delivery details:", error);
+      }
+    }
+
+   
+     const checkSalesmanId = () => {
+      if(orderDetail && user){
+        const userRole = user.role.rolename;
+        console.log("user id: ", user.id);
+        console.log("orderDetail.salesmanid: ", orderDetail.salesmanid);
+        if((allowedRoles.find(role => role ===userRole) 
+          &&user.id !== orderDetail.salesmanid) || !allowedRoles.find(role => role === userRole)){
+            navigate(`/error403`);
+        }
+      }
+    }
+
+    checkSalesmanId();
+
     fetchPartners();
     fetchProducts();
-  }, []);
+    fetchDeliveryDetails();
+    setSelectedPartner(orderDetail.partner || null);
+    setSelectedProducts(orderDetail.orderdetail.map((item,index) => {
+        console.log ("Item id: " ,item.id )
+        let obj = {
+          ...item,
+          orderdetailid:item.id,
+          ...item.product,
+          trueId : index+1}
+        return obj;
+    }));
 
+
+  
+  },[]);
+
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedPartner || !selectedProducts || selectedProducts.length === 0) {
@@ -75,27 +124,29 @@ const CreateOrder = ({user, setUser}) => {
       return;
     }
     // Here you would typically send the order data to your backend
-    const orderData = {
-      type: "E",
+    const data = {
+      id: orderId,
       partnerid: selectedPartner?.id,
       address: selectedPartner?.address,
-      totalbars: totalBars,
-      totalweight: totalWeight,
-      date: new Date().toISOString(),
-      salesmanid: user.id,
       note:"",
 
       orderdetail: selectedProducts.map(product => ({
+        id: product?.orderdetailid,
         productid: product?.id,
         numberofbars: product?.numberofbars,
-        weight: product?.weight
+        weight: product?.weight,
+        note: product?.note || "",
         
         }))
     };
-    console.log("Order Data:", orderData);
-    orderCalls.createImportOrder(orderData);
+    
+    const msg = await orderCalls.updateOrder(orderId, data);
+    toast.success(msg.message);
+
     setSelectedProducts([]);
     setSelectedPartner(null);
+    navigate(-1);
+   
   };
 
   // Calculate totals for selectedProducts
@@ -108,28 +159,22 @@ const CreateOrder = ({user, setUser}) => {
     const value = Number(item.weight);
     return !isNaN(value) ? sum + value : sum;
   }, 0);
-  let checkNumberOfBars = () => {
-    const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0 || product.numberofbars == null);
-      if(invalidProducts.length > 0) {
-        return false;
-      }
-      return true;
-            
-    };
+
   return (
     <div className="min-h-screen bg-[#fafafa] pt-25 pl-77 pr-5 ">
-      <div className="max-X`w-9xl mx-auto relative">
+      <div className="max-w-9xl mx-auto relative">
         {showForm && (
           <CompleteForm 
             activeTab={activeTab} 
             setActiveTab={setActiveTab} 
             setShowForm={setShowForm}
             partnerList={partnerList}
+            setPartnerList={setPartnerList}
             selectedProducts={selectedProducts}
             selectedPartner={selectedPartner}
             setSelectedPartner={setSelectedPartner}
             setSelectedProducts={setSelectedProducts}
-            productList={productList}
+            
           />
         )}
         <div className="grid grid-cols-5 :grid-cols-5 gap-4">
@@ -161,23 +206,25 @@ const CreateOrder = ({user, setUser}) => {
                 setSelectedProducts={setSelectedProducts}
                 setActiveTab={tab => {setActiveTab(tab); setShowForm(true);}}
               />
-              <OrderTable
+              <EditTable
                 selectedProducts={selectedProducts}
                 setSelectedProducts={setSelectedProducts}
                 productList={productList}
                 setActiveTab={setActiveTab}
                 totalBars={totalBars}
                 totalWeight={totalWeight}
+                delivery={delivery}
+                setDelivery={setDelivery}
               />
             </div>
             {/* Bottom Buttons */}
             <div className="mt-5 flex gap-2 justify-end">
-              <Link to="/xuat-hang" className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm">
+              <button onClick={() => navigate(-1) } className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 Quay lại
-              </Link>
+              </button>
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
@@ -185,15 +232,15 @@ const CreateOrder = ({user, setUser}) => {
                 disabled={
                   !selectedPartner ||
                   !selectedProducts ||
-                  selectedProducts.length === 0||
-                  !checkNumberOfBars()
+                  selectedProducts.length === 0
                 }
 
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2 ">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3" />
                 </svg>
-                Tạo kế hoạch xuất hàng
+
+                Lưu
               </button>
             </div>
           </div>
@@ -203,4 +250,4 @@ const CreateOrder = ({user, setUser}) => {
   );
 }
 
-export default CreateOrder;
+export default EditOrder;
