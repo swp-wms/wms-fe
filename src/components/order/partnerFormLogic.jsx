@@ -228,7 +228,8 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
     switch (name) {
       case "length":
         if (value === "" || value === null) return "Bắt buộc";
-        if (isNaN(value) || Number(value) < 0) return "Không được nhập số âm";
+        if (Number(value) < 0) return "Không được nhập số âm";
+        if (isNaN(value)) return "Vui lòng nhập vào kí tự là số";
         break;
 
       case "barsperbundle":

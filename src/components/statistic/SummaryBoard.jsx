@@ -12,6 +12,11 @@ import {
 } from "chart.js";
 import { fetchImportWarehouses } from "../../backendCalls/import";
 import { fetchExportWarehouses } from "../../backendCalls/export";
+import {
+  fetchWeightByBrand,
+  fetchWeightByPartner,
+  fetchWeightByType,
+} from "../../backendCalls/warehouse";
 
 ChartJS.register(
   ArcElement,
@@ -55,6 +60,9 @@ const SummaryBoard = () => {
   const [exportWeight, setExportWeight] = useState(0);
   const [exportBarsPercent, setExportBarsPercent] = useState(0);
   const [exportWeightPercent, setExportWeightPercent] = useState(0);
+  const [weightBrands, setWeightBrands] = useState([]);
+  const [weightPartners, setWeightPartners] = useState([]);
+  const [weightTypes, setWeightTypes] = useState([]);
 
   useEffect(() => {
     const getData = async () => {
@@ -78,9 +86,61 @@ const SummaryBoard = () => {
     getData();
   }, []);
 
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetchWeightByBrand();
+      console.log(response);
+      setWeightBrands(response);
+    };
+    getData();
+  }, []);
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetchWeightByType();
+      console.log(response);
+      setWeightTypes(response);
+    };
+    getData();
+  }, []);
+
+  const doughnutDataBrand = {
+    name: "Tổng khối lượng thép phân loại theo nhà cung",
+    labels: weightBrands.map((item) => item.brandname),
+    values: weightBrands.map((item) => item.total_weight),
+  };
+  const doughnutDataType = {
+    name: "Tổng khối lượng theo phân loại thép",
+    labels: weightTypes.map((item) => item.type),
+    values: weightTypes.map((item) => item.total_weight),
+  };
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetchWeightByPartner();
+      console.log(response);
+      setWeightPartners(response);
+    };
+    getData();
+  });
+
+  const barData = {
+    labels: weightPartners.map((item) => item.name),
+    values: weightPartners.map((item) => item.total_weight),
+  };
+
+  const getRandomColors = (num) => {
+    const colors = [];
+    for (let i = 0; i < num; i++) {
+      const color = `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
+      colors.push(color);
+    }
+    return colors;
+  };  
+
   return (
     <>
-      <div className="grid grid-cols-4 gap-14 mb-10">
+      <div className="grid grid-cols-4 gap-12 mb-10">
         <Board
           number={importBars === null ? 0 : importBars}
           title={"Tổng số lượng hàng nhập"}
@@ -102,11 +162,13 @@ const SummaryBoard = () => {
           status={exportWeightPercent}
         />
       </div>
-      <div className="flex gap-14">
-        <DoughnutChart />
-        <div className="bg-white shadow-btn rounded-lg w-full flex justify-center">
-          <BarChart />
-        </div>
+      <div className="flex justify-between mb-10 w-full gap-12 ">
+        <DoughnutChart chartData={doughnutDataBrand} />
+        <DoughnutChart chartData={doughnutDataType} />
+      </div>
+
+      <div className="bg-white shadow-btn rounded-lg w-[100%] flex justify-center mb-10">
+        <BarChart chartData={barData} />
       </div>
     </>
   );
@@ -133,23 +195,12 @@ const Board = ({ number, title, status }) => {
   );
 };
 
-const BarChart = () => {
+const BarChart = ({ chartData }) => {
   return (
-    <div className="w-full scale-90 ms-2">
+    <div className="w-full flex justify-center py-8 px-12">
       <Bar
         data={{
-          labels: [
-            "Công ty thép Đức Anh",
-            "Công ty TNHH thép Hòa Phát Hưng Yên",
-            "Công ty TNHH thép Kyoei Việt Nam",
-            "Công ty CP Tập Đoàn VAS Nghi Sơn",
-            "Công ty Cổ phần thép Việt Ý",
-            "Công Ty TNHH sản xuất và kinh doanh Thép Việt Đức",
-            "Công ty cổ phần thép Việt Nhật",
-            "Công ty TNHH Thép Tung Ho Việt Nam",
-            "Thép Tung Dịch Hai Duong",
-            "Công ty thép Đức Anh ProMax",
-          ],
+          labels: chartData.labels,
           datasets: [
             {
               label: "Khối lượng thép (kg)",
@@ -165,7 +216,7 @@ const BarChart = () => {
                 "gray",
                 "black",
               ],
-              data: [2478, 5267, 734, 784, 433, 1104, 675, 979, 406, 509],
+              data: chartData.values,
             },
           ],
         }}
@@ -176,6 +227,13 @@ const BarChart = () => {
             title: {
               display: true,
               text: "Biểu đồ thống kê tổng khối lượng nhập kho theo nhà cung cấp",
+              font: {
+                size: 14,
+              },
+              padding: {
+                top: 5,
+                bottom: 30,
+              },
             },
           },
         }}
@@ -184,37 +242,39 @@ const BarChart = () => {
   );
 };
 
-const DoughnutChart = () => {
+const DoughnutChart = ({ chartData }) => {
+  const data = {
+    labels: chartData.labels,
+    datasets: [
+      {
+        label: "Khối lượng (kg)",
+        backgroundColor: ["#3195ff", "#3cba9f", "pink", "#c45850"],
+        data: chartData.values,
+      },
+    ],
+  };
+
   return (
-    <div className="bg-white shadow-btn py-4 px-5 rounded-lg">
-      <Doughnut
-        data={{
-          labels: [
-            "Thép Việt Mỹ (thanh)",
-            "Thép Hóa Phát (thanh)",
-            "Thép Việt Mỹ (cuộn)",
-            "Thép Hòa Phát (cuộn)",
-          ],
-          datasets: [
-            {
-              label: "Khối lượng (kg)",
-              backgroundColor: ["#3195ff", "#3cba9f", "pink", "#c45850"],
-              data: [2478, 734, 784, 433],
-            },
-          ],
-        }}
+    <div className="bg-white shadow-btn px-12 w-full rounded-lg flex justify-center">
+      <Doughnut className="w-full scale-90"
+        data={data}
         options={{
           responsive: true,
           plugins: {
-            legend: { display: true, position: "bottom" },
+            legend: { display: true, position: "bottom", labels: { font: { size: 16 }} },
             title: {
               display: true,
               position: "top",
-              text: "Biểu đồ thống kê tổng khối lượng thép",
+              text: chartData.name,
+              font: {
+                size: 16,
+              },
+              padding: {
+                top: 5,
+                bottom: 30,
+              },
             },
           },
-          width: 400,
-          height: 400,
         }}
       />
     </div>

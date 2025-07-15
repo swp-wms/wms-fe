@@ -3,11 +3,14 @@ import { getRemainQuantityOfOrder } from "../../backendCalls/orderDetail";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRemove, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { handleUpdateRealData } from "../../backendCalls/delivery";
+import toast from "react-hot-toast";
 
 const ProductTable = ({
+    setIsChangePercent,
     currentOrder,
     currentDelivery, currentDeliveryDetail,
-    setCurrentDeliveryDetail,
+    setCurrentDeliveryDetail, setCurrentDelivery,
+    deliverySchedule, setDeliverySchedule,
     user, act,
     newDeliveryList, setNewDeliveryList
 }) => {
@@ -30,7 +33,7 @@ const ProductTable = ({
         });
 
         for (let index = 0; index < realData.length; index++) {
-            if(realData[index].productid === null || realData[index].realnumberofbars === null || realData[index].realtotalweight === null) {
+            if (realData[index].productid === null || realData[index].realnumberofbars === null || realData[index].realtotalweight === null) {
                 return setError("Vui lòng nhập đầy đủ thông tin về khối lượng thực tế và số lượng thực tế.");
             }
         }
@@ -38,7 +41,11 @@ const ProductTable = ({
         try {
             await handleUpdateRealData(currentDelivery.id, realData, act);
             setError();
-            window.location.reload();
+            // window.location.reload();
+            setCurrentDelivery({ ...currentDelivery, deliverystatus: currentDelivery.deliverystatus === '4' ? '5' : '4' });
+            setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: currentDelivery.deliverystatus === '4' ? '5' : '4' } : delivery));
+            toast.success('Xác nhận thành công.');
+            setIsChangePercent(prev => !prev);
         } catch (error) {
             console.log(error);
 
@@ -85,7 +92,8 @@ const ProductTable = ({
 
     return (
         <div className="">
-            <div className="flex justify-between items-center my-3">
+            {/* Search bar */}
+            <div className="SearchBar flex justify-between items-center my-3">
                 <h1 className='font-bold'>THÔNG TIN HÀNG HÓA</h1>
                 {!currentDelivery && user.roleid === 3 &&
                     <div className="relative border-[1px] border-[#aaa]  rounded px-3 py-2 w-[50%] flex items-center">
@@ -108,7 +116,7 @@ const ProductTable = ({
                                     className='flex justify-between p-2 hover:bg-[#eee] cursor-pointer'
                                 >
                                     <span>{s.name}</span>
-                                    <span>{s.remain} kg</span>
+                                    <span>{(s.remain).toFixed(2)} kg</span>
                                 </li>
                             ))}
                         </ul>
@@ -119,8 +127,10 @@ const ProductTable = ({
                     <tr>
                         <th className='border-[1px] border-black'>STT</th>
                         <th className='border-[1px] border-black'>Mã hàng</th>
-                        <th className='border-[1px] border-black'>Đơn trọng</th>
-                        <th className='border-[1px] border-black'>Dài</th>
+                        {!currentDeliveryDetail && <>
+                            <th className='border-[1px] border-black'>Khối lượng đơn (kg)</th>
+                            <th className='border-[1px] border-black'>Còn lại (kg)</th>
+                        </>}
                         <th className='border-[1px] border-black'>Tổng số lượng</th>
                         {(user.roleid == 4 || currentDeliveryDetail !== null) &&
                             <th className='border-[1px] border-black'>Tổng số lượng thực tế</th>
@@ -138,8 +148,8 @@ const ProductTable = ({
                         <tr key={index}>
                             <td className='border-[1px] border-black text-center'>{index + 1}</td>
                             <td className='border-[1px] border-black text-center'>{d.name}</td>
-                            <td className='border-[1px] border-black text-center'>{Number(d.weightperbar).toFixed(2)}</td>
-                            <td className='border-[1px] border-black text-center'>{d.length}</td>
+                            {/* <td className='border-[1px] border-black text-center'>{Number(d.weightperbar).toFixed(2)}</td>
+                            <td className='border-[1px] border-black text-center'>{d.length}</td> */}
 
                             <td className='border-[1px] border-black text-center'>
                                 {d.numberofbars}
@@ -199,8 +209,8 @@ const ProductTable = ({
                             <tr key={index}>
                                 <td className='border-[1px] border-black text-center'>{index + 1}</td>
                                 <td className='border-[1px] border-black text-center'>{d.name}</td>
-                                <td className='border-[1px] border-black text-center'>{Number(d.weightperbar).toFixed(2)}</td>
-                                <td className='border-[1px] border-black text-center'>{d.length}</td>
+                                <td className='border-[1px] border-black text-center'>{Number(d.ordertotalweight).toFixed(2)}</td>
+                                <td className='border-[1px] border-black text-center'>{Number(d.remain).toFixed(2)}</td>
 
                                 <td className='total-bar border-[1px] border-black text-center'>
                                     <input
@@ -266,7 +276,12 @@ const ProductTable = ({
                                     </td>
                                 }
                                 <td className='border-[1px] border-black text-center'>
-                                    <input type="text" className='w-[60px] text-center' />
+                                    <input type="text" className='w-[60px] text-center' placeholder="..."
+                                        onChange={(e) => {
+                                            setNewDeliveryList([...newDeliveryList].map((d, i) => i === index ? { ...d, note: e.target.value } : d));
+                                        }}
+                                        value={newDeliveryList[index].note}
+                                    />
                                 </td>
                                 <td className='border-[1px] border-black text-center'>
                                     <FontAwesomeIcon
@@ -284,8 +299,10 @@ const ProductTable = ({
 
                     {/* Tổng */}
                     <tr>
-                        <td></td>
-                        <td></td>
+                        {!currentDeliveryDetail && <>
+                            <td></td>
+                            <td></td>
+                        </>}
                         <td></td>
                         <td></td>
                         {currentDeliveryDetail &&
@@ -298,7 +315,7 @@ const ProductTable = ({
                         }
                         {!currentDelivery > 0 &&
                             <>
-                                <td className='text-center'>Tổng: {totalQuantity}kg</td>
+                                <td className='text-center'>Tổng: {totalQuantity}</td>
                                 <td className='text-center'>Tổng: {totalWeight.toFixed(2)}kg</td>
                             </>
                         }
