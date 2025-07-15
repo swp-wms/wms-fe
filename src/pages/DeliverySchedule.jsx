@@ -17,6 +17,8 @@ const DeliverySchedule = ({ user, setUser }) => {
   const [currentDeliveryDetail, setCurrentDeliveryDetail] = useState();
   const [isChangePercent, setIsChangePercent] = useState(false);
 
+  // const [isCreate, setIsCreate]
+
   useEffect(() => {
     const getData = async () => {
       if (currentDelivery) {

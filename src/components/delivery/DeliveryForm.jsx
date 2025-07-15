@@ -7,7 +7,6 @@ import { getDeliveriesForOrder, handleApproveTruck, handleCreateDelivery } from 
 import StatusButton from './StatusButton'
 import DeliveryInfo from './DeliveryInfo'
 import toast from 'react-hot-toast'
-import { getUser } from '../../backendCalls/user'
 
 const DeliveryForm = ({
     setIsChangePercent,

@@ -56,7 +56,7 @@ export const getDeliveryDetail = async (deliveryid) => {
 export const handleCreateDelivery = async (orderid, newDelivery) => {
     try {
         const response = await axios.post(api.CREATE_DELIVERY_FOR_ORDER(orderid), {
-            newDelivery
+            newDelivery: newDelivery
         }, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
