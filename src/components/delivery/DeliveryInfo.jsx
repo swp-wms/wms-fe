@@ -1,5 +1,6 @@
 
 const DeliveryInfo = ({ currentOrder, currentDelivery, setCurrentDelivery, newDelivery, setNewDelivery, user }) => {
+    
     return (
         <div>
             <div className="mb-3 flex">
@@ -15,7 +16,7 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, setCurrentDelivery, newDe
                             setNewDelivery({ ...newDelivery, getdate: e.target.value })
                         }}
                         readOnly={currentDelivery ? true : false}
-                        value={currentDelivery ? currentDelivery.getdate : newDelivery.getdate ? newDelivery.getdate : undefined}
+                        value={currentDelivery ? currentDelivery.getdate : newDelivery.getdate ? newDelivery.getdate : ''}
                         required
                         className='border-[1px] border-[#aaa] rounded py-1 px-2' type="date"
                     />
@@ -30,7 +31,7 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, setCurrentDelivery, newDe
                             setCurrentDelivery({ ...currentDelivery, gettime: e.target.value })
                         }}
                         readOnly={(user.roleid === 5 && Math.abs(Number(currentDelivery?.deliverystatus)) === 1) ? false : true}
-                        value={currentDelivery ? currentDelivery.gettime : newDelivery.gettime ? newDelivery.gettime : undefined}
+                        value={currentDelivery ? currentDelivery.gettime : newDelivery.gettime ? newDelivery.gettime : ''}
                         required
                         className='border-[1px] border-[#aaa] rounded py-1 px-2' 
                     />
@@ -46,7 +47,7 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, setCurrentDelivery, newDe
                             setNewDelivery({ ...newDelivery, deliverydate: e.target.value })
                         }}
                         readOnly={currentDelivery ? true : false}
-                        value={currentDelivery ? currentDelivery.deliverydate : newDelivery.deliverydate ? newDelivery.deliverydate : undefined}
+                        value={currentDelivery ? currentDelivery.deliverydate : newDelivery.deliverydate ? newDelivery.deliverydate : ''}
                         required
                         className='border-[1px] border-[#aaa] rounded py-1 px-2' type="date"
                     />
@@ -61,7 +62,7 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, setCurrentDelivery, newDe
                             
                         }}
                         readOnly={(user.roleid === 5 && Math.abs(Number(currentDelivery?.deliverystatus)) === 1) ? false : true}
-                        value={currentDelivery ? currentDelivery.deliverytime : newDelivery.deliverytime ? newDelivery.deliverytime : undefined}
+                        value={currentDelivery ? currentDelivery.deliverytime : newDelivery.deliverytime ? newDelivery.deliverytime : ''}
                         required
                         className='border-[1px] border-[#aaa] rounded py-1 px-2'
                     />
