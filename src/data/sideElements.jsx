@@ -44,7 +44,7 @@ const sideElement = [
       icon: faChartSimple,
       path: "/thong-ke-kho",
       name: "Thống kê kho",
-      allowed: [3]
+      allowed: [3, 4]
     },
     {
       id: 5,
@@ -63,12 +63,6 @@ const sideElement = [
     {
       id: 7,
       icon: faFile,
-      path: "/cac-loai-don-tu-khac",
-      name: "Các loại đơn từ khác",
-      allowed: [3, 4, 5]
-    }, {
-      id: 8,
-      icon: faFile,
       path: "/danh-sach-nguoi-dung",
       name: "Danh sách người dùng",
       allowed: [1]
@@ -76,7 +70,7 @@ const sideElement = [
       id: 8,
       icon: faBookOpenReader,
       path: "/danh-muc",
-      "name": "Danh mục thép",
+      name: "Danh mục thép",
       allowed: [3]
     }
     
