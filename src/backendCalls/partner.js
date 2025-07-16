@@ -2,7 +2,7 @@ import axios from 'axios';
 import {api} from '../config/api';
 const accessToken = localStorage.getItem('token');
 
-const fetchPartners = async () => {
+export const fetchPartners = async () => {
     try{
         const response = await axios.get(`${api.GET_PARTNERS}`, {
         headers: {

@@ -34,13 +34,14 @@ body {
     @apply shadow-[0_0_1.5px_#666] rounded hover:duration-200 hover:shadow-[0_0_2px_#555] hover:cursor-pointer hover:scale-[1.02] bg-white
 }
 
+
 .my-popup-content {
   margin: auto;
   background: rgb(255, 255, 255);
   width: 50%;
   padding: 5px;
 }
-.my-popup-arrow {
+.my-popup-arrow {   
   color: rgb(255, 255, 255);
 }
 [role='tooltip'].my-popup-content {
@@ -53,4 +54,20 @@ body {
 }
 [data-popup='tooltip'].my-popup-overlay {
   background: transparent;
+}
+
+.animation-grow-down {
+    animation: grow-down 0.2s linear;
+}
+
+@keyframes grow-down {
+    from {
+        opacity: 0;
+        transform-origin: top left;
+        transform: scale(0);
+    } to {
+        transform-origin: top left;
+        opacity: 1;
+        transform: scale(1);
+    }
 }

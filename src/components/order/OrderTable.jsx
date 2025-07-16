@@ -197,7 +197,6 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
     // Call setActiveTab with data
     setActiveTab('product', initialData);
   };
-  
 
     return (
      <Popup
@@ -436,7 +435,19 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
     );
   }
 
-
+  /*  [
+      {
+        
+        trueId: 1,
+        name: "Thép D10",
+        namedetail: "Thép tròn D10",
+        brandname: "Hòa Phát",
+        numberofbars: 10,
+        weight: 100,
+        note: "Ghi chú về thép D10",
+        
+      }
+    ]*/
   return (
     <div className="m-4 bg-white border-1 border-gray-600 overflow-hidden">
       <div className="h-full flex flex-col">

@@ -68,9 +68,6 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act, delivery
         <div className='StatusButton mt-3'>
             <p className='text-red-700'>{error}</p>
             {currentDelivery && <div className="button-status flex justify-between items-center">
-                {user.roleid === 3 && <button className='btn px-5 py-2'
-                    onClick={(e) => handleCancelADelivery(e)}
-                >Hủy vận chuyển</button>}
                 {status &&
                     <div>
                         <span>Trạng thái:</span>
@@ -84,6 +81,11 @@ const StatusButton = ({ currentDelivery, user, setCurrentDelivery, act, delivery
                             className={`w-fit text-white cursor-pointer hover:scale-[1.02] ml-2 hover:shadow-[1px_1px_3px_#aaa] hover:duration-200 rounded-full py-2 px-4 shadow-[0_0_2px_#aaa]`}
                         >{(deliveryStatus.find(d => d.id === status)).name}</button>
                     </div>}
+                {user.roleid === 3 && Number(currentDelivery.deliverystatus) < 4 && Number(currentDelivery.deliverystatus) !== 0 &&
+                    <button className={`text-red-600 cursor-pointer hover:bg-red-600 hover:text-white hover:duration-200 rounded-full py-2 px-4 shadow-[0_0_4px_#a00000]`}
+                        onClick={(e) => handleCancelADelivery(e)}
+                    >Hủy vận chuyển</button>
+                }
             </div>}
         </div>
     )

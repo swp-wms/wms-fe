@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation,useNavigate } from "react-router-dom";
 import PartnerSearch from "../components/order/PartnerSearch";
 import ProductSearch from "../components/order/ProductSearch";
@@ -9,6 +9,8 @@ import { getUser } from "../backendCalls/user";
 import CompleteForm from "../components/order/partnerForm";
 import orderCalls from "../backendCalls/order";
 import toast from "react-hot-toast";
+import order from "../backendCalls/order";
+import catalog from "../backendCalls/catalog";
 
 const EditOrder = ({user, setUser}) => {
   
@@ -43,6 +45,33 @@ const navigate = useNavigate();
 const allowedRoles = ["Salesman"];
 const orderDetail = location.state?.orderDetail || null; // Get order details from the state if available
 const orderId = location.state?.id || null; // Get order ID from the state if available
+
+const extractOrderDetail = (orderdetail) => {
+  if (!orderdetail) return [];
+  return orderdetail.map((item, index) => {
+    // Keep the orderdetail properties (numberofbars, weight, note, etc.)
+    // And selectively add product properties
+    const product = item?.product || {};
+    
+    let obj = {
+      ...item,                    // Keep ALL orderdetail properties (including numberofbars, weight, note)
+      orderdetailid: item?.id,    // Map the orderdetail ID
+      
+      // Add specific product properties
+      id: product.id,
+      name: product.name,
+      namedetail: product.namedetail,
+      brandname: product.brandname,
+      catalog: product.catalog,
+      partnerid: product.partnerid,
+      steeltype: product.steeltype,
+      type: product.type,
+      
+      trueId: index + 1
+    };
+    return obj;
+  });
+}
   React.useEffect(() => {
      if(!user){
       const getData = async () => {
@@ -102,21 +131,24 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
     fetchProducts();
     fetchDeliveryDetails();
     setSelectedPartner(orderDetail.partner || null);
-    setSelectedProducts(orderDetail.orderdetail.map((item,index) => {
-        console.log ("Item id: " ,item.id )
-        let obj = {
-          ...item,
-          orderdetailid:item.id,
-          ...item.product,
-          trueId : index+1}
-        return obj;
-    }));
+    const initialProducts = extractOrderDetail(orderDetail?.orderdetail);
+    console.log("Initial Products: ", initialProducts);
+    setSelectedProducts(initialProducts);
+        
+
 
 
   
   },[]);
+  
+React.useEffect(() => {
+  if (selectedProducts.length > 0) {
+    console.log("selectedProducts updated: ", selectedProducts);
+    console.log("First item in selectedProducts: ", selectedProducts[0]);
+    console.log("Properties of first item: ", Object.keys(selectedProducts[0]));
+  }
+}, [selectedProducts]);
 
- 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedPartner || !selectedProducts || selectedProducts.length === 0) {
@@ -232,11 +264,13 @@ const orderId = location.state?.id || null; // Get order ID from the state if av
                 setSelectedProducts={setSelectedProducts}
                 selectedPartner={selectedPartner}
                 productList={productList}
-                delivery={delivery}
-                setDelivery={setDelivery}
+                setActiveTab={handleSetActiveTab}
                 totalBars={totalBars}
                 totalWeight={totalWeight}
-                setActiveTab={handleSetActiveTab}
+                delivery={delivery}
+                setDelivery={setDelivery}
+                
+                
               />
             </div>
             {/* Bottom Buttons */}

@@ -49,20 +49,22 @@ const OrderForm = ({ user, setUser }) => {
     fetchOrderDetails();
   }, [id, user]);
 
+useEffect(() => {
+  if(user){
+    const checkSalesmanId = () => {
+      if(orderDetail && user){
+        if(
+          user.role == 3 &&
+          user.id !== orderDetail.salesmanid
+        ){
+          navigate(`/error403`)
+        }
+      }
+    }
+    checkSalesmanId();
+  }
+}, [user, orderDetail, navigate]);
 
-  //   if(user){
-  //   const checkSalesmanId = () => {
-  //     if(orderDetail && user){
-  //       if(
-  //         user.role == 3 &&
-  //         user.id !== orderDetail.salesmanid
-  //       ){
-  //         navigate(`/error403`)
-  //       }
-  //     }
-  //   }
-  //   checkSalesmanId();
-  // }
   useEffect(() => {
     const getSupplementOrder = async () =>{
       try{

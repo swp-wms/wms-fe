@@ -48,6 +48,21 @@ export const fetchWeightByBrand = async () => {
     }
 }
 
+export const fetchWeightByType = async () => {
+    try {
+        const response = await axios.get(`${api.GET_WEIGHT_BY_TYPE}`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouses:", error);
+        throw error; 
+    }
+}
+
 export const fetchWeightByPartner = async () => {
     try {
         const response = await axios.get(`${api.GET_WEIGHT_BY_PARTNER}`, {

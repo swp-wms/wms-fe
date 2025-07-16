@@ -33,6 +33,7 @@ const DriverInfo = ({ currentDelivery, setCurrentDelivery, user, deliverySchedul
                 setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '2' } : delivery));
 
                 toast.success('Thêm tài xế thành công.');
+                setDriver({});
             }
         } catch (error) {
             console.log(error);

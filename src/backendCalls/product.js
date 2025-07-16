@@ -34,6 +34,22 @@ const addProduct = async(productInfo) => {
 }
 
 
+export const updateProduct = async (id,data) => {
+    try{
+    const response = await axios.put(`${api.UPDATE_PRODUCT(id)}`,data,{
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    });
+    console.log("Sended to backend successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating order:", error);
+    throw error;
+  }
+}
+
+
 export default {
     fetchProducts,
     addProduct

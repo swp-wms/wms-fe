@@ -30,7 +30,7 @@ const DeliverySchedule = ({ user, setUser }) => {
   useEffect(() => {
     const getData = async () => {
       if (act === 'nhap') {
-        const response = await getAllImportDelivery();
+        const response = await getAllImportDelivery();        
         setOrders(response.data);
       } else if (act === 'xuat') {
         const response = await getAllExportDelivery();

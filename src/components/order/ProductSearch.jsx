@@ -96,25 +96,31 @@ useEffect(() => {
   
   setSelectedProducts(prevProducts => {
     if(selectedPartner.isfactory === true) {
-      return prevProducts.map(product => {
+      return prevProducts?.map(product => {
         const matchingProduct = productList.find(item => 
           item.name === product.name && item.partnerid === selectedPartner.id
         );
         if(matchingProduct){
           return {
+            ...product,
             ...matchingProduct,
             trueId: product.trueId !== undefined ? product.trueId : 
               (prevProducts.length == 0 ? 1 : prevProducts[prevProducts.length - 1].trueId + 1),
-            numberofbars: product.numberofbars || ''            
+            numberofbars: product.numberofbars,
+            note: product.note,
+            orderdetailid: product.orderdetailid,
           };
         }else{
+          const generalProduct = generalProductList.find(item => item.name === product.name);
           return{
             trueId :product.trueId,
-            ...generalProductList.find(item => item.name === product.name),
-            numberofbars: product.numberofbars || '',
+            ...product,
+            ...generalProduct,
+            numberofbars: product.numberofbars,
+            note: product.note,
+            orderdetailid: product.orderdetailid,
           }
         }
-        return product;
       }
     
     );
@@ -123,12 +129,12 @@ useEffect(() => {
   });
 }, [selectedPartner, productList]);
 
-// Effect 2: Handle selectedProducts changes for general products
+// Handle selectedProducts changes for non-factory
 useEffect(() => {
   if (selectedPartner && selectedPartner.isfactory === true) return; // Skip if factory partner
   
   setSelectedProducts(prevProducts => {
-    const updatedProducts = prevProducts.map(product => {
+    const updatedProducts = prevProducts?.map(product => {
       const matchingProduct = productList.filter(item => item.name === product.name);
       if(matchingProduct.length > 0){
         return {
@@ -148,7 +154,8 @@ useEffect(() => {
     return hasChanges ? updatedProducts : prevProducts;
     // //return to prev if no changes
   });
-}, [selectedPartner, productList,selectedProducts]);
+}, [selectedPartner, productList]);
+
   console.log("Selected Product: ", selectedProducts);
   const handleProductInputChange = (e) => {
     const value = e.target.value;

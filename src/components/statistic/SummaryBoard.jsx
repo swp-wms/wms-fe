@@ -15,6 +15,7 @@ import { fetchExportWarehouses } from "../../backendCalls/export";
 import {
   fetchWeightByBrand,
   fetchWeightByPartner,
+  fetchWeightByType,
 } from "../../backendCalls/warehouse";
 
 ChartJS.register(
@@ -61,6 +62,7 @@ const SummaryBoard = () => {
   const [exportWeightPercent, setExportWeightPercent] = useState(0);
   const [weightBrands, setWeightBrands] = useState([]);
   const [weightPartners, setWeightPartners] = useState([]);
+  const [weightTypes, setWeightTypes] = useState([]);
 
   useEffect(() => {
     const getData = async () => {
@@ -93,9 +95,24 @@ const SummaryBoard = () => {
     getData();
   }, []);
 
-  const doughnutData = {
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetchWeightByType();
+      console.log(response);
+      setWeightTypes(response);
+    };
+    getData();
+  }, []);
+
+  const doughnutDataBrand = {
+    name: "Tổng khối lượng thép phân loại theo nhà cung",
     labels: weightBrands.map((item) => item.brandname),
     values: weightBrands.map((item) => item.total_weight),
+  };
+  const doughnutDataType = {
+    name: "Tổng khối lượng theo phân loại thép",
+    labels: weightTypes.map((item) => item.type),
+    values: weightTypes.map((item) => item.total_weight),
   };
 
   useEffect(() => {
@@ -112,9 +129,18 @@ const SummaryBoard = () => {
     values: weightPartners.map((item) => item.total_weight),
   };
 
+  const getRandomColors = (num) => {
+    const colors = [];
+    for (let i = 0; i < num; i++) {
+      const color = `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
+      colors.push(color);
+    }
+    return colors;
+  };  
+
   return (
     <>
-      <div className="grid grid-cols-4 gap-14 mb-10">
+      <div className="grid grid-cols-4 gap-12 mb-10">
         <Board
           number={importBars === null ? 0 : importBars}
           title={"Tổng số lượng hàng nhập"}
@@ -136,11 +162,13 @@ const SummaryBoard = () => {
           status={exportWeightPercent}
         />
       </div>
-      <div className="flex gap-14">
-        <DoughnutChart chartData={doughnutData} />
-        <div className="bg-white shadow-btn rounded-lg w-full flex justify-center">
-          <BarChart chartData={barData}/>
-        </div>
+      <div className="flex justify-between mb-10 w-full gap-12 ">
+        <DoughnutChart chartData={doughnutDataBrand} />
+        <DoughnutChart chartData={doughnutDataType} />
+      </div>
+
+      <div className="bg-white shadow-btn rounded-lg w-[100%] flex justify-center mb-10">
+        <BarChart chartData={barData} />
       </div>
     </>
   );
@@ -169,7 +197,7 @@ const Board = ({ number, title, status }) => {
 
 const BarChart = ({ chartData }) => {
   return (
-    <div className="w-full scale-90 ms-2">
+    <div className="w-full flex justify-center py-8 px-12">
       <Bar
         data={{
           labels: chartData.labels,
@@ -199,6 +227,13 @@ const BarChart = ({ chartData }) => {
             title: {
               display: true,
               text: "Biểu đồ thống kê tổng khối lượng nhập kho theo nhà cung cấp",
+              font: {
+                size: 14,
+              },
+              padding: {
+                top: 5,
+                bottom: 30,
+              },
             },
           },
         }}
@@ -220,17 +255,24 @@ const DoughnutChart = ({ chartData }) => {
   };
 
   return (
-    <div className="bg-white shadow-btn py-4 px-5 rounded-lg">
-      <Doughnut
+    <div className="bg-white shadow-btn px-12 w-full rounded-lg flex justify-center">
+      <Doughnut className="w-full scale-90"
         data={data}
         options={{
           responsive: true,
           plugins: {
-            legend: { display: true, position: "bottom" },
+            legend: { display: true, position: "bottom", labels: { font: { size: 16 }} },
             title: {
               display: true,
               position: "top",
-              text: "Biểu đồ thống kê tổng khối lượng thép",
+              text: chartData.name,
+              font: {
+                size: 16,
+              },
+              padding: {
+                top: 5,
+                bottom: 30,
+              },
             },
           },
         }}
