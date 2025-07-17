@@ -21,7 +21,7 @@ const DeliveryForm = ({
 
     const [newDeliveryList, setNewDeliveryList] = useState([]);  //product list of delivery
     const [error, setError] = useState();
-
+    
     const handleEmptyForm = (e) => {
         e.preventDefault();
         setNewDelivery({
@@ -106,6 +106,8 @@ const DeliveryForm = ({
                 setNewDelivery={setNewDelivery}
             />}
             {currentDelivery && <StatusButton
+                currentOrder={currentOrder}
+                currentDeliveryDetail={currentDeliveryDetail}
                 setIsChangePercent={setIsChangePercent}
                 setCurrentDelivery={setCurrentDelivery}
                 currentDelivery={currentDelivery} user={user}
