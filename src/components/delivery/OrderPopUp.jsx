@@ -17,6 +17,7 @@ const OrderPopUp = ({ setShowOrderPopup, currentOrder }) => {
             onClick={() => { setShowOrderPopup(false) }}
         >
             <div className="bg-white p-5 rounded">
+                <h1 className="font-bold uppercase text-center mb-3 text-lg">{window.location.pathname.split('/')[2] === 'nhap' ? 'Đơn nhập hàng':'Đơn xuất hàng'}</h1>
                 <div className="font-semibold flex justify-between mb-3">
                     <h1 className="max-w-[75%]">Công ty: {currentOrder.partnername}</h1>
                     <h1>Mã đơn: {currentOrder.orderid}</h1>
