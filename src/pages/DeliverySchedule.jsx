@@ -5,11 +5,15 @@ import { getUser } from "../backendCalls/user";
 import DeliveryForm from "../components/delivery/DeliveryForm";
 import { useParams } from "react-router-dom";
 import { getAllExportDelivery, getAllImportDelivery, getDeliveriesForOrder, getDeliveryDetail } from "../backendCalls/delivery";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import OrderPopUp from "../components/delivery/OrderPopUp";
 
 
 const DeliverySchedule = ({ user, setUser }) => {
   const { act, orderId, deliveryId } = useParams();
 
+  const [showOrderPopup, setShowOrderPopup] = useState(false);
   const [orders, setOrders] = useState(); //list big order. load 1 time
   const [currentOrder, setCurrentOrder] = useState(); //hit 1 order, then load
   const [deliverySchedule, setDeliverySchedule] = useState([]);
@@ -102,8 +106,13 @@ const DeliverySchedule = ({ user, setUser }) => {
           <div className="flex-2 h-full ml-4">
             <div className="flex justify-between">
               {!currentDelivery && <h1 className="font-medium mb-2">Thêm xe</h1>}
-              {currentOrder && <h1 className="font-medium mb-2">{currentOrder.partnername}</h1>}
+              <div className="flex items-center mb-2 gap-3">
+                {currentOrder && <h1 className="font-medium">{currentOrder.partnername}</h1>}
+                {currentOrder && <FontAwesomeIcon onClick={() => setShowOrderPopup(true)} className="text-[18px] cursor-pointer" title="Order Information" icon={faInfoCircle} />}
+              </div>
             </div>
+
+            {showOrderPopup && <OrderPopUp setShowOrderPopup={setShowOrderPopup} currentOrder={currentOrder}/>}
 
             {currentOrder ? <DeliveryForm
               setIsChangePercent={setIsChangePercent}
