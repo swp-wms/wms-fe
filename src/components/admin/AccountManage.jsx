@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
@@ -10,6 +12,7 @@ import CreateUserModal from "./CreateUserModal";
 const AccountManage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPosition, setSelectedPosition] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState(""); // New state for status filter
   const [users, setUsers] = useState([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -37,20 +40,40 @@ const AccountManage = () => {
     getData();
   }, []);
 
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user?.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPosition =
-      selectedPosition === "" || user?.role?.rolename === selectedPosition;
-    return matchesSearch && matchesPosition;
-  });
+  const filteredUsers = users
+    .filter((user) => {
+      const matchesSearch =
+        user?.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesPosition =
+        selectedPosition === "" || user?.role?.rolename === selectedPosition;
+
+      // New status filter logic
+      const matchesStatus =
+        selectedStatus === "" ||
+        (selectedStatus === "active" && user?.status === "1") ||
+        (selectedStatus === "inactive" && user?.status === "0");
+
+      return matchesSearch && matchesPosition && matchesStatus;
+    })
+    // Sort by fullname alphabetically
+    .sort((a, b) => {
+      const nameA = a?.fullname?.toLowerCase() || "";
+      const nameB = b?.fullname?.toLowerCase() || "";
+      return nameA.localeCompare(nameB);
+    });
 
   const positions = [
     "Salesman",
     "Warehouse keeper",
     "Delivery staff",
     "System admin",
+  ];
+
+  const statusOptions = [
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
   ];
 
   const handleStatusClick = (user) => {
@@ -60,7 +83,6 @@ const AccountManage = () => {
 
   const handleConfirmStatusChange = async () => {
     if (!selectedUser) return;
-
     console.log("Selected User:", selectedUser);
     setIsUpdating(true);
     try {
@@ -147,21 +169,42 @@ const AccountManage = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-        {/* Filter */}
-        <div className="flex-shrink-0">
-          <select
-            value={selectedPosition}
-            onChange={(e) => setSelectedPosition(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-          >
-            <option value="">Tất cả vị trí</option>
-            {positions.map((position) => (
-              <option key={position} value={position}>
-                {position}
-              </option>
-            ))}
-          </select>
+
+        {/* Filters */}
+        <div className="flex gap-3">
+          {/* Position Filter */}
+          <div className="flex-shrink-0">
+            <select
+              value={selectedPosition}
+              onChange={(e) => setSelectedPosition(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            >
+              <option value="">Tất cả vị trí</option>
+              {positions.map((position) => (
+                <option key={position} value={position}>
+                  {position}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <div className="flex-shrink-0">
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            >
+              <option value="">Tất cả trạng thái</option>
+              {statusOptions.map((status) => (
+                <option key={status.value} value={status.value}>
+                  {status.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+
         {/* Add */}
         <button
           onClick={handleCreateClick}

@@ -66,10 +66,11 @@ const CreateUserModal = ({ onSuccess, onCancel }) => {
       return;
     }
 
-    if (!validateEmail(createFormData.username)) {
-      toast.error("Tên đăng nhập phải có định dạng email hợp lệ!");
-      return;
-    }
+    // if (!validateEmail(createFormData.username)) {
+    //   toast.error("Tên đăng nhập phải có định dạng email hehehehehe!");
+    //   return;
+    // }
+    // Check emailError => disable nút CF
 
     setIsCreating(true);
     try {
@@ -87,6 +88,10 @@ const CreateUserModal = ({ onSuccess, onCancel }) => {
       if (response.status === 200 || response.status === 201) {
         toast.success("Tạo tài khoản thành công!");
         onSuccess();
+      } 
+      //Kiểm tra email tồn tại
+      else if (response.status === 409) {
+        toast.error("TÊN ĐĂNG NHẬP đã tồn tại!");
       } else {
         toast.error("Có lỗi xảy ra khi tạo tài khoản!");
       }

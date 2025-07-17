@@ -26,6 +26,7 @@ export const api = {
 
   //admin API
   GET_ALL_USER: `${baseUrl}/users`,
+  REGISTER_ADMIN: `${baseUrl}/admin/register`,
 
   //partner API
   GET_PARTNERS: `${baseUrl}/partners`,

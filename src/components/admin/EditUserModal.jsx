@@ -6,13 +6,12 @@ import toast from "react-hot-toast";
 
 const EditUserModal = ({ user, onSuccess, onCancel }) => {
   const [editFormData, setEditFormData] = useState({
-    fullname: user?.fullname || "",
     username: user?.username || "",
     password: "",
     role: user?.role?.rolename || "",
   });
   const [isEditUpdating, setIsEditUpdating] = useState(false);
-
+  const [emailError, setEmailError] = useState("");
   const positions = [
     "Salesman",
     "Warehouse keeper",
@@ -35,39 +34,61 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
     }
   };
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleEditFormChange = (field, value) => {
     setEditFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+    if (field === "username") {
+      if (value && !validateEmail(value)) {
+        setEmailError("Tên đăng nhập phải có định dạng email hợp lệ");
+      } else {
+        setEmailError("");
+      }
+    }
   };
 
   const handleSaveEdit = async () => {
     if (!user) return;
     setIsEditUpdating(true);
+
+    if (!editFormData.username || !editFormData.role) {
+      toast.error("Vui lòng điện đày đủ thông tin!");
+      setIsEditUpdating(false);
+      return;
+    }
+
+    // if (!validateEmail(editFormData.username)) {
+    //   toast.error("Tên đăng nhập phải có định dạng email hehe!");
+    //   return;
+    // }
+
     try {
       const updatedUserData = {
         ...user,
         username: editFormData.username,
-        // Chỉ gửi password nếu nhập
-        ...(editFormData.password &&
-          editFormData.password.trim() !== "" && {
-            password: editFormData.password,
-          }),
-        roleid: getRoleIdFromName(editFormData.role),
+        ...(editFormData.password && { password: editFormData.password }),
+        role: getRoleIdFromName(editFormData.role),
       };
-
-      delete updatedUserData.role;
 
       const response = await updateUserInfo(updatedUserData);
       if (response.status === 200) {
         const updatedUser = {
           ...user,
-          username: editFormData.username,
+          ...updatedUserData,
           role: { ...user.role, rolename: editFormData.role },
         };
         onSuccess(updatedUser);
         toast.success("Cập nhật thông tin thành công!");
+      }
+      // Kiểm tra email tồn tại
+      else if (response.status === 400) {
+        toast.error("TÊN ĐĂNG NHẬP đã tồn tại!");
       } else {
         toast.error("Có lỗi xảy ra khi cập nhật thông tin!");
       }
@@ -132,7 +153,7 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
               </label>
               <input
                 type="text"
-                value={editFormData.fullname}
+                value={user?.fullname || ""}
                 disabled
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
               />
@@ -141,14 +162,23 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
               <label className="w-32 text-sm font-medium text-gray-700">
                 TÊN ĐĂNG NHẬP:
               </label>
-              <input
-                type="text"
-                value={editFormData.username}
-                onChange={(e) =>
-                  handleEditFormChange("username", e.target.value)
-                }
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <div className="flex-1">
+                <input
+                  placeholder="example@email.com"
+                  type="email"
+                  value={editFormData.username}
+                  onChange={(e) =>
+                    handleEditFormChange("username", e.target.value)
+                  }
+                  className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    emailError ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                {emailError && (
+                  <p className="text-red-500 text-xs mt-1">{emailError}</p>
+                )}
+              </div>
+
             </div>
             <div className="flex items-center gap-4">
               <label className="w-32 text-sm font-medium text-gray-700">
@@ -169,7 +199,7 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
           <div className="flex flex-col gap-3">
             <button
               onClick={handleSaveEdit}
-              disabled={isEditUpdating}
+              disabled={isEditUpdating || emailError}
               className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 min-w-[100px]"
             >
               <FontAwesomeIcon icon={faSave} />
