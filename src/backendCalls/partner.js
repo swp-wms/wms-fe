@@ -28,11 +28,27 @@ const addPartner = async (partnerInfo) => {
         return response;
     }catch(error){
         console.error("Error adding partner:", error);
-        throw error; // Re-throw the error for further handling
+        throw error;
+    }
+}
+
+const updatePartner = async (partnerInfo) => {
+    try{
+        const response = await axios.put(`${api.UPDATE_PARTNER}`, partnerInfo, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        return response;
+    }catch(error){
+        console.error("Error updating partner:", error);
+        throw error;
     }
 }
 
 export default {
     fetchPartners,
-    addPartner  
+    addPartner,
+    updatePartner  
 }

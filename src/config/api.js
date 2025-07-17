@@ -1,31 +1,39 @@
 const baseUrl = "http://localhost:3800";
 
 export const api = {
-    LOGIN: `${baseUrl}/login`,
-    LOGOUT: `${baseUrl}/logout`,
-    REGISTER: `${baseUrl}/register`,
-    GET_USER: `${baseUrl}/users/me`,
-    UPDATE_USER: (userid) => `${baseUrl}/users/${userid}`,
-    FORGET_PASSWORD: `${baseUrl}/forget-password`,
-    RESET_PASSWORD: `${baseUrl}/reset-password`,
-    // Order API
-    GET_ORDERS: `${baseUrl}/orders`,
-    GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
-    GET_EXPORT_ORDER: `${baseUrl}/orders/export`,
-    GET_ORDER_DETAIL: `${baseUrl}/detail`,
-    CREATE_ORDER: `${baseUrl}/orders/`,
-    GET_DELIVERY_DETAIL_FOR_UPDATE_ORDER: `${baseUrl}/orders/delivery`,
-    UPDATE_ORDER: (orderid) => `${baseUrl}/orders/${orderid}`,
+  LOGIN: `${baseUrl}/login`,
+  LOGOUT: `${baseUrl}/logout`,
+  REGISTER: `${baseUrl}/register`,
+  GET_USER: `${baseUrl}/users/me`,
+  UPDATE_USER: (userid) => `${baseUrl}/users/${userid}`,
+  FORGET_PASSWORD: `${baseUrl}/forget-password`,
+  RESET_PASSWORD: `${baseUrl}/reset-password`,
 
-    GET_REMAIN_QUANTITY: (orderid) => `${baseUrl}/detail/${orderid}/remain`,
-    CHECK_COMPLETE: (orderid) => `${baseUrl}/orders/${orderid}/complete`,
+  // Order API
+  GET_ORDERS: `${baseUrl}/orders`,
+  GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
+  GET_EXPORT_ORDER: `${baseUrl}/orders/export`,
+  GET_ORDER_DETAIL: `${baseUrl}/detail`,
+  CREATE_ORDER: `${baseUrl}/orders/`,
+  GET_DELIVERY_DETAIL_FOR_UPDATE_ORDER: `${baseUrl}/orders/delivery`,
+  UPDATE_ORDER: (orderid) => `${baseUrl}/orders/${orderid}`,
 
-    GET_SUPPPLEMENT_ORDER: (orderid) =>`${baseUrl}/supplement/${orderid}`,
-    ADD_SUPPLEMENT_ORDER: `${baseUrl}/supplement`,
-    GET_SUPPLEMENT_DETAIL_BY_ID: (id) => `${baseUrl}/supplement/detail/${id}`,
+  GET_REMAIN_QUANTITY: (orderid) => `${baseUrl}/detail/${orderid}/remain`,
+  CHECK_COMPLETE: (orderid) => `${baseUrl}/orders/${orderid}/complete`,
+
+  GET_SUPPPLEMENT_ORDER: (orderid) => `${baseUrl}/supplement/${orderid}`,
+  ADD_SUPPLEMENT_ORDER: `${baseUrl}/supplement`,
+  GET_SUPPLEMENT_DETAIL_BY_ID: (id) => `${baseUrl}/supplement/detail/${id}`,
+
+  //admin API
+  GET_ALL_USER: `${baseUrl}/users`,
+  REGISTER_ADMIN: `${baseUrl}/admin/register`,
+
+
   //partner API
   GET_PARTNERS: `${baseUrl}/partners`,
   ADD_PARTNER: `${baseUrl}/partners/`,
+  UPDATE_PARTNER: (partnerid) => `${baseUrl}/partners/${partnerid}`,
 
   //product API
   GET_PRODUCTS: `${baseUrl}/products`,
@@ -40,9 +48,9 @@ export const api = {
   //warehouse API
   GET_WAREHOUSE: `${baseUrl}/warehouse`,
   GET_WAREHOUSE_BY_DATE: (createdate) => `${baseUrl}/warehouse/future/${createdate}`,
-  GET_WEIGHT_BY_BRANDNAME:`${baseUrl}/warehouse/brandname`,
-  GET_WEIGHT_BY_TYPE:`${baseUrl}/warehouse/type`,
-  GET_WEIGHT_BY_PARTNER:`${baseUrl}/warehouse/partner`,
+  GET_WEIGHT_BY_BRANDNAME: `${baseUrl}/warehouse/brandname`,
+  GET_WEIGHT_BY_TYPE: `${baseUrl}/warehouse/type`,
+  GET_WEIGHT_BY_PARTNER: `${baseUrl}/warehouse/partner`,
 
   //import API
   GET_IMPORT: `${baseUrl}/warehouse/import`,

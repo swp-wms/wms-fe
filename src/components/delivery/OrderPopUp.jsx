@@ -3,11 +3,18 @@ import orderBeCall from '../../backendCalls/order.js'
 
 const OrderPopUp = ({ setShowOrderPopup, currentOrder }) => {
     const [orderDetail, setOrderDetail] = useState();
+    const [totalWeight, setTotalWeight] = useState();
 
     useEffect(() => {
         const getData = async () => {
             const response = await orderBeCall.getOrderDetail(currentOrder.orderid);
-            setOrderDetail(response[0].orderdetail);
+            const productList = response[0].orderdetail;
+            setOrderDetail(productList);
+            let sum = 0;
+            for (let index = 0; index < productList.length; index++) {
+                sum += productList[index].weight;
+            }
+            setTotalWeight(sum);
         }
         getData();
     }, []);
@@ -48,6 +55,7 @@ const OrderPopUp = ({ setShowOrderPopup, currentOrder }) => {
                         ))}
                     </tbody>
                 </table>
+                <p className="font-bold text-sm float-end mt-2">Tổng khối lượng: {totalWeight && totalWeight.toFixed(2)} kg</p>
             </div>
         </div>
     )
