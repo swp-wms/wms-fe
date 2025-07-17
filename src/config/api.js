@@ -31,6 +31,7 @@ export const api = {
   //partner API
   GET_PARTNERS: `${baseUrl}/partners`,
   ADD_PARTNER: `${baseUrl}/partners/`,
+  UPDATE_PARTNER: (partnerid) => `${baseUrl}/partners/${partnerid}`,
 
   //product API
   GET_PRODUCTS: `${baseUrl}/products`,

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import partner from "../../backendCalls/partner";
 import AddPartnerModal from "./AddPartnerModal";
+import PartnerDetailModal from "./PartnerDetailModal";
 
 const PartnerManagement = () => {
   const [partners, setPartners] = useState([]);
@@ -10,6 +11,8 @@ const PartnerManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedPartner, setSelectedPartner] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const partnersPerPage = 5;
 
@@ -57,7 +60,7 @@ const PartnerManagement = () => {
       });
     }
 
-    // Sort by ID (ascending order) - for text IDs
+    // Sort by ID (ascending order)
     filtered = filtered.sort((a, b) => {
       const idA = a.id || "";
       const idB = b.id || "";
@@ -77,6 +80,17 @@ const PartnerManagement = () => {
       console.error("Error adding partner:", error);
       throw error;
     }
+  };
+
+  const handlePartnerClick = (partnerData) => {
+    setSelectedPartner(partnerData);
+    setIsDetailModalOpen(true);
+  };
+
+  const handlePartnerUpdate = async () => {
+    await loadPartners();
+    setIsDetailModalOpen(false);
+    setSelectedPartner(null);
   };
 
   // Pagination
@@ -104,7 +118,6 @@ const PartnerManagement = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
         {/* FILTER */}
         <div>
           <select
@@ -117,7 +130,6 @@ const PartnerManagement = () => {
             <option value="non-factory">Không phải nhà máy</option>
           </select>
         </div>
-
         {/* ADD BUTTON */}
         <button
           onClick={() => setIsModalOpen(true)}
@@ -135,23 +147,24 @@ const PartnerManagement = () => {
             Không tìm thấy đối tác nào
           </div>
         ) : (
-          currentPartners.map((partner, index) => (
+          currentPartners.map((partnerItem, index) => (
             <div
-              key={partner.id || index}
-              className="border border-gray-300 rounded-lg p-4 bg-white"
+              key={partnerItem.id || index}
+              className="border border-gray-300 rounded-lg p-4 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
+              onClick={() => handlePartnerClick(partnerItem)}
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg mb-2">
-                    [{partner.id || "MÃ CÔNG TY"}] - [
-                    {partner.name || "TÊN CÔNG TY"}]
+                    [{partnerItem.id || "MÃ CÔNG TY"}] - [
+                    {partnerItem.name || "TÊN CÔNG TY"}]
                   </h3>
                   <p className="text-gray-600">
                     <span className="font-medium">Địa chỉ:</span>{" "}
-                    {partner.address || "Chưa có thông tin"}
+                    {partnerItem.address || "Chưa có thông tin"}
                   </p>
                 </div>
-                {partner.isfactory && (
+                {partnerItem.isfactory && (
                   <div className="bg-gray-100 px-3 py-1 rounded text-sm font-medium">
                     NHÀ MÁY
                   </div>
@@ -179,11 +192,23 @@ const PartnerManagement = () => {
         </div>
       )}
 
-      {/* ADD */}
+      {/* ADD MODAL */}
       <AddPartnerModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleAddPartner}
+      />
+
+      {/* DETAIL MODAL */}
+      <PartnerDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedPartner(null);
+        }}
+        partner={selectedPartner}
+        onUpdate={handlePartnerUpdate}
+        allPartners={partners}
       />
     </div>
   );
