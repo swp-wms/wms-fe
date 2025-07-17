@@ -25,7 +25,7 @@ const Header = ({ user, setUser }) => {
 };
 
 const NavBar = ({ user, data }) => {
-  const { emit, on, off, isConnect } = useSocket(user.roleid);
+  const { emit, on, off, isConnect } = useSocket(user.roleid, user.id);
   const [notifs, setNotifs] = useState([]);
 
   const [showNotif, setShowNotif] = useState(false);
@@ -37,7 +37,7 @@ const NavBar = ({ user, data }) => {
   }, []);
 
   useEffect(() => {
-    if (!isConnect) {
+    if (!isConnect) {      
       console.log('Socket not connected, delaying listener registration.');
       return;
     }

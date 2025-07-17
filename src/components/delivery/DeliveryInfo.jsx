@@ -1,6 +1,6 @@
 
 const DeliveryInfo = ({ currentOrder, currentDelivery, setCurrentDelivery, newDelivery, setNewDelivery, user }) => {
-    
+
     return (
         <div>
             <div className="mb-3 flex">
@@ -33,7 +33,7 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, setCurrentDelivery, newDe
                         readOnly={(user.roleid === 5 && Math.abs(Number(currentDelivery?.deliverystatus)) === 1) ? false : true}
                         value={currentDelivery ? currentDelivery.gettime : newDelivery.gettime ? newDelivery.gettime : ''}
                         required
-                        className='border-[1px] border-[#aaa] rounded py-1 px-2' 
+                        className='border-[1px] border-[#aaa] rounded py-1 px-2'
                     />
                 </div>
 
@@ -59,7 +59,7 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, setCurrentDelivery, newDe
                         type="time"
                         onChange={(e) => {
                             setCurrentDelivery({ ...currentDelivery, deliverytime: e.target.value })
-                            
+
                         }}
                         readOnly={(user.roleid === 5 && Math.abs(Number(currentDelivery?.deliverystatus)) === 1) ? false : true}
                         value={currentDelivery ? currentDelivery.deliverytime : newDelivery.deliverytime ? newDelivery.deliverytime : ''}
