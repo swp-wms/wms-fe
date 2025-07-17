@@ -31,7 +31,7 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, setCurrentDelivery, newDe
                             setCurrentDelivery({ ...currentDelivery, gettime: e.target.value })
                         }}
                         readOnly={(user.roleid === 5 && Math.abs(Number(currentDelivery?.deliverystatus)) === 1) ? false : true}
-                        value={currentDelivery ? currentDelivery.gettime : newDelivery.gettime ? newDelivery.gettime : ''}
+                        value={currentDelivery ? currentDelivery.gettime ? currentDelivery.gettime :'' : ''}
                         required
                         className='border-[1px] border-[#aaa] rounded py-1 px-2'
                     />
@@ -62,7 +62,7 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, setCurrentDelivery, newDe
 
                         }}
                         readOnly={(user.roleid === 5 && Math.abs(Number(currentDelivery?.deliverystatus)) === 1) ? false : true}
-                        value={currentDelivery ? currentDelivery.deliverytime : newDelivery.deliverytime ? newDelivery.deliverytime : ''}
+                        value={currentDelivery ? currentDelivery.deliverytime ? currentDelivery.deliverytime :'' : ''}
                         required
                         className='border-[1px] border-[#aaa] rounded py-1 px-2'
                     />

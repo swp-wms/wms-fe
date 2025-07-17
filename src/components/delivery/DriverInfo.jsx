@@ -18,8 +18,10 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
                 setError('Bạn cần điền đầy đủ thông tin tài xế.');
             } else if (driver.drivername.trim().length <= 0 || driver.drivercode.trim().length <= 0 || driver.driverphonenumber.trim().length <= 0 || driver.licenseplate.trim().length <= 0) {
                 setError('Bạn cần điền đầy đủ thông tin tài xế.');
-            } else if (!(/^\d+$/.test(driver.drivercode)) || !(/^\d+$/.test(driver.driverphonenumber)) || !(/^\d+$/.test(driver.drivercode))) {
-                setError('CCCD, GPLX và số điện thoại chỉ chứa số.');
+            } else if (driver.drivercode.length !== 12 || !(/^\d+$/.test(driver.drivercode))) {
+                setError('CCCD/GPLX bao gồm 12 chữ số.');
+            } else if (!(/^0\d{9,10}$/.test(driver.driverphonenumber))) {
+                setError('Số điện thoại gồm 10 hoặc 11 chữ số, bắt đầu bằng số 0.');
             } else if (!currentDelivery.deliverytime || !currentDelivery.gettime) {
                 setError('Thời gian bốc hàng và giao hàng cần được điền.');
             } else {
