@@ -1,7 +1,7 @@
 import React, { useState,useEffect, useRef, use } from "react";
 import { Link } from "react-router-dom";
 import PartnerSearch from "../components/order/PartnerSearch";
-import ProductSearch from "../components/order/ProductSearch";
+import ProductSearch from "../components/order/ProductSearchExport";
 import OrderTable from "../components/order/OrderTable";
 import partner from "../backendCalls/partner";
 import product from "../backendCalls/product";
@@ -82,7 +82,7 @@ const CreateOrder = ({user, setUser}) => {
     fetchProducts();
   },[selectedProducts, selectedPartner]);
   let checkNumberOfBars = () => {
-            const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0 || product.numberofbars == null);
+            const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0 || product.numberofbars == null && product.type === "Thép Thanh");
             if(invalidProducts.length > 0) {
               return false;
             }

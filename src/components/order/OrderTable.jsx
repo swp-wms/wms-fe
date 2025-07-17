@@ -24,13 +24,14 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
     // } 
 
   const checkNumberOfBars = () => {
-    const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0);
+    
+    const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0 && product.type === 'Thép Thanh');
+    
     if(invalidProducts.length > 0) {
       toast.error("Số lượng hàng hóa mỗi loại phải lớn hơn 0");
       return false;
     }
     return true;
-    
   }
   checkNumberOfBars();
 
@@ -43,15 +44,16 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
 
   const handleProductFieldChange = (id, field, value) => {
     if (
-      (field === "numberofbars" || field === "weight") &&
-      (isNaN(value) || value === '' || Number(value) < 0)
+      (field === "numberofbars" || field === "weight") 
+      && value === '' 
+      && (isNaN(value) ||  Number(value) < 0)
     ) {
       return; // Do not update if invalid
     }
     let updateProduct = selectedProducts.find(product => product.trueId === id);
     
     if(updateProduct) {
-    // Same pattern for both objects and primitives
+    
     updateProduct = {
       ...updateProduct,
       [field]: value
@@ -61,11 +63,11 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
         if(updateProduct.catalog?.type === "Thép Thanh") {
           let w = (updateProduct.catalog?.weightperbundle / updateProduct.catalog?.barsperbundle) * value; // Assuming weight is calculated based on catalog length and number of bars
           updateProduct.weight = w.toFixed(2); // Update weight based on number of bars
+        } else if (value === '') {
+          // ✅ Clear weight when number of bars is cleared
+          updateProduct.weight = '';
         }
-        if(updateProduct.catalog?.type === "Thép Cuộn") {
-          let w = (updateProduct.catalog?.weightperroll * value);
-          updateProduct.weight = w.toFixed(2);
-        }
+        
       }
     
       if(field === "name"){
@@ -249,11 +251,12 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
                   /> */}
                   {product.catalog?.length}
                 </td>
-                <td className="border border-gray-800  py-2 text-xs text-black w-9">
+                <td className="border border-gray-800  py-2 text-xs text-black w-9 disabled:bg-gray-100">
                   <input
                     type="number"
-                    className="w-full h-full focus:outline-none"
+                    className="w-full h-full py-5 focus:outline-none disabled:bg-gray-100"
                     value={product.numberofbars || ''}
+                    disabled = {product.catalog?.type === "Thép Cuộn"}
                     onChange={e => {
                         const val = e.target.value;
                         if (/^\d*$/.test(val)) { // Only allow non-negative integers
@@ -267,6 +270,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
                     type="number"
                     className="w-full h-full focus:outline-none"
                     value={product.weight || ''}
+                    
                     onChange={e => {
                       const val = e.target.value;
                       if (/^\d*\.?\d*$/.test(val)) { // Only allow non-negative numbers
@@ -375,20 +379,22 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
                   /> */}
                   {product.namedetail}
                 </td>
-                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-9">
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-9 disabled:bg-gray-100">
                   {/* <input
                     type="text"
                     className="w-full h-full focus:outline-none"
                     value={product.catalog?.length || ''}
                     onChange={e => handleProductFieldChange(product.trueId, "catalog.length", e.target.value)}
                   /> */}
-                  {product.catalog?.length}
+                  {product.catalog?.length || ''}
+                  
                 </td>
-                <td className="border border-gray-800  py-2 text-xs text-black w-9">
+                <td className="border border-gray-800  py-2 text-xs text-black w-9 disabled:bg-gray-100">
                   <input
                     type="number"
-                    className="w-full h-full focus:outline-none"
+                    className="w-full h-full py-5 focus:outline-none disabled:bg-gray-100"
                     value={product.numberofbars || ''}
+                    disabled = {product.catalog?.type === "Thép Cuộn"}
                     onChange={e => {
                         const val = e.target.value;
                         if (/^\d*$/.test(val)) { // Only allow non-negative integers
@@ -402,6 +408,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
                     type="number"
                     className="w-full h-full focus:outline-none"
                     value={product.weight || ''}
+                    
                     onChange={e => {
                       const val = e.target.value;
                       if (/^\d*\.?\d*$/.test(val)) { // Only allow non-negative numbers
@@ -458,16 +465,16 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
               <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-16">Mã hàng</th>
               <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Tên hãng</th>
               <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Tên hàng hóa</th>
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Dài</th>
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Số lượng</th>
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Khối lượng</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Dài (m)</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Số lượng (cây)</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Khối lượng (KG)</th>
               <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Ghi chú</th>
               <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-5">Thao tác</th>
             </tr> 
           </thead>
           <tbody>
             {selectedProducts.map((product, index) =>
-              (selectedPartner && selectedPartner.isfactory && product.partnerid == null)
+              (selectedPartner && product.partnerid == null)
                 ? popupTableRow(product, index)
                 : normalTableRow(product, index)
             )}

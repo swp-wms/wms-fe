@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const PartnerSearch = ({
   inputpartner,
@@ -10,11 +10,19 @@ const PartnerSearch = ({
   setSelectedPartner,
   focused,
   setFocused,
-  setActiveTab
+  setActiveTab,
+  refresh,
+  setRefresh
 }) => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const inputRef = useRef(null);
     const dropdownRef = useRef(null);
+
+    useEffect(() => {
+      if(selectedPartner) 
+        setInputpartner(selectedPartner.name || selectedPartner.id);
+      
+    },[]);
 
 
   const handleBlur = () => {
@@ -32,7 +40,7 @@ const PartnerSearch = ({
   const handlePartnerInputChange = (e) => {
     const value = e.target.value;
     setInputpartner(value);
-    if(value.trim() === "") {
+    if(value.trim() === "" && selectedPartner) {
       setSelectedPartner(null);
     }
     const filteredSuggestions = partnerList.filter(
@@ -47,7 +55,7 @@ const PartnerSearch = ({
     setInputpartner(partner.name || partner.id || "");
     setpartnerFilteredSuggestions([]);
     setSelectedPartner(partner);
-
+    setRefresh(prev => !prev); // Trigger re-rendering of the table
     setTimeout(() => {
       console.log("Selected Partner: ", selectedPartner);
     }, 500);
@@ -62,12 +70,13 @@ const PartnerSearch = ({
       if (matched) {
         setSelectedPartner(matched);
         setpartnerFilteredSuggestions([]);
+        setRefresh(prev => !prev); // Trigger re-rendering of the table
       
       }
       console.log("selectedPartner: ", selectedPartner);
     }
   };
-
+  console.log("selected partner: ", selectedPartner);
   return (
     <div className="bg-white border-2 border-gray-600 rounded-md p-4">
       <div className="space-y-4">

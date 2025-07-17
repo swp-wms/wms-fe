@@ -159,6 +159,7 @@ export function usePartnerFormLogic({
     fetchPartners();
 
   },[selectedProducts],selectedPartner);
+
     useEffect(() => {
     if (initialData) {
       if (initialData.product) {
@@ -209,6 +210,8 @@ export function usePartnerFormLogic({
 
 
   }, [activeTab, setShowForm]);
+
+
   //----------------- VALIDATION FUNCTIONS -----------------
   const validateField = (name, value) => {
     switch (name) {
@@ -260,8 +263,10 @@ export function usePartnerFormLogic({
       case "name": // mã hàng
         console.log(productList);
         if (!value.trim()) return "Bắt buộc";
-        if (!/^TD\d{1,4}(CB\d{1,3}V|C\d{2,3}|CD\d{2}|CB\d|CB\d{2,3})$/.test(value.trim())) return "Định dạng: TD + 1-4 số";
-        if (Array.isArray(productList) && productList.some(prod => prod.name === value && prod.brandname === product.brandname)) {
+        if (!/^TD\d{1,4}(CB\d{1,3}V|C\d{2,3}|CD\d{2}|CB\d|CB\d{2,3})|[a-zA-Z]$/.test(value.trim())) return "Vui lòng nhập: TD8CB240T hoặc TD8CB230 hoặc ";
+        if (Array.isArray(productList) && productList.some(prod => prod.name.trim().toLowerCase() === value.trim().toLowerCase() 
+                                                                && prod.brandname.trim().toLowerCase() === product.brandname.trim().toLowerCase() 
+                                                                && prod.partnerid.trim().toLowerCase() === product.partnerid.trim().toLowerCase())) {
 
           return "Sản phẩm đã tồn tại";
         }
@@ -281,19 +286,25 @@ export function usePartnerFormLogic({
   const validateCatalogField = (name, value, catalog) => {
     switch (name) {
       case "length":
+      if (catalog.type === "Thép Thanh") {
         if (value === "" || value === null) return "Bắt buộc";
         if (Number(value) < 0) return "Không được nhập số âm";
         if (isNaN(value)) return "Vui lòng nhập vào kí tự là số";
-        break;
+      }
+      break;
 
       case "barsperbundle":
-        if (value === "" || value === null) return "Bắt buộc";
-        if (!/^\d+$/.test(value) || Number(value) <= 0) return "Phải là số nguyên dương";
+        if (catalog.type === "Thép Thanh") {
+          if (value === "" || value === null) return "Bắt buộc";
+          if (!/^\d+$/.test(value) || Number(value) <= 0) return "Phải là số nguyên dương";
+        }
         break;
 
-      case "weightpermeter":
-        if (Number(value) <= 0) return "Phải là số thực dương";
-        break;
+      // case "weightpermeter":
+      //   if (catalog.type === "Thép Thanh") {
+      //     if (Number(value) <= 0) return "Phải là số thực dương";
+      //   }
+      //   break;
 
       case "type":
         if (!value.trim() === "#") return "Bắt buộc";
@@ -305,6 +316,7 @@ export function usePartnerFormLogic({
           if (value === "" || value === null) return "Bắt buộc cho Thép Thanh";
           if (isNaN(value) || Number(value) <= 0) return "Phải là số thực dương";
         }
+        
         break;
       case "weightperoll":
         // Only required if type is "Thép Cuộn"
@@ -312,6 +324,8 @@ export function usePartnerFormLogic({
           if (value === "" || value === null) return "Bắt buộc cho Thép Cuộn";
           if (isNaN(value) || Number(value) <= 0) return "Phải là số thực dương";
         }
+
+
         break;
     }
   }
@@ -424,11 +438,12 @@ export function usePartnerFormLogic({
       updatedCatalog.brandname = updatedProduct.brandname.trim();
 
     // Check for catalog autofill if both brandname and steeltype are present
-    if (updatedProduct.brandname && steeltype) {
+    if (updatedProduct.brandname && steeltype && updatedProduct.type) {
       const foundCatalog = catalogList.find(
         catalog =>
           catalog.brandname.trim().toLowerCase() === updatedProduct.brandname.trim().toLowerCase() &&
-          catalog.steeltype.trim().toLowerCase() === steeltype.trim().toLowerCase()
+          catalog.steeltype.trim().toLowerCase() === steeltype.trim().toLowerCase() &&
+          catalog.type.trim().toLowerCase() === updatedProduct.type.trim().toLowerCase()
       );
 
       if (foundCatalog) {
@@ -518,7 +533,7 @@ export function usePartnerFormLogic({
         }
 
         else {
-          console.log("Catalog: ", catalog);
+          
           catalogCalls.addCatalog(catalog)
             .then(() => {
               console.log('add product:', product); 

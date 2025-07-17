@@ -1,5 +1,5 @@
 import React, { useState,useEffect, useRef, use } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PartnerSearch from "../components/order/PartnerSearch";
 import ProductSearch from "../components/order/ProductSearch";
 import OrderTable from "../components/order/OrderTable";
@@ -8,6 +8,7 @@ import product from "../backendCalls/product";
 import { getUser } from "../backendCalls/user";
 import AddPartnerAndProductForm from "../components/order/partnerForm";
 import orderCalls from "../backendCalls/order";
+import toast from "react-hot-toast";
 const CreateOrder = ({user, setUser}) => {
   
 
@@ -37,6 +38,9 @@ const CreateOrder = ({user, setUser}) => {
   //------------------ USE REF --------------------
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
+  //------------------USE NAVIGATION --------------------
+  const navigate = useNavigate();
+
 
   useEffect(() => {
      if(!user){const getData = async () => {
@@ -81,14 +85,27 @@ const CreateOrder = ({user, setUser}) => {
     fetchPartners();
     fetchProducts();
   },[selectedProducts, selectedPartner]);
+  
+  
+  
   let checkNumberOfBars = () => {
-            const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0 || product.numberofbars == null);
-            if(invalidProducts.length > 0) {
-              return false;
-            }
-            return true;
-            
-          };
+  
+    const invalidProducts = selectedProducts.filter(product =>
+    {
+      //if product is Thep Thanh, check numberofbars
+      if(product.type === 'Thép Thanh') 
+        return !product.numberofbars || product.numberofbars <= 0;  
+      else{
+        //if product is Thep Cuon, check weight
+        return !product.weight || product.weight <= 0;
+      }
+    });  
+
+    if(invalidProducts.length > 0) {
+      return false;
+    }
+    return true;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -101,7 +118,7 @@ const CreateOrder = ({user, setUser}) => {
       type: "I",
       partnerid: selectedPartner?.id,
       address: selectedPartner?.address,
-      totalbars: totalBars,
+      totalbars: totalBars == undefined ? 0 : totalBars,
       totalweight: totalWeight,
       date: new Date().toISOString(),
       salesmanid: user.id,
@@ -109,13 +126,21 @@ const CreateOrder = ({user, setUser}) => {
 
       orderdetail: selectedProducts.map(product => ({
         productid: product?.id,
-        numberofbars: product?.numberofbars,
+        numberofbars: product?.numberofbars || 0,
         weight: product?.weight
         
         }))
     };
     console.log("Order Data:", orderData);
-    orderCalls.createImportOrder(orderData);
+    const response = await orderCalls.createImportOrder(orderData);
+    if(response.error) {
+      toast.error(response.error);
+      return
+    }
+    toast.success("Tạo đơn thành công !")
+    setTimeout(() => {
+      navigate(`/nhap-hang/${response.data.id}`);
+    }, 2000);
     setSelectedProducts([]);
     setSelectedPartner(null);
   };
@@ -150,6 +175,8 @@ const CreateOrder = ({user, setUser}) => {
             setShowForm={setShowForm}
             partnerList={partnerList}
             setPartnerList={setPartnerList}
+            productList={productList}
+            setProductList={setProductList}
             selectedProducts={selectedProducts}
             selectedPartner={selectedPartner}
             setSelectedPartner={setSelectedPartner}
@@ -222,7 +249,7 @@ const CreateOrder = ({user, setUser}) => {
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Tạo kế hoạch nhập hàng
+                Tạo đơn nhập hàng
               </button>
             </div>
           </div>

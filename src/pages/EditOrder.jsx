@@ -32,10 +32,13 @@ const EditOrder = ({user, setUser}) => {
   const [productFilteredSuggestions, setProductFilteredSuggestions] = useState([]);
   const [inputpartner, setInputpartner] = useState("");
   const [inputProduct, setInputProduct] = useState("");
+  const [refresh, setRefresh] = useState(false); // state to trigger re-rendering of the table
 
   //-- ACTIVE TAB
   const [activeTab, setActiveTab] = useState('partner'); // state to manage active tab
   const [showForm, setShowForm] = useState(false)
+    
+  const [formInitialData, setFormInitialData] = useState(null);
 
   
 
@@ -84,6 +87,12 @@ const extractOrderDetail = (orderdetail) => {
             }
             getData();
      }
+      if (!orderDetail) {
+      console.error("❌ No orderDetail found");
+      toast.error("Không tìm thấy thông tin đơn hàng");
+      navigate(-1);
+      return;
+    }
 
     const fetchPartners = async () => {
       try {
@@ -130,9 +139,18 @@ const extractOrderDetail = (orderdetail) => {
     fetchPartners();
     fetchProducts();
     fetchDeliveryDetails();
-    setSelectedPartner(orderDetail.partner || null);
+      console.log("🔍 orderDetail: ", orderDetail);
+     console.log("orderDetail partner: ", orderDetail.partner);
+    
+    if (orderDetail.partner) {
+      console.log("✅ Setting selectedPartner: ", orderDetail.partner);
+      setSelectedPartner(orderDetail.partner);
+    } else {
+      console.error("❌ orderDetail.partner is null/undefined");
+    }
+    
     const initialProducts = extractOrderDetail(orderDetail?.orderdetail);
-    console.log("Initial Products: ", initialProducts);
+   
     setSelectedProducts(initialProducts);
         
 
@@ -140,7 +158,7 @@ const extractOrderDetail = (orderdetail) => {
 
   
   },[]);
-  
+  console.log("orderDetapartner: ", selectedPartner);
 React.useEffect(() => {
   if (selectedProducts.length > 0) {
     console.log("selectedProducts updated: ", selectedProducts);
@@ -234,6 +252,8 @@ React.useEffect(() => {
               focused={focused}
               setFocused={setFocused}
               setActiveTab={tab => {setActiveTab(tab); setShowForm(true);}}
+              refresh={refresh}
+              setRefresh={setRefresh}
             />
           </div>
           {/* Right Column */}
@@ -242,6 +262,8 @@ React.useEffect(() => {
               <ProductSearch
                 inputProduct={inputProduct}
                 setInputProduct={setInputProduct}
+                inputpartner={inputpartner}
+                setInputpartner={setInputpartner}
                 selectedPartner={selectedPartner}
                 productList={productList}
                 productFilteredSuggestions={productFilteredSuggestions}
@@ -249,6 +271,8 @@ React.useEffect(() => {
                 selectedProducts={selectedProducts}
                 setSelectedProducts={setSelectedProducts}
                 setActiveTab={tab => {setActiveTab(tab); setShowForm(true);}}
+                refresh={refresh}
+                setRefresh={setRefresh}
               />
               <EditTable
                 // selectedProducts={selectedProducts}
