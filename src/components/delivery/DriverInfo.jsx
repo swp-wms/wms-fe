@@ -12,7 +12,7 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
     const addTruck = async (e) => {
         e.preventDefault();
         console.log(currentDelivery.gettime);
-        
+
         try {
             if (!driver.drivername || !driver.drivercode || !driver.licenseplate || !driver.driverphonenumber) {
                 setError('Bạn cần điền đầy đủ thông tin tài xế.');
@@ -24,8 +24,12 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
                 setError('Số điện thoại gồm 10 hoặc 11 chữ số, bắt đầu bằng số 0.');
             } else if (!currentDelivery.deliverytime || !currentDelivery.gettime) {
                 setError('Thời gian bốc hàng và giao hàng cần được điền.');
+            } else if (currentDelivery.getdate === currentDelivery.deliverydate) {
+                if (currentDelivery.deliverytime < currentDelivery.gettime) {
+                    setError('Thời gian giao hàng không thể sớm hơn thời gian bốc hàng.');
+                }
             } else {
-                await handleAddTruck(currentDelivery.id, {...driver, deliverytime: currentDelivery.deliverytime, gettime: currentDelivery.gettime});
+                await handleAddTruck(currentDelivery.id, { ...driver, deliverytime: currentDelivery.deliverytime, gettime: currentDelivery.gettime });
                 setError();
                 setCurrentDelivery({
                     ...currentDelivery,

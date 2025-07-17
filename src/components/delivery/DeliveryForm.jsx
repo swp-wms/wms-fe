@@ -65,6 +65,11 @@ const DeliveryForm = ({
         e.preventDefault();
         if (document.querySelector('.DeliveryForm').checkValidity()) {
             setError();
+            
+            if((new Date()) > new Date(newDelivery.getdate)) {
+                setError('Ngày vận chuyển không thể sớm hơn thời gian hiện tại.');
+                return;
+            }
             if (newDelivery.getdate > newDelivery.deliverydate) {
                 setError('Ngày vận chuyển không thể sớm hơn ngày bốc hàng.');
                 return;
