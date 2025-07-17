@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faBackward } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlus,
+  faBackward,
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import { createNewUser } from "../../backendCalls/userInfo";
 import toast from "react-hot-toast";
 
@@ -13,6 +18,8 @@ const CreateUserModal = ({ onSuccess, onCancel }) => {
   });
   const [isCreating, setIsCreating] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const positions = [
     "Salesman",
@@ -24,6 +31,15 @@ const CreateUserModal = ({ onSuccess, onCancel }) => {
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    if (password.length < 8 || password.length > 30) {
+      return "Mật khẩu tối thiểu 8 ký tự. Tối đa 30 ký tự.";
+    } else if (!/^(?=.*\d)(?=.*[a-zA-Z]).*$/.test(password)) {
+      return "Mật khẩu phải chứa cả chữ và số.";
+    }
+    return "";
   };
 
   const getRoleIdFromName = (roleName) => {
@@ -46,12 +62,18 @@ const CreateUserModal = ({ onSuccess, onCancel }) => {
       ...prev,
       [field]: value,
     }));
+
     if (field === "username") {
       if (value && !validateEmail(value)) {
         setEmailError("Tên đăng nhập phải có định dạng email hợp lệ");
       } else {
         setEmailError("");
       }
+    }
+
+    if (field === "password") {
+      const error = validatePassword(value);
+      setPasswordError(error);
     }
   };
 
@@ -66,11 +88,10 @@ const CreateUserModal = ({ onSuccess, onCancel }) => {
       return;
     }
 
-    // if (!validateEmail(createFormData.username)) {
-    //   toast.error("Tên đăng nhập phải có định dạng email hehehehehe!");
+    // if (emailError || passwordError) {
+    //   toast.error("HEHEHEHEHEHE");
     //   return;
     // }
-    // Check emailError => disable nút CF
 
     setIsCreating(true);
     try {
@@ -81,16 +102,12 @@ const CreateUserModal = ({ onSuccess, onCancel }) => {
         roleid: getRoleIdFromName(createFormData.role),
       };
       const response = await createNewUser(newUserData);
-
       console.log("New User Data:", newUserData);
       console.log("Response:", response);
-
       if (response.status === 200 || response.status === 201) {
         toast.success("Tạo tài khoản thành công!");
         onSuccess();
-      } 
-      //Kiểm tra email tồn tại
-      else if (response.status === 409) {
+      } else if (response.status === 409) {
         toast.error("TÊN ĐĂNG NHẬP đã tồn tại!");
       } else {
         toast.error("Có lỗi xảy ra khi tạo tài khoản!");
@@ -178,22 +195,41 @@ const CreateUserModal = ({ onSuccess, onCancel }) => {
               <label className="w-32 text-sm font-medium text-gray-700">
                 MẬT KHẨU:
               </label>
-              <input
-                type="password"
-                value={createFormData.password}
-                onChange={(e) =>
-                  handleCreateFormChange("password", e.target.value)
-                }
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Nhập mật khẩu"
-              />
+              <div className="flex-1">
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={createFormData.password}
+                    onChange={(e) =>
+                      handleCreateFormChange("password", e.target.value)
+                    }
+                    className={`w-full px-3 py-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      passwordError ? "border-red-500" : "border-gray-300"
+                    }`}
+                    placeholder="Nhập mật khẩu"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    <FontAwesomeIcon
+                      icon={showPassword ? faEyeSlash : faEye}
+                      className="h-4 w-4"
+                    />
+                  </button>
+                </div>
+                {passwordError && (
+                  <p className="text-red-500 text-xs mt-1">{passwordError}</p>
+                )}
+              </div>
             </div>
           </div>
           {/* Buttons */}
           <div className="flex flex-col gap-3">
             <button
               onClick={handleCreateUser}
-              disabled={isCreating || emailError}
+              disabled={isCreating || emailError || passwordError}
               className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 min-w-[100px]"
             >
               <FontAwesomeIcon icon={faPlus} />
