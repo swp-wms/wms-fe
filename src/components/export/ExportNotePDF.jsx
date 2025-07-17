@@ -224,7 +224,9 @@ const ImportNotePDF = ({ currentDelivery, currentDeliveryDetail, currentOrder })
       </View>
 
       <View style={styles.section}>
-        <Text>Tổng số tiền (Viết bằng chữ): {VNnum2words(currentDeliveryDetail.realsum)} kilogram</Text>
+        <Text>Tổng số tiền (Viết bằng chữ): {String((currentDeliveryDetail.realsum).toFixed(2)).split('.').length > 1
+          ? `${VNnum2words(String((currentDeliveryDetail.realsum).toFixed(2)).split('.')[0])} phẩy ${VNnum2words(String((currentDeliveryDetail.realsum).toFixed(2)).split('.')[1])}`
+          : VNnum2words((currentDeliveryDetail.realsum).toFixed(2))} kilogram</Text>
       </View>
 
       {/* Footer / Signatures */}

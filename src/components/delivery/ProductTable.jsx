@@ -33,7 +33,7 @@ const ProductTable = ({
         });
 
         for (let index = 0; index < realData.length; index++) {
-            if (realData[index].productid === null || realData[index].realnumberofbars === null || realData[index].realtotalweight === null) {
+            if (realData[index].productid === null || (currentDeliveryDetail.deliveryDetail[index].length !== 0 && realData[index].realnumberofbars === null) || realData[index].realtotalweight === null) {
                 return setError("Vui lòng nhập đầy đủ thông tin về khối lượng thực tế và số lượng thực tế.");
             }
         }
@@ -168,9 +168,10 @@ const ProductTable = ({
                                                 });
                                         }}
                                         min={1}
-                                        required
+                                        readOnly={d.length === 0 ? true : false}
+                                        required={d.length !== 0 ? true : false}
                                         value={currentDeliveryDetail.deliveryDetail[index].realnumberofbars ? currentDeliveryDetail.deliveryDetail[index].realnumberofbars : ''}
-                                        type="number" placeholder='...'
+                                        type="number" placeholder={d.length === 0 ? 'T.cuộn' : '...'}
                                         className='w-[60px] text-center'
                                     />
                                 ) : d.realnumberofbars}
@@ -224,9 +225,10 @@ const ProductTable = ({
                                             }
                                         }}
                                         min={1}
-                                        required
+                                        readOnly={d.length === 0 ? true : false}
+                                        required={d.length !== 0 ? true : false}
                                         value={newDeliveryList[index].numberofbars}
-                                        type="number" placeholder='...'
+                                        type="number" placeholder={d.length === 0 ? 'T.cuộn':'...'}
                                         className='w-[60px] text-center'
                                     />
                                 </td>
@@ -236,10 +238,11 @@ const ProductTable = ({
                                             onChange={(e) => {
                                                 setNewDeliveryList([...newDeliveryList].map((d, i) => i === index ? { ...d, realnumberofbars: e.target.value } : d));
                                             }}
-                                            required
+                                            readOnly={d.length === 0 ? true : false}
+                                            required={d.length !== 0 ? true : false}
                                             min={1}
                                             value={newDeliveryList[index].realnumberofbars}
-                                            type="number" className='w-[100%] text-center' placeholder="..."
+                                            type="number" className='w-[100%] text-center' placeholder={d.length === 0 ? 'T.cuộn':'...'}
                                         />
                                     </td>
                                 }
