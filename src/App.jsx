@@ -19,6 +19,7 @@ import Statistic from "./pages/Statistic";
 import DeliverySchedule from "./pages/DeliverySchedule";
 import Profile from "./pages/Profile";
 import AdminPage from "./pages/AdminPage";
+import Partner from "./pages/Partner";
 
 import Error404 from "./pages/Error-404";
 import Error403 from "./pages/Error-403";
@@ -32,20 +33,25 @@ function App() {
     <div>
       {user && <Header user={user} setUser={setUser} />}
       <Routes>
-        
         <Route path="/" element={<Home setUser={setUser} user={user} />} />
         <Route path="/dang-nhap" element={<Login />} />
 
         <Route path="/quen-mat-khau" element={<ForgotPassword />} />
-        <Route path="/nhap-hang" element={<ImportOrder setUser={setUser} user={user}  />} />
-        <Route path='/xuat-hang' element={<ExportOrder setUser={setUser} user={user}/>} />
+        <Route
+          path="/nhap-hang"
+          element={<ImportOrder setUser={setUser} user={user} />}
+        />
+        <Route
+          path="/xuat-hang"
+          element={<ExportOrder setUser={setUser} user={user} />}
+        />
         <Route
           path="/nhap-hang/tao-don-nhap-hang"
           element={<CreateImportOrder setUser={setUser} user={user} />}
         />
-        <Route path='/doi-tac' element={<FormTemplate />} />
+        <Route path="/doi-tac" element={<FormTemplate />} />
         <Route
-          path='/xuat-hang/tao-don-xuat-hang'
+          path="/xuat-hang/tao-don-xuat-hang"
           element={<CreateExportOrder setUser={setUser} user={user} />}
         />
         {/* View Order */}
@@ -69,7 +75,11 @@ function App() {
           setUser={setUser}
           user={user}
         />} />
-        <Route path="/ke-hoach-van-chuyen/:act" element={<DeliverySchedule
+        <Route path="/ke-hoach-van-chuyen/:act/:orderId/:deliveryId" element={<DeliverySchedule
+          setUser={setUser}
+          user={user}
+        />} />
+        <Route path="/ke-hoach-van-chuyen/:act/*" element={<DeliverySchedule
           setUser={setUser}
           user={user}
         />} />
@@ -84,10 +94,15 @@ function App() {
           element={<AdminPage user={user} setUser={setUser} />}
         />
 
+        <Route
+          path="/thong-tin-doi-tac"
+          element={<Partner user={user} setUser={setUser} />}
+        />
         <Route path="/danh-muc" element={<Catalog user={user} setUser={setUser} />} />
 
         <Route path="/error403" element={<Error403 user={user} setUser={setUser} />} />
         <Route path="/error404" element={<Error404 user={user} setUser={setUser} />} />
+
       </Routes>
     </div>
   );

@@ -1,5 +1,6 @@
 
-const DeliveryInfo = ({ currentOrder, currentDelivery, newDelivery, setNewDelivery }) => {
+const DeliveryInfo = ({ currentOrder, currentDelivery, setCurrentDelivery, newDelivery, setNewDelivery, user }) => {
+    
     return (
         <div>
             <div className="mb-3 flex">
@@ -15,7 +16,7 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, newDelivery, setNewDelive
                             setNewDelivery({ ...newDelivery, getdate: e.target.value })
                         }}
                         readOnly={currentDelivery ? true : false}
-                        value={currentDelivery ? currentDelivery.getdate : newDelivery.getdate}
+                        value={currentDelivery ? currentDelivery.getdate : newDelivery.getdate ? newDelivery.getdate : ''}
                         required
                         className='border-[1px] border-[#aaa] rounded py-1 px-2' type="date"
                     />
@@ -27,10 +28,10 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, newDelivery, setNewDelive
                     <input
                         type="time"
                         onChange={(e) => {
-                            setNewDelivery({ ...newDelivery, gettime: e.target.value })
+                            setCurrentDelivery({ ...currentDelivery, gettime: e.target.value })
                         }}
-                        readOnly={currentDelivery ? true : false}
-                        value={currentDelivery ? currentDelivery.gettime : newDelivery.gettime}
+                        readOnly={(user.roleid === 5 && Math.abs(Number(currentDelivery?.deliverystatus)) === 1) ? false : true}
+                        value={currentDelivery ? currentDelivery.gettime : newDelivery.gettime ? newDelivery.gettime : ''}
                         required
                         className='border-[1px] border-[#aaa] rounded py-1 px-2' 
                     />
@@ -46,7 +47,7 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, newDelivery, setNewDelive
                             setNewDelivery({ ...newDelivery, deliverydate: e.target.value })
                         }}
                         readOnly={currentDelivery ? true : false}
-                        value={currentDelivery ? currentDelivery.deliverydate : newDelivery.deliverydate}
+                        value={currentDelivery ? currentDelivery.deliverydate : newDelivery.deliverydate ? newDelivery.deliverydate : ''}
                         required
                         className='border-[1px] border-[#aaa] rounded py-1 px-2' type="date"
                     />
@@ -57,10 +58,11 @@ const DeliveryInfo = ({ currentOrder, currentDelivery, newDelivery, setNewDelive
                     <input
                         type="time"
                         onChange={(e) => {
-                            setNewDelivery({ ...newDelivery, deliverytime: e.target.value })
+                            setCurrentDelivery({ ...currentDelivery, deliverytime: e.target.value })
+                            
                         }}
-                        readOnly={currentDelivery ? true : false}
-                        value={currentDelivery ? currentDelivery.deliverytime : newDelivery.deliverytime}
+                        readOnly={(user.roleid === 5 && Math.abs(Number(currentDelivery?.deliverystatus)) === 1) ? false : true}
+                        value={currentDelivery ? currentDelivery.deliverytime : newDelivery.deliverytime ? newDelivery.deliverytime : ''}
                         required
                         className='border-[1px] border-[#aaa] rounded py-1 px-2'
                     />

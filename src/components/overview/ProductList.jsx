@@ -126,19 +126,20 @@ const ProductList = () => {
             <input type="file" className="hidden" onChange={handleFileUpload} />
           </label>
 
-          <div
+          <button
             className="flex bg-white shadow-btn py-2 px-4 items-center gap-4 rounded-sm cursor-pointer"
             onClick={handleAddNew}
           >
             <FontAwesomeIcon icon={faSquarePlus} />
             <span className="font-medium">Thêm hàng hóa</span>
-          </div>
+          </button>
         </div>
       </div>
 
       <TableList
         data={paginatedData}
         onEdit={handleEdit}
+        setSelectedProduct={setSelectedProduct}
       />
 
       <div className="flex justify-center mt-2 gap-2 mb-8">

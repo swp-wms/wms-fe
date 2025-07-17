@@ -131,12 +131,20 @@ const ProductEdit = ({ product, onClose, onUpdate }) => {
           <div>
             <label className="block mb-1 font-medium">Tên đối tác:</label>
             <select
-              name="brandname"
-              value={formData.brandname || ""}
+              name="partner"
               onChange={handleChange}
               className="w-full border px-2 py-1 rounded"
             >
-              <option value="" className="truncate">{product.partner.name}</option>
+              {product.partner === null ? (
+                <option value="" className="truncate">
+                  {product.partner.name}
+                </option>
+              ) : (
+                <option value="" disabled selected className="truncate">
+                  Vui lòng chọn đối tác
+                </option>
+              )}
+
               {partners.map((partner) => (
                 <option key={partner.id} value={partner.name}>
                   {partner.name}

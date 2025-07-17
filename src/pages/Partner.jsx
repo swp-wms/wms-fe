@@ -1,9 +1,9 @@
 import React from "react";
 import { useEffect } from "react";
 import { getUser } from "../backendCalls/user";
-import AccountManage from "../components/admin/AccountManage";
+import PartnerManagement from "../components/partner/PartnerManagement";
 
-const AdminPage = ({user, setUser}) => {
+const Partner = ({user, setUser}) => {
     useEffect(() => {
             if (!user) {
                 const getData = async () => {
@@ -18,8 +18,9 @@ const AdminPage = ({user, setUser}) => {
             }
         }, []);
     return(
-        <AccountManage/>
+        // <h1>Hello</h1>
+        <PartnerManagement/>
     )
 };
 
-export default AdminPage;
+export default Partner;

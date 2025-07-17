@@ -1,7 +1,6 @@
 const baseUrl = "http://localhost:3800";
 
 export const api = {
-
     LOGIN: `${baseUrl}/login`,
     LOGOUT: `${baseUrl}/logout`,
     REGISTER: `${baseUrl}/register`,
@@ -78,7 +77,8 @@ export const api = {
 
   //notification API
   GET_NOTIFS: `${baseUrl}/notification`,
-  SEEN_NOTIF: (notifId) => `${baseUrl}/notification/${notifId}`
+  GET_SEEN_NOTIF: (index) => `${baseUrl}/notification/seen/${index}`,
+  SEEN_NOTIF: (notifId) => `${baseUrl}/notification/${notifId}`,
 }
 
   

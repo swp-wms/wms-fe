@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAnglesDown, faAnglesUp } from "@fortawesome/free-solid-svg-icons";
+import { faAnglesDown, faAnglesUp, faLayerGroup } from "@fortawesome/free-solid-svg-icons";
 import {
   fetchWarehouses,
   fetchWarehousesByDate,
@@ -52,7 +52,7 @@ const WarehouseStatus = () => {
   const difference = estimated - actual;
 
   let changeLabel = "";
-  let icon = "";
+  let icon = faLayerGroup;
   if (difference > 0) {
     icon = faAnglesUp;
     changeLabel = `Tăng ${difference.toFixed(4)}%`;

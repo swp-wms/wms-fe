@@ -6,6 +6,7 @@ import {
   faTruckFast,
   faFile,
   faShapes,
+  faHandshake,
   faBookOpenReader
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -43,7 +44,7 @@ const sideElement = [
       icon: faChartSimple,
       path: "/thong-ke-kho",
       name: "Thống kê kho",
-      allowed: [3]
+      allowed: [3, 4]
     },
     {
       id: 5,
@@ -54,11 +55,12 @@ const sideElement = [
     },
     {
       id: 6,
-      icon: faFile,
-      path: "/cac-loai-don-tu-khac",
-      name: "Các loại đơn từ khác",
-      allowed: [3, 4, 5]
-    }, {
+      icon: faHandshake,
+      path: "/thong-tin-doi-tac",
+      name: "Thông tin đối tác",
+      allowed: [3]
+    },
+    {
       id: 7,
       icon: faFile,
       path: "/danh-sach-nguoi-dung",
@@ -68,7 +70,7 @@ const sideElement = [
       id: 8,
       icon: faBookOpenReader,
       path: "/danh-muc",
-      "name": "Danh mục thép",
+      name: "Danh mục thép",
       allowed: [3]
     }
     

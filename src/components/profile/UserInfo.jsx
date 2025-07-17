@@ -23,15 +23,15 @@ const UserInfo = () => {
   });
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const getData = async () => {
       let response = await getUserInfo();
       console.log("check useeffect", response);
       setUser(response.data);
     };
-    fetchUserInfo();
+    getData();
   }, []);
 
-  let [edit, setEdit] = useState(false);
+  const [edit, setEdit] = useState(false);
 
   const handleEditInfoButton = async () => {
     console.log("Edit: ", edit);
@@ -48,6 +48,12 @@ const UserInfo = () => {
   const handleEditPassWordButton = async () => {
     console.log("Edit: ", editPassWord);
     setEditPassWord(!editPassWord);
+  };
+
+  const handleSavePassWordButton = async () => {
+    await updateUserInfo(user);
+    console.log("User: ", user);
+    setEditPassWord(false);
   };
 
   return (
@@ -81,7 +87,7 @@ const UserInfo = () => {
             <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
               <svg
                 className="w-20 h-20 text-gray-400"
-                fill="currentColor"
+                // fill="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
@@ -173,6 +179,7 @@ const UserInfo = () => {
                 value={user.username}
                 readOnly={!edit}
                 onChange={(e) => setUser({ ...user, username: e.target.value })}
+                
                 className="flex-1 ml-2 h-8 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -346,20 +353,27 @@ const UserInfo = () => {
                 </button>
               </div>
             </div>
+
+
+            
             {/* Div change password */}
             <div className={editPassWord ? "block" : "hidden"}>
               <div className="flex items-center gap-6">
                 <span className="text-sm font-medium text-gray-700 w-32">
                   MẬT KHẨU MỚI:
                 </span>
-                <input className="text-sm text-gray-900 bg-white px-3 py-1 rounded border" />
+                <input
+                  className="text-sm text-gray-900 bg-white px-3 py-1 rounded border"
+                />
               </div>
 
               <div className="flex items-center gap-6 mt-3">
                 <span className="text-sm font-medium text-gray-700 w-32">
                   NHẬP LẠI MẬT KHẨU:
                 </span>
-                <input className="text-sm text-gray-900 bg-white px-3 py-1 rounded border" />
+                <input
+                  className="text-sm text-gray-900 bg-white px-3 py-1 rounded border"
+                />
               </div>
               <div className="flex justify-end">
                 <div className="">
@@ -375,6 +389,7 @@ const UserInfo = () => {
                 <div className="">
                   <button className="p-2 hover:bg-gray-200 rounded mx-2">
                     <FontAwesomeIcon
+                      onClick={() => handleEditPassWordButton()}
                       icon={faDownload}
                       className="text-lg text-gray-600"
                     />
