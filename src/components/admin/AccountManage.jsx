@@ -28,13 +28,6 @@ const AccountManage = () => {
         }
         const userData = response.data;
         console.log("API Response:", userData);
-        if (userData && userData.length > 0) {
-          console.log(
-            "First user status:",
-            userData[0].status,
-            typeof userData[0].status
-          );
-        }
         setUsers(Array.isArray(userData) ? userData : []);
       } catch (error) {
         console.error("Error fetching user data:", error);
