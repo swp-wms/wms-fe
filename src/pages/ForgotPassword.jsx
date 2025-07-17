@@ -108,12 +108,12 @@ const ForgotPassword = () => {
                     {step === 2 &&
                         <>
                             <div className="flex justify-between">
-                                <input className="login-input text-center text-xl font-bold" autoFocus={true} style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, 1: e.target.value })} value={otp[1]} />
-                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, 2: e.target.value })} value={otp[2]} />
-                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, 3: e.target.value })} value={otp[3]} />
-                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, 4: e.target.value })} value={otp[4]} />
-                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, 5: e.target.value })} value={otp[5]} />
-                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, 6: e.target.value })} value={otp[6]} />
+                                <input className="login-input text-center text-xl font-bold" autoFocus={true} style={{ width: '15%', padding: '8px 0' }} type="text" inputMode="numeric" maxLength={1} onChange={(e) => setOtp({ ...otp, 1: e.target.value })} value={otp[1]} />
+                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} inputMode="numeric" type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, 2: e.target.value })} value={otp[2]} />
+                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" inputMode="numeric" maxLength={1} onChange={(e) => setOtp({ ...otp, 3: e.target.value })} value={otp[3]} />
+                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" inputMode="numeric" maxLength={1} onChange={(e) => setOtp({ ...otp, 4: e.target.value })} value={otp[4]} />
+                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" inputMode="numeric" maxLength={1} onChange={(e) => setOtp({ ...otp, 5: e.target.value })} value={otp[5]} />
+                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" inputMode="numeric" maxLength={1} onChange={(e) => setOtp({ ...otp, 6: e.target.value })} value={otp[6]} />
                             </div>
                             <p className="text-xs py-2">Kiểm tra hòm thư của bạn để lấy mã OTP</p>
                             <button className="login-button" onClick={(e) => { handleCheckOtp(e) }}>
