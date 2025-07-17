@@ -1,5 +1,6 @@
 import { PDFViewer } from "@react-pdf/renderer"
 import ImportNotePDF from "../export/ImportNotePDF"
+import ExportNotePDF from "../export/ExportNotePDF"
 
 
 const PDFPopup = ({ setShowNote, currentDelivery, act, currentDeliveryDetail, currentOrder }) => {
@@ -11,7 +12,10 @@ const PDFPopup = ({ setShowNote, currentDelivery, act, currentDeliveryDetail, cu
             <div onClick={(e) => e.stopPropagation()}>
 
                 <PDFViewer style={{ width: '60vw', height: '70vh' }}>
-                    <ImportNotePDF currentDelivery={currentDelivery} currentOrder={currentOrder} currentDeliveryDetail={currentDeliveryDetail}/>
+                    {act === 'nhap'
+                        ? <ImportNotePDF currentDelivery={currentDelivery} currentOrder={currentOrder} currentDeliveryDetail={currentDeliveryDetail} />
+                        : <ExportNotePDF currentDelivery={currentDelivery} currentOrder={currentOrder} currentDeliveryDetail={currentDeliveryDetail} />
+                    }
                 </PDFViewer>
             </div>
         </div>

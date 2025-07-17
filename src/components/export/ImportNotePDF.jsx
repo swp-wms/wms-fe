@@ -1,6 +1,7 @@
 import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 import Roboto from './font/Roboto_Condensed-Medium.ttf';
 import RobotoRegular from './font/Roboto_Condensed-Regular.ttf';
+import VNnum2words from 'vn-num2words';
 
 Font.register({
   family: 'Roboto',
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const ImportNotePDF = ({currentDelivery, currentDeliveryDetail, currentOrder}) => (
+const ImportNotePDF = ({ currentDelivery, currentDeliveryDetail, currentOrder }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       {/* Header Section */}
@@ -169,7 +170,7 @@ const ImportNotePDF = ({currentDelivery, currentDeliveryDetail, currentOrder}) =
       {/* Recipient/Delivery Info */}
       <View style={styles.section}>
         <View style={styles.sectionRow}>
-          <Text style={styles.label}>Họ và tên người giao:</Text>
+          <Text style={styles.label}>Họ và tên người giao hàng:</Text>
           <Text style={styles.value}>{currentDelivery.drivername}</Text>
         </View>
         <View style={styles.sectionRow}>
@@ -223,7 +224,7 @@ const ImportNotePDF = ({currentDelivery, currentDeliveryDetail, currentOrder}) =
       </View>
 
       <View style={styles.section}>
-        <Text>Tổng số tiền (Viết bằng chữ): Bốn trăm hai mươi ba triệu, chín trăm sáu mươi tám nghìn, bảy trăm chín mươi tám đồng chẵn!</Text>
+        <Text>Tổng số tiền (Viết bằng chữ): {VNnum2words(currentDeliveryDetail.realsum)} kilogram</Text>
       </View>
 
       {/* Footer / Signatures */}
