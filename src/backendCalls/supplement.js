@@ -31,7 +31,21 @@ const addSupplementOrder = async(order) => {
     }
 }
 
+const getSupplementById = async(id) => {
+    try{
+        const response = await axios.get(api.GET_SUPPLEMENT_DETAIL_BY_ID(id), {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        return response.data;
+    }catch(error){
+        console.log("error: ",error);
+    }
+}
+
 export default {
     getSupplementByOrderId,
-    addSupplementOrder
+    addSupplementOrder,
+    getSupplementById
 };

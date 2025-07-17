@@ -90,11 +90,28 @@ const updateOrder = async (id,data) =>{
   }
 }
 
+const getProductGeneral = async() => {
+    try{
+        const response = await axios.get(`${api.GET_PRODUCT_GENERAL}`,{
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            }
+
+        });
+        console.log("Product General Data:", response.data);
+        return response.data;
+    }catch(error){
+        console.error("Exception fetching product general data:", error);
+        throw error;
+    }
+}
+
 export default {
     getImportOrder,
     getExportOrder,
     getOrderDetail,
     createImportOrder,
     fetchDeliveryDetails,
-    updateOrder
+    updateOrder,
+    getProductGeneral
 }

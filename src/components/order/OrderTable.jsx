@@ -1,7 +1,10 @@
 import React, {useState, useEffect} from "react";
 import { toast } from "react-hot-toast";
+import Popup from 'reactjs-popup';
+import order from "../../backendCalls/order";
+import '../../index.css';
 
-const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalBars, totalWeight }) => {
+const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, productList, totalBars, totalWeight, setActiveTab,TYPE }) => {
   // Handler for changing product fields (e.g. quantity)
   
   useEffect(() => {
@@ -21,41 +24,52 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
     // } 
 
   const checkNumberOfBars = () => {
-    const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0);
+    
+    const invalidProducts = selectedProducts.filter(product => product.numberofbars <= 0 && product.type === 'Thép Thanh');
+    
     if(invalidProducts.length > 0) {
       toast.error("Số lượng hàng hóa mỗi loại phải lớn hơn 0");
       return false;
     }
     return true;
-    
   }
   checkNumberOfBars();
 
+  
+
   }, [selectedProducts, setSelectedProducts]);
+
+  
+
+
   const handleProductFieldChange = (id, field, value) => {
     if (
-      (field === "numberofbars" || field === "weight") &&
-      (isNaN(value) || value === '' || Number(value) < 0)
+      (field === "numberofbars" || field === "weight") 
+      && value === '' 
+      && (isNaN(value) ||  Number(value) < 0)
     ) {
       return; // Do not update if invalid
     }
     let updateProduct = selectedProducts.find(product => product.trueId === id);
     
-    if(updateProduct)  {
-      updateProduct[field] = value;
+    if(updateProduct) {
+    
+    updateProduct = {
+      ...updateProduct,
+      [field]: value
+      };
       
-
       if(field === "numberofbars") {
         if(updateProduct.catalog?.type === "Thép Thanh") {
           let w = (updateProduct.catalog?.weightperbundle / updateProduct.catalog?.barsperbundle) * value; // Assuming weight is calculated based on catalog length and number of bars
           updateProduct.weight = w.toFixed(2); // Update weight based on number of bars
+        } else if (value === '') {
+          // ✅ Clear weight when number of bars is cleared
+          updateProduct.weight = '';
         }
-        if(updateProduct.catalog?.type === "Thép Cuộn") {
-          let w = (updateProduct.catalog?.weightperroll * value);
-          updateProduct.weight = w.toFixed(2);
-        }
+        
       }
-
+    
       if(field === "name"){
         // let steelType = value.match("/(?<=CB)(D\d+)/");
 
@@ -132,27 +146,66 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
     setSelectedProducts(products.sort((a,b) => a.trueId - b.trueId));
   }
  
-  return (
-    <div className="m-4 bg-white border-1 border-gray-600 overflow-hidden">
-      <div className="h-full flex flex-col">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-4">STT</th>
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-16">Mã hàng</th>
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Tên hãng</th>
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Tên hàng hóa</th>
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Dài</th>
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Số lượng</th>
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Khối lượng</th>
-              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Ghi chú</th>
-              <th className=" px-2 py-2 text-xs font-bold text-black w-5"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {selectedProducts.map((product, index) => (
-              <tr key={product.trueId || index}>
-                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-4">{product.trueId}</td>
+  const handleBrandNameSelect = (e,product) =>{
+    const selectedid= e.target.value;
+    const selected = product.matchingProduct.find(p => p.id == selectedid);
+    console.log("selected: ", selected);
+    
+  
+  // Update the product's brandname using your existing function
+  console.log("Selected brand name: ", selected.catalog.brandname);
+  handleProductFieldChange(product.trueId, "brandname", selected.catalog.brandname);
+  
+
+  console.log("Selected partner: ", selected.partner);
+  handleProductFieldChange(product.trueId, "partner", selected.partner);
+  
+  console.log("Selected catalog: ", selected.catalog);
+  handleProductFieldChange(product.trueId, "catalog", selected.catalog);
+
+  }
+
+  const popupTableRow = (product, index) =>{
+    const extractSteelType = (productName) => {
+    if (!productName) return '';
+    const match = productName.match(/D\d+/);
+    return match ? match[0] : '';
+  };
+  
+  const handleAddProductToForm = () => {
+    const initialData = {
+      product: {
+        trueId: product.trueId,
+        name: product.name || '',
+        namedetail: product.namedetail || '',
+        brandname: product.brandname || '',
+        steeltype: extractSteelType(product.name),
+        type: product.catalog?.type || '',
+        partnerid: selectedPartner?.id || ''
+      },
+      catalog: {
+        brandname: product.brandname || '',
+        steeltype: extractSteelType(product.name),
+        type: product.catalog?.type || '',
+        length: product.catalog?.length || 0,
+        barsperbundle: product.catalog?.barsperbundle || 0,
+        weightpermeter: product.catalog?.weightpermeter || null,
+        weightperbundle: product.catalog?.weightperbundle || null,
+        weightperroll: product.catalog?.weightperroll || null,
+        standard: product.catalog?.standard || ''
+      }
+    };
+
+    // Call setActiveTab with data
+    setActiveTab('product', initialData);
+  };
+
+    return (
+     <Popup
+        key={product.trueId || index}
+        trigger={
+              <tr >
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-2">{product.trueId}</td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-16">
                     {/* <input
                       type="text"
@@ -163,13 +216,27 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
                     {product.name}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
-                    {/* <input
-                      type="text"
-                      className="w-full h-full focus:outline-none"
-                      value={product.brandname || ''}
-                      onChange={e => handleProductFieldChange(product.trueId, "brandname", e.target.value)}
-                    /> */}
-                    {product.brandname}
+                   {TYPE == "I" ? (
+                      <>
+                        {/* Show brandname for factory partners */}
+                        {selectedPartner && selectedPartner.isfactory && (
+                          <span>{product.brandname}</span>
+                        )}
+                        
+                        {/* Show select for non-factory partners or when no partner selected */}
+                        {(!selectedPartner || !selectedPartner.isfactory) && (
+                          <select onChange={(e) => handleBrandNameSelect(e, product)}>
+                            <option value="">Chọn hãng</option>
+                            {product.matchingProduct?.map((p, index) => (
+                              <option key={index} value={p.id}>{p.brandname}</option>
+                            ))}
+                          </select>
+                        )}
+                      </>
+                    ) : (
+                      <span>{product.brandname}</span>
+                    )}
+
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
                   {/* <input
@@ -189,11 +256,12 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
                   /> */}
                   {product.catalog?.length}
                 </td>
-                <td className="border border-gray-800  py-2 text-xs text-black w-9">
+                <td className="border border-gray-800  py-2 text-xs text-black w-9 disabled:bg-gray-100">
                   <input
                     type="number"
-                    className="w-full h-full focus:outline-none"
+                    className="w-full h-full py-5 focus:outline-none disabled:bg-gray-100"
                     value={product.numberofbars || ''}
+                    disabled = {product.catalog?.type === "Thép Cuộn"}
                     onChange={e => {
                         const val = e.target.value;
                         if (/^\d*$/.test(val)) { // Only allow non-negative integers
@@ -207,6 +275,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
                     type="number"
                     className="w-full h-full focus:outline-none"
                     value={product.weight || ''}
+                    
                     onChange={e => {
                       const val = e.target.value;
                       if (/^\d*\.?\d*$/.test(val)) { // Only allow non-negative numbers
@@ -223,27 +292,202 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
                     onChange={e => handleProductFieldChange(product.trueId, "note", e.target.value)}
                   />
                 </td>
-                <td className="py-1 text-xs text-black flex flex-col gap-1 justify-items-center align-items-center" >
-                    <svg xmlns="http://www.w3.org/2000/svg" 
-                    viewBox="0 0 24 24" 
-                    fill="currentColor" 
-                    className="size-4">
-                      <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
-                      <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
-                    </svg>
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20" >
+                  <div className="flex flex-row gap-1 justify-around justify-items-center align-items-center">
+                   
+                  <button className="p-1.5 text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-200 rounded transition-colors" 
+                     onClick={() => deleteProduct(product.trueId)} title="Xóa">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                  </button>
 
-
-                  <svg xmlns="http://www.w3.org/2000/svg" 
-                  viewBox="0 0 24 24" fill="currentColor" 
-                  className="size-4 hover:cursor-pointer text-red-700"
-                  onClick={() => deleteProduct(product.trueId)}>
-                    <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z" clipRule="evenodd" />
-                  </svg>
-
-                  
+                  </div>
                 </td>
               </tr>
-            ))}
+        }
+        on="hover"
+        position="top center"
+        arrow={true}
+        arrowStyle={{ 
+                    
+                    color: 'white',           // White arrow to match background
+                          // Solid border style
+      
+                    }}
+        contentStyle={{ 
+                        background: 'white',      // White background
+                        color: 'black',           // Black text
+                        border: '1px solid black', // Black border around popup
+                        borderRadius: '8px',
+                        padding: '12px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        fontSize: '12px',
+                        maxWidth: '300px',
+                        zIndex: 1000
+                      }}
+        >
+            Mặt hàng này chưa tồn tại, bạn có muốn thêm thông tin?
+            <button className="mx-2 p-1.5 flex text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-200 rounded transition-colors" 
+                        title="Chỉnh sửa"
+                        onClick={() => handleAddProductToForm()}>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        <div className="mx-1">
+                        Thêm hàng hóa
+                        </div>
+                  </button>
+              </Popup>
+              );
+  }
+
+  const normalTableRow = (product, index) => {
+    return(
+    <tr key={product.trueId || index}>
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-2">{product.trueId}</td>
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-16">
+                    {/* <input
+                      type="text"
+                      className="w-full h-full focus:outline-none"
+                      value={product.name || ''}
+                      onChange={e => handleProductFieldChange(product.trueId, "name", e.target.value)}
+                    /> */}
+                    {product.name}
+                </td>
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
+                    {TYPE == "I" ? (
+                      <>
+                        {/* Show brandname for factory partners */}
+                        {selectedPartner && selectedPartner.isfactory && (
+                          <span>{product.brandname}</span>
+                        )}
+                        
+                        {/* Show select for non-factory partners or when no partner selected */}
+                        {(!selectedPartner || !selectedPartner.isfactory) && (
+                          <select onChange={(e) => handleBrandNameSelect(e, product)}>
+                            <option value="">Chọn hãng</option>
+                            {product.matchingProduct?.map((p, index) => (
+                              <option key={index} value={p.id}>{p.brandname}</option>
+                            ))}
+                          </select>
+                        )}
+                      </>
+                    ) : (
+                      <span>{product.brandname}</span>
+                    )}
+
+                </td>
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
+                  {/* <input
+                    type="text"
+                    className="w-full h-full focus:outline-none"
+                    value={product.namedetail || ''}
+                    onChange={e => handleProductFieldChange(product.trueId, "namedetail", e.target.value)}
+                  /> */}
+                  {product.namedetail}
+                </td>
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-9 disabled:bg-gray-100">
+                  {/* <input
+                    type="text"
+                    className="w-full h-full focus:outline-none"
+                    value={product.catalog?.length || ''}
+                    onChange={e => handleProductFieldChange(product.trueId, "catalog.length", e.target.value)}
+                  /> */}
+                  {product.catalog?.length || ''}
+                  
+                </td>
+                <td className="border border-gray-800  py-2 text-xs text-black w-9 disabled:bg-gray-100">
+                  <input
+                    type="number"
+                    className="w-full h-full py-5 focus:outline-none disabled:bg-gray-100"
+                    value={product.numberofbars || ''}
+                    disabled = {product.catalog?.type === "Thép Cuộn"}
+                    onChange={e => {
+                        const val = e.target.value;
+                        if (/^\d*$/.test(val)) { // Only allow non-negative integers
+                          handleProductFieldChange(product.trueId, "numberofbars", val === '' ? '' : Number(val));
+                        }
+                      }}
+                  />
+                </td>
+                <td className="border border-gray-800  py-2 text-xs text-black w-9">
+                  <input
+                    type="number"
+                    className="w-full h-full focus:outline-none"
+                    value={product.weight || ''}
+                    
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (/^\d*\.?\d*$/.test(val)) { // Only allow non-negative numbers
+                        handleProductFieldChange(product.trueId, "weight", val === '' ? '' : Number(val));
+                      }
+                    }}
+                  />
+                </td>
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
+                  <input
+                    type="text"
+                    className="w-full h-full focus:outline-none"
+                    value={product.note || ""}
+                    onChange={e => handleProductFieldChange(product.trueId, "note", e.target.value)}
+                  />
+                </td>
+                <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20" >
+                  <div className="flex flex-row gap-1 justify-around justify-items-center align-items-center">
+                   
+                  <button className="p-1.5 text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-200 rounded transition-colors" 
+                     onClick={() => deleteProduct(product.trueId)} title="Xóa">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                  </button>
+
+                  </div>
+                </td>
+              </tr>
+    );
+  }
+
+  /*  [
+      {
+        
+        trueId: 1,
+        name: "Thép D10",
+        namedetail: "Thép tròn D10",
+        brandname: "Hòa Phát",
+        numberofbars: 10,
+        weight: 100,
+        note: "Ghi chú về thép D10",
+        
+      }
+    ]*/
+  return (
+    <div className="m-4 bg-white border-1 border-gray-600 overflow-hidden">
+      <div className="h-full flex flex-col">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-2">STT</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-16">Mã hàng</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Tên hãng</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Tên hàng hóa</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Dài (m)</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Số lượng (cây)</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-9">Khối lượng (KG)</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-20">Ghi chú</th>
+              <th className="border border-gray-800 px-2 py-1 text-xs font-bold text-black w-5">Thao tác</th>
+            </tr> 
+          </thead>
+          <tbody>
+            {selectedProducts.map((product, index) =>
+              (selectedPartner && product.partnerid == null && TYPE === "I")
+                ? popupTableRow(product, index)
+                : normalTableRow(product, index)
+            )}
             <tr>
               <td className="border border-gray-800 px-2 py-2 pl-15 text-xs font-bold text-black w-12" colSpan={5}>Tổng cộng</td>
               <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{totalBars}</td>
@@ -269,7 +513,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, productList, totalB
           </tbody>
         </table>
         <div className="flex-1 bg-white">
-          <div className="h-64"></div>
+          
         </div>
       </div>
     </div>

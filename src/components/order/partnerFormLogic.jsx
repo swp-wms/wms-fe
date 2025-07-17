@@ -85,12 +85,47 @@ const isEmailValid = (email) => {
 
 
 
-export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, partnerList, setPartnerList, productList, selectedProducts, setSelectedProducts, selectedPartner, setSelectedPartner }) {
+export function usePartnerFormLogic({ 
+  activeTab, 
+  setActiveTab, 
+  setShowForm, 
+  partnerList, 
+  setPartnerList, 
+  productList, 
+  selectedProducts, 
+  setSelectedProducts, 
+  selectedPartner, 
+  setSelectedPartner, 
+  initialData = null
+}) {
+  
+  const getInitialProduct = () => {
+    if (initialData?.product) {
+      return {
+        ...initialProduct,
+        ...initialData.product
+      };
+    }
+    return initialProduct;
+  };
+
+  const getInitialCatalog = () => {
+    if (initialData?.catalog) {
+      return {
+        ...initialCatalog,
+        ...initialData.catalog
+      };
+    }
+    return initialCatalog;
+  };
+
+
+
   const [partner, setPartner] = useState(initialPartner);
   const [partnerErrors, setPartnerErrors] = useState(initialPartnerErrors);
 
-  const [product, setProduct] = useState(initialProduct);
-  const [catalog, setCatalog] = useState(initialCatalog);
+  const [product, setProduct] = useState(getInitialProduct());
+  const [catalog, setCatalog] = useState(getInitialCatalog());
   const [productErrors, setProductErrors] = useState(initialProductErrors);
   const [catalogErrors, setCatalogErrors] = useState(initialCatalogErrors);
   const [catalogList, setCatalogList] = useState([]);
@@ -125,6 +160,26 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
 
   },[selectedProducts],selectedPartner);
 
+    useEffect(() => {
+    if (initialData) {
+      if (initialData.product) {
+        setProduct(prev => ({
+          ...prev,
+          ...initialData.product
+        }));
+      }
+      if (initialData.catalog) {
+        setCatalog(prev => ({
+          ...prev,
+          ...initialData.catalog
+        }));
+      }
+    }
+  }, [initialData]);
+
+  // ... rest of your existing logic
+
+
   useEffect(() => {
     if (activeTab === "product" && setShowForm) {
       // Validate product fields immediately
@@ -155,6 +210,8 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
 
 
   }, [activeTab, setShowForm]);
+
+
   //----------------- VALIDATION FUNCTIONS -----------------
   const validateField = (name, value) => {
     switch (name) {
@@ -206,8 +263,10 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
       case "name": // mã hàng
         console.log(productList);
         if (!value.trim()) return "Bắt buộc";
-        if (!/^TD\d{1,4}(CB\d{1,3}V|C\d{2,3}|CD\d{2}|CB\d|CB\d{2,3})$/.test(value.trim())) return "Định dạng: TD + 1-4 số";
-        if (Array.isArray(productList) && productList.some(prod => prod.name === value && prod.brandname === product.brandname)) {
+        if (!/^TD\d{1,4}((CB\d{1,3}V|C\d{2,3}|CD\d{2}|CB\d|CB\d{2,3})|[a-zA-Z])$/.test(value.trim())) return "Vui lòng nhập: TDxCBxxxT hoặc TDxxCBxxxV";
+        if (Array.isArray(productList) && productList.some(prod => prod.name.trim().toLowerCase() === value.trim().toLowerCase() &&
+                                                                prod.brandname.trim().toLowerCase() === product.brandname.trim().toLowerCase() &&
+                                                                prod.partnerid.trim().toLowerCase() === product.partnerid.trim().toLowerCase())) {
 
           return "Sản phẩm đã tồn tại";
         }
@@ -227,19 +286,25 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
   const validateCatalogField = (name, value, catalog) => {
     switch (name) {
       case "length":
+      if (catalog.type === "Thép Thanh") {
         if (value === "" || value === null) return "Bắt buộc";
         if (Number(value) < 0) return "Không được nhập số âm";
         if (isNaN(value)) return "Vui lòng nhập vào kí tự là số";
-        break;
+      }
+      break;
 
       case "barsperbundle":
-        if (value === "" || value === null) return "Bắt buộc";
-        if (!/^\d+$/.test(value) || Number(value) <= 0) return "Phải là số nguyên dương";
+        if (catalog.type === "Thép Thanh") {
+          if (value === "" || value === null) return "Bắt buộc";
+          if (!/^\d+$/.test(value) || Number(value) <= 0) return "Phải là số nguyên dương";
+        }
         break;
 
-      case "weightpermeter":
-        if (Number(value) <= 0) return "Phải là số thực dương";
-        break;
+      // case "weightpermeter":
+      //   if (catalog.type === "Thép Thanh") {
+      //     if (Number(value) <= 0) return "Phải là số thực dương";
+      //   }
+      //   break;
 
       case "type":
         if (!value.trim() === "#") return "Bắt buộc";
@@ -251,6 +316,7 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
           if (value === "" || value === null) return "Bắt buộc cho Thép Thanh";
           if (isNaN(value) || Number(value) <= 0) return "Phải là số thực dương";
         }
+        
         break;
       case "weightperoll":
         // Only required if type is "Thép Cuộn"
@@ -258,6 +324,8 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
           if (value === "" || value === null) return "Bắt buộc cho Thép Cuộn";
           if (isNaN(value) || Number(value) <= 0) return "Phải là số thực dương";
         }
+
+
         break;
     }
   }
@@ -370,11 +438,12 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
       updatedCatalog.brandname = updatedProduct.brandname.trim();
 
     // Check for catalog autofill if both brandname and steeltype are present
-    if (updatedProduct.brandname && steeltype) {
+    if (updatedProduct.brandname && steeltype && updatedProduct.type) {
       const foundCatalog = catalogList.find(
         catalog =>
           catalog.brandname.trim().toLowerCase() === updatedProduct.brandname.trim().toLowerCase() &&
-          catalog.steeltype.trim().toLowerCase() === steeltype.trim().toLowerCase()
+          catalog.steeltype.trim().toLowerCase() === steeltype.trim().toLowerCase() &&
+          catalog.type.trim().toLowerCase() === updatedProduct.type.trim().toLowerCase()
       );
 
       if (foundCatalog) {
@@ -438,34 +507,60 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
           productCalls.addProduct(product);
           toast.success("Thêm sản phẩm thành công");
           setShowForm(false);
-          setSelectedProducts((prev) => [
-            ...prev,
-            {
-              ...product,
-              trueId: selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].id + 1,
-              catalog: catalog,
+          if(initialData !== null && selectedPartner !== null && selectedPartner.isfactory) {
+            // If initialData is provided, update the existing product
+            const updatedProducts = selectedProducts.map((p) =>
+              p.name === initialData.product.name ? 
+            { ...product, 
+                trueId: initialData.product.trueId,  // Keep the trueId from initialData
+                catalog: catalog,
+                partner: partner
+              } : p
+            );
+            setSelectedProducts(updatedProducts);
+            initialData = null; // Reset initialData after use
+          }else{
+            setSelectedProducts((prev) => [
+              ...prev,
+              {
+                ...product,
+                trueId: selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].trueId + 1,
+                catalog: catalog,
 
-            }
-          ])
+              }
+            ])
+          }
         }
 
         else {
-          console.log("Catalog: ", catalog);
+          
           catalogCalls.addCatalog(catalog)
             .then(() => {
-              console.log('add product:', product);
+              console.log('add product:', product); 
               productCalls.addProduct(product);
               toast.success("Thêm sản phẩm thành công");
               setShowForm(false);
-              setSelectedProducts((prev) => [
-                ...prev,
-                {
-                  ...product,
-                  trueId: selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].id + 1,
-                  catalog: catalog,
+             if(initialData !== null && selectedPartner.isfactory) {
+            // If initialData is provided, update the existing product
+            const updatedProducts = selectedProducts.map((p) =>
+              p.name === initialData.product.name ? 
+            { ...product, 
+                trueId: initialData.product.trueId,  // Keep the trueId from initialData
+                catalog: catalog,
+                partner:partner } : p
+            );
+            setSelectedProducts(updatedProducts);
+            initialData = null; // Reset initialData after use
+          }else{
+            setSelectedProducts((prev) => [
+              ...prev,
+              {
+                ...product,
+                trueId: selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].trueId + 1,
+                catalog: catalog,
                 }
               ]);
-            })
+            }})
             .catch((error) => {
               toast.error("Lỗi khi thêm sản phẩm");
               console.error(error);
@@ -483,6 +578,7 @@ export function usePartnerFormLogic({ activeTab, setActiveTab, setShowForm, part
     catalog, setCatalog, catalogErrors, setCatalogErrors,
     catalogList, setCatalogList,
     handleChange, handleProductChange, handleCatalogChange, handleSubmit,
-    activeTab, setActiveTab, setShowForm, partnerList, setPartnerList, selectedProducts, selectedPartner, setSelectedProducts, setSelectedPartner
+    activeTab, setActiveTab, setShowForm, partnerList, setPartnerList, selectedProducts, selectedPartner, setSelectedProducts, setSelectedPartner,
+    initialData
   };
 }

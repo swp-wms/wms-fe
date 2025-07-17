@@ -8,6 +8,7 @@ import SupplementOrderList from "../components/order/SupplementOrderList";
 import supplement from "../backendCalls/supplement.js"
 import supplementForm from "../components/order/supplementForm.jsx";
 import SupplementForm from "../components/order/supplementForm.jsx";
+import orderCalls from "../backendCalls/order";
 
 const OrderForm = ({ user, setUser }) => {
   const [orderDetail, setOrderDetail] = useState({});
@@ -26,13 +27,14 @@ const OrderForm = ({ user, setUser }) => {
         const response = await getUser();
         if (response.status !== 200) {
           window.location.href = '/dang-nhap';
-          }
-      const user = response.data  ;
-      setUser(user);
-      }
+        } else {
+          const user = response.data;
+          setUser(user);
+        }
+      };
       getData();
     }
-  }, [user, setUser]);
+  }, [user]);
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -48,20 +50,22 @@ const OrderForm = ({ user, setUser }) => {
     fetchOrderDetails();
   }, [id, user]);
 
+useEffect(() => {
+  if(user){
+    const checkSalesmanId = () => {
+      if(orderDetail && user){
+        if(
+          user.role == 3 &&
+          user.id !== orderDetail.salesmanid
+        ){
+          navigate(`/error403`)
+        }
+      }
+    }
+    checkSalesmanId();
+  }
+}, [user, orderDetail, navigate]);
 
-  //   if(user){
-  //   const checkSalesmanId = () => {
-  //     if(orderDetail && user){
-  //       if(
-  //         user.role == 3 &&
-  //         user.id !== orderDetail.salesmanid
-  //       ){
-  //         navigate(`/error403`)
-  //       }
-  //     }
-  //   }
-  //   checkSalesmanId();
-  // }
   useEffect(() => {
     const getSupplementOrder = async () =>{
       try{
@@ -87,6 +91,36 @@ const OrderForm = ({ user, setUser }) => {
     navigate(`${window.location.pathname}/cap-nhat`, { state: { orderDetail, id } });
   }
 
+        const handleCancel = async (e) => {
+        e.preventDefault();
+        if (!selectedPartner || !selectedProducts || selectedProducts.length === 0) {
+          alert("Please select a partner and at least one product.");
+          return;
+        }
+        // Here you would typically send the order data to your backend
+        const orderData = {
+          type: orderDetail.type,
+          partnerid: orderDetail.partnerid,
+          address: orderDetail.partner.address,
+          totalbars: orderDetail.totalbars,
+          totalweight: orderDetail.totalweight,
+          date: orderDetail.date,
+          salesmanid: orderDetail.salesmanid,
+          note: orderDetail.note,
+          status: "Hủy",
+    
+          orderdetail: selectedProducts.map(product => ({
+            productid: product?.id,
+            numberofbars: product?.numberofbars,
+            weight: product?.weight
+            
+            }))
+        };
+        console.log("Order Data:", orderData);
+        orderCalls.createImportOrder(orderData);
+        setSelectedProducts([]);
+        setSelectedPartner(null);
+      };
   
 
   return (
@@ -113,27 +147,30 @@ const OrderForm = ({ user, setUser }) => {
               <div className="bg-white border-2 border-gray-800 rounded-md">
                 <div className="border-b-2 border-gray-800 px-4 py-2 rounded-t-md bg-white">
                   <h2 className="text-sm font-bold text-black">
-                    {orderDetail?.partnerid} - {orderDetail?.partner?.name}
+                    {orderDetail?.partner?.name}
                   </h2>
                 </div>
                 <div className="p-4 space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Địa chỉ: <span>{orderDetail?.partner?.address}</span></label>
+                    <label className="block text-md font-extrabold text-black mb-1">Mã đơn: <span className="font-extrabold">{orderDetail?.id}</span></label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Mã số thuế: <span>{orderDetail?.partner?.taxcode}</span></label>
+                    <label className="block text-sm font-bold text-black mb-1">Địa chỉ: <span className="font-medium">{orderDetail?.partner?.address}</span></label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Số điện thoại: <span>{orderDetail?.partner?.phonenumber}</span></label>
+                    <label className="block text-sm font-bold text-black mb-1">Mã số thuế: <span className="font-medium">{orderDetail?.partner?.taxcode}</span></label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Email: <span>{orderDetail?.partner?.email}</span></label>
+                    <label className="block text-sm font-bold text-black mb-1">Số điện thoại: <span className="font-medium">{orderDetail?.partner?.phonenumber}</span></label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Số tài khoản:</label>
+                    <label className="block text-sm font-bold text-black mb-1">Email: <span className="font-medium">{orderDetail?.partner?.email}</span></label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Tên ngân hàng:</label>
+                    <label className="block text-sm font-bold text-black mb-1">Số tài khoản: <span className="font-medium">{orderDetail?.partner?.accountNumber}</span></label>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-black mb-1">Tên ngân hàng: <span className="font-medium">{orderDetail?.partner?.bankName}</span></label>
                   </div>
                 </div>
               </div>
@@ -221,7 +258,7 @@ const OrderForm = ({ user, setUser }) => {
                   )}
 
                   {orderActiveTab ==="supplementorder" && (
-                    <SupplementOrderList className=" h-[90%] w-full bg-[#f3eaea] border-t-1 border-gray-400 " supplementList={supplementOrder || []} />
+                    <SupplementOrderList className=" h-[90%] w-full bg-[#ffffff] border-t-1 border-gray-400 " supplementList={supplementOrder || []} />
                   )}
 
                   {/* Empty table body area */}
@@ -238,7 +275,7 @@ const OrderForm = ({ user, setUser }) => {
             
           </div>
         </div>
-        <div className="flex flex-row gap-2 w-full mt-5 pb-30 mb-20">
+        <div className="flex flex-row gap-2 w-full mt-5  mb-20">
               <div className="basis-2/3  w-[60%]">              
                 {/* <SupplementOrderList className=" basis-2/3 w-[40%] bg-[#f3eaea] border-t-1 border-gray-400 fixed" supplementList={supplementOrder || []} /> */}
               </div>
@@ -253,16 +290,27 @@ const OrderForm = ({ user, setUser }) => {
 
                   Quay lại
                 </Link>
-                {user.roleid === 3 && (
-                  <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg">
+                {}
+
+                {user?.roleid === 3 && orderDetail.status !== "Hủy" && orderDetail.status !== "XONG" && (
+                  <button onClick={handleCancel} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg">
                   <svg className="w-3 h-3 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
                     <path d="M48 448L48 64c0-8.8 7.2-16 16-16l160 0 0 80c0 17.7 14.3 32 32 32l80 0 0 288c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-293.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0L64 0zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z" />
                   </svg>
                   Hủy đơn hàng
                 </button>
                 )}
+
+                {user?.roleid === 3 && orderDetail?.status === "Hủy" && (
+                  <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg">
+                  <svg className="w-3 h-3 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                    <path d="M48 448L48 64c0-8.8 7.2-16 16-16l160 0 0 80c0 17.7 14.3 32 32 32l80 0 0 288c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-293.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0L64 0zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z" />
+                  </svg>
+                  Khôi phục đơn hàng
+                </button>
+                )}
                 
-              { user && user.roleid == 4 &&  (
+              { user?.roleid == 4 && orderDetail?.status !== "Hủy" && (
                   <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg"
                           onClick={() => setActiveSupplementForm(true)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -271,7 +319,7 @@ const OrderForm = ({ user, setUser }) => {
                     Thêm đơn bù
                   </button>
                 )}
-                {user.roleid === 3 &&(
+                {user?.roleid === 3 && orderDetail?.status !== "Hủy"&& orderDetail?.status !== "XONG" && (
                 <button onClick={handleEdit} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg">
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

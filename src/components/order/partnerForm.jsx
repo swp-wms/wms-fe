@@ -4,7 +4,8 @@ const CompleteForm = (props) => {
   const {
     partner, partnerErrors, product, productErrors, catalog, catalogErrors, catalogList,
     handleChange, handleProductChange, handleCatalogChange, handleSubmit,
-    activeTab, setActiveTab, setShowForm, partnerList, setPartnerList,productList, selectedProducts, selectedPartner, setSelectedPartner, setSelectedProducts
+    activeTab, setActiveTab, setShowForm, partnerList, setPartnerList,productList, selectedProducts, selectedPartner, setSelectedPartner, setSelectedProducts,
+    initialData
   } = usePartnerFormLogic(props);
 
 return (
@@ -275,9 +276,10 @@ return (
                         <input
                           type="text"
                           name="length"
-                          value={catalog.length || ""}
+                          value={product.type == "Thép Thanh"? catalog.length : ""}
                           onChange={handleCatalogChange}
-                          className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
+                          className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm disabled:bg-gray-200"
+                          disabled={product.type !== "Thép Thanh"}
                         />
                       </div>
 
@@ -366,9 +368,10 @@ return (
                         <input
                           type="text"
                           name="barsperbundle"
-                          value={catalog.barsperbundle || ""}
+                          value={product.type == "Thép Thanh" ? catalog.barsperbundle : ""}
                           onChange={handleCatalogChange}
-                          className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
+                          className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm disabled:bg-gray-200"
+                          disabled={product.type !== "Thép Thanh"} 
                         />
                       </div>
 
@@ -384,9 +387,10 @@ return (
                         <input
                           type="text"
                           name="weightpermeter"
-                          value={catalog.weightpermeter || ""}
+                          value={product.type == "Thép Thanh"?(catalog.weightperbundle/catalog.barsperbundle/catalog.length).toFixed(3) : ""}
                           onChange={handleCatalogChange}
-                          className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
+                          className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm disabled:bg-gray-200"
+                          disabled={product.type !== "Thép Thanh"}
                         />
                       </div>
 
@@ -423,9 +427,10 @@ return (
                         <input
                           type="text"
                           name="weightperbundle"
-                          value={catalog.weightperbundle || ""}
+                          value={product.type == "Thép Thanh"?catalog.weightperbundle : ""}
                           onChange={handleCatalogChange}
-                          className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
+                          className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm disabled:bg-gray-200"
+                          disabled={product.type !== "Thép Thanh"}
                         />
                       </div> 
                       
@@ -443,7 +448,8 @@ return (
                           name="weightperroll"
                           value={catalog.weightperroll || ""}
                           onChange={handleCatalogChange}
-                          className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
+                          className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm disabled:bg-gray-200"
+                          disabled={product.type !== "Thép Cuộn"}
                         />
                       </div>
                       

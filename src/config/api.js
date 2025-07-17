@@ -23,10 +23,12 @@ export const api = {
 
   GET_SUPPPLEMENT_ORDER: (orderid) => `${baseUrl}/supplement/${orderid}`,
   ADD_SUPPLEMENT_ORDER: `${baseUrl}/supplement`,
+  GET_SUPPLEMENT_DETAIL_BY_ID: (id) => `${baseUrl}/supplement/detail/${id}`,
 
   //admin API
   GET_ALL_USER: `${baseUrl}/users`,
   REGISTER_ADMIN: `${baseUrl}/admin/register`,
+
 
   //partner API
   GET_PARTNERS: `${baseUrl}/partners`,
@@ -36,7 +38,11 @@ export const api = {
   //product API
   GET_PRODUCTS: `${baseUrl}/products`,
   ADD_PRODUCT: `${baseUrl}/products`,
+
+  GET_PRODUCT_GENERAL :`${baseUrl}/orders/product_general`,
+
   UPDATE_PRODUCT: (productid) => `${baseUrl}/products/${productid}`,
+
 
 
   //warehouse API
@@ -83,3 +89,4 @@ export const api = {
   SEEN_NOTIF: (notifId) => `${baseUrl}/notification/${notifId}`,
 }
 
+  
