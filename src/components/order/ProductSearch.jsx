@@ -129,7 +129,7 @@ useEffect(() => {
           const generalProduct = generalProductList.find(item => item.name === product.name);
           return{
             trueId :product.trueId,
-            // ...product,
+            ...product,
             ...generalProduct,
             numberofbars: product.numberofbars,
             note: product.note,
@@ -239,7 +239,7 @@ useEffect(() => {
         }
       );
       setSelectedProducts(updatedProductList);
-      findSimilarProduct
+      findSimilarProduct();
     } else {
       // setSelectedProducts()
       // product.trueId = selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].trueId + 1;

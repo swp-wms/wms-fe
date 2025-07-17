@@ -4,7 +4,7 @@ import Popup from 'reactjs-popup';
 import order from "../../backendCalls/order";
 import '../../index.css';
 
-const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, productList, totalBars, totalWeight, setActiveTab }) => {
+const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, productList, totalBars, totalWeight, setActiveTab,TYPE }) => {
   // Handler for changing product fields (e.g. quantity)
   
   useEffect(() => {
@@ -216,20 +216,25 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
                     {product.name}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
-                    {/* <input
-                      type="text"
-                      className="w-full h-full focus:outline-none"
-                      value={product.brandname || ''}
-                      onChange={e => handleProductFieldChange(product.trueId, "brandname", e.target.value)}
-                    /> */}
-                    {selectedPartner && selectedPartner.isfactory && product.brandname}
-                    {!selectedPartner || !selectedPartner.isfactory && (
-                      <select onChange={(e) => handleBrandNameSelect(e, product)}>
-                        <option value="" >Chọn hãng</option>
-                        {product.matchingProduct?.map((p,index) =>(
-                        <option key={index} value={p.id} >{p.brandname}</option>
-                        ))}
-                      </select>
+                   {TYPE == "I" ? (
+                      <>
+                        {/* Show brandname for factory partners */}
+                        {selectedPartner && selectedPartner.isfactory && (
+                          <span>{product.brandname}</span>
+                        )}
+                        
+                        {/* Show select for non-factory partners or when no partner selected */}
+                        {(!selectedPartner || !selectedPartner.isfactory) && (
+                          <select onChange={(e) => handleBrandNameSelect(e, product)}>
+                            <option value="">Chọn hãng</option>
+                            {product.matchingProduct?.map((p, index) => (
+                              <option key={index} value={p.id}>{p.brandname}</option>
+                            ))}
+                          </select>
+                        )}
+                      </>
+                    ) : (
+                      <span>{product.brandname}</span>
                     )}
 
                 </td>
@@ -353,20 +358,25 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
                     {product.name}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
-                    {/* <input
-                      type="text"
-                      className="w-full h-full focus:outline-none"
-                      value={product.brandname || ''}
-                      onChange={e => handleProductFieldChange(product.trueId, "brandname", e.target.value)}
-                    /> */}
-                    {selectedPartner && selectedPartner.isfactory && product.brandname}
-                    {!selectedPartner || !selectedPartner.isfactory && (
-                      <select onChange={(e) => handleBrandNameSelect(e, product)}>
-                        <option value="" >Chọn hãng</option>
-                        {product.matchingProduct?.map((p,index) =>(
-                        <option key={index} value={p.id} >{p.brandname}</option>
-                        ))}
-                      </select>
+                    {TYPE == "I" ? (
+                      <>
+                        {/* Show brandname for factory partners */}
+                        {selectedPartner && selectedPartner.isfactory && (
+                          <span>{product.brandname}</span>
+                        )}
+                        
+                        {/* Show select for non-factory partners or when no partner selected */}
+                        {(!selectedPartner || !selectedPartner.isfactory) && (
+                          <select onChange={(e) => handleBrandNameSelect(e, product)}>
+                            <option value="">Chọn hãng</option>
+                            {product.matchingProduct?.map((p, index) => (
+                              <option key={index} value={p.id}>{p.brandname}</option>
+                            ))}
+                          </select>
+                        )}
+                      </>
+                    ) : (
+                      <span>{product.brandname}</span>
                     )}
 
                 </td>
@@ -474,7 +484,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
           </thead>
           <tbody>
             {selectedProducts.map((product, index) =>
-              (selectedPartner && product.partnerid == null)
+              (selectedPartner && product.partnerid == null && TYPE === "I")
                 ? popupTableRow(product, index)
                 : normalTableRow(product, index)
             )}

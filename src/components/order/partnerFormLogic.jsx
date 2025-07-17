@@ -263,10 +263,10 @@ export function usePartnerFormLogic({
       case "name": // mã hàng
         console.log(productList);
         if (!value.trim()) return "Bắt buộc";
-        if (!/^TD\d{1,4}(CB\d{1,3}V|C\d{2,3}|CD\d{2}|CB\d|CB\d{2,3})|[a-zA-Z]$/.test(value.trim())) return "Vui lòng nhập: TD8CB240T hoặc TD8CB230 hoặc ";
-        if (Array.isArray(productList) && productList.some(prod => prod.name.trim().toLowerCase() === value.trim().toLowerCase() 
-                                                                && prod.brandname.trim().toLowerCase() === product.brandname.trim().toLowerCase() 
-                                                                && prod.partnerid.trim().toLowerCase() === product.partnerid.trim().toLowerCase())) {
+        if (!/^TD\d{1,4}((CB\d{1,3}V|C\d{2,3}|CD\d{2}|CB\d|CB\d{2,3})|[a-zA-Z])$/.test(value.trim())) return "Vui lòng nhập: TDxCBxxxT hoặc TDxxCBxxxV";
+        if (Array.isArray(productList) && productList.some(prod => prod.name.trim().toLowerCase() === value.trim().toLowerCase() &&
+                                                                prod.brandname.trim().toLowerCase() === product.brandname.trim().toLowerCase() &&
+                                                                prod.partnerid.trim().toLowerCase() === product.partnerid.trim().toLowerCase())) {
 
           return "Sản phẩm đã tồn tại";
         }
@@ -507,7 +507,7 @@ export function usePartnerFormLogic({
           productCalls.addProduct(product);
           toast.success("Thêm sản phẩm thành công");
           setShowForm(false);
-          if(initialData !== null && selectedPartner.isfactory) {
+          if(initialData !== null && selectedPartner !== null && selectedPartner.isfactory) {
             // If initialData is provided, update the existing product
             const updatedProducts = selectedProducts.map((p) =>
               p.name === initialData.product.name ? 

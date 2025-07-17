@@ -9,6 +9,8 @@ import { getUser } from "../backendCalls/user";
 import AddPartnerAndProductForm from "../components/order/partnerForm";
 import orderCalls from "../backendCalls/order";
 import toast from "react-hot-toast";
+const TYPE = "I"; // Type for import order
+
 const CreateOrder = ({user, setUser}) => {
   
 
@@ -139,7 +141,7 @@ const CreateOrder = ({user, setUser}) => {
     }
     toast.success("Tạo đơn thành công !")
     setTimeout(() => {
-      navigate(`/nhap-hang/${response.data.id}`);
+      navigate(`/nhap-hang/${response.order.id}`);
     }, 2000);
     setSelectedProducts([]);
     setSelectedPartner(null);
@@ -198,6 +200,7 @@ const CreateOrder = ({user, setUser}) => {
               focused={focused}
               setFocused={setFocused}
               setActiveTab={tab => {setActiveTab(tab); setShowForm(true);}}
+              TYPE={TYPE}
             />
           </div>
           {/* Right Column */}
@@ -223,7 +226,7 @@ const CreateOrder = ({user, setUser}) => {
                 totalBars={totalBars}
                 totalWeight={totalWeight}
                 setActiveTab={handleSetActiveTab}
-                
+                TYPE={TYPE}
               />
             </div>
             {/* Bottom Buttons */}

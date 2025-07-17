@@ -12,7 +12,9 @@ const PartnerSearch = ({
   setFocused,
   setActiveTab,
   refresh,
-  setRefresh
+  setRefresh,
+  TYPE
+
 }) => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const inputRef = useRef(null);
