@@ -396,14 +396,14 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
                     value={product.catalog?.length || ''}
                     onChange={e => handleProductFieldChange(product.trueId, "catalog.length", e.target.value)}
                   /> */}
-                  {product.catalog?.length || ''}
+                  {product.type === "Thép Cuộn" ?'': product.catalog?.length}
                   
                 </td>
                 <td className="border border-gray-800  py-2 text-xs text-black w-9 disabled:bg-gray-100">
                   <input
                     type="number"
                     className="w-full h-full py-5 focus:outline-none disabled:bg-gray-100"
-                    value={product.numberofbars || ''}
+                    value={product.type === "Thép Cuộn" ? '': product.numberofbars}
                     disabled = {product.catalog?.type === "Thép Cuộn"}
                     onChange={e => {
                         const val = e.target.value;

@@ -177,8 +177,8 @@ const Catalog = ({user, setUser}) => {
 
             <div className="grid grid-cols-2 gap-4 shadow-sm border border-gray-200 overflow-hidden">
                 {catalogBrands.length > 0 && (
-                    catalogBrands.map((brand) => (   
-                        <div key={brand.id || brand.brandname}>
+                    catalogBrands.map((brand,id) => (   
+                        <div key={id || brand.brandname}>
                             <div className=" bg-gray-300 px-6 py-2 border border-gray-150">
                                 <h2 className="text-lg text-center font-semibold text-gray-700">{brand.brandname}</h2> 
                             </div>
@@ -269,8 +269,8 @@ const Catalog = ({user, setUser}) => {
                                     <tbody className="divide-y border border-gray-400 divide-gray-200">
                                         {catalogData
                                             .filter(item => item.brandname === brand.brandname && item.standard === brand.standard)
-                                            .map((item) => (
-                                                <tr key={item.id || item.steeltype} className=  "hover:bg-gray-200 border border-gray-400">
+                                            .map((item,id) => (
+                                                <tr key={id || item.steeltype} className=  "hover:bg-gray-200 border border-gray-400">
                                                     <td className="px-4 py-3 font-medium text-gray-900">{item.steeltype}</td>
                                                     <td className="px-4 py-3 text-gray-700 border border-gray-400" >{item.type}</td>
                                                     <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh"? item?.barsperbundle : null}</td>
