@@ -28,29 +28,6 @@ ChartJS.register(
   Legend
 );
 
-const Data = [
-  {
-    number: 1000,
-    title: "Tổng số lượng hàng xuất",
-    status: "-16.5%",
-  },
-  {
-    number: 1200,
-    title: "Tổng số lượng hàng nhập",
-    status: "-16.5%",
-  },
-  {
-    number: 10500,
-    title: "Tổng khối lượng hàng xuất",
-    status: "+8.2%",
-  },
-  {
-    number: 15000,
-    title: "Tổng khối lượng hàng nhập",
-    status: "+12.4%",
-  },
-];
-
 const SummaryBoard = () => {
   const [importBars, setImportBars] = useState(0);
   const [importWeight, setImportWeight] = useState(0);
@@ -129,15 +106,6 @@ const SummaryBoard = () => {
     values: weightPartners.map((item) => item.total_weight),
   };
 
-  const getRandomColors = (num) => {
-    const colors = [];
-    for (let i = 0; i < num; i++) {
-      const color = `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
-      colors.push(color);
-    }
-    return colors;
-  };  
-
   return (
     <>
       <div className="grid grid-cols-4 gap-12 mb-10">
@@ -196,6 +164,7 @@ const Board = ({ number, title, status }) => {
 };
 
 const BarChart = ({ chartData }) => {
+  const backgroundColors = generateColorSet(chartData.values.length);
   return (
     <div className="w-full flex justify-center py-8 px-12">
       <Bar
@@ -204,18 +173,7 @@ const BarChart = ({ chartData }) => {
           datasets: [
             {
               label: "Khối lượng thép (kg)",
-              backgroundColor: [
-                "#c45850",
-                "#3195ff",
-                "yellow",
-                "green",
-                "orange",
-                "purple",
-                "pink",
-                "brown",
-                "gray",
-                "black",
-              ],
+              backgroundColor: backgroundColors,
               data: chartData.values,
             },
           ],
@@ -243,12 +201,13 @@ const BarChart = ({ chartData }) => {
 };
 
 const DoughnutChart = ({ chartData }) => {
+  const backgroundColors = generateColorSet(chartData.values.length);
   const data = {
     labels: chartData.labels,
     datasets: [
       {
         label: "Khối lượng (kg)",
-        backgroundColor: ["#3195ff", "#3cba9f", "pink", "#c45850"],
+        backgroundColor: backgroundColors,
         data: chartData.values,
       },
     ],
@@ -256,12 +215,17 @@ const DoughnutChart = ({ chartData }) => {
 
   return (
     <div className="bg-white shadow-btn px-12 w-full rounded-lg flex justify-center">
-      <Doughnut className="w-full scale-90"
+      <Doughnut
+        className="w-full scale-90"
         data={data}
         options={{
           responsive: true,
           plugins: {
-            legend: { display: true, position: "bottom", labels: { font: { size: 16 }} },
+            legend: {
+              display: true,
+              position: "bottom",
+              labels: { font: { size: 16 } },
+            },
             title: {
               display: true,
               position: "top",
@@ -279,4 +243,40 @@ const DoughnutChart = ({ chartData }) => {
       />
     </div>
   );
+};
+
+const baseColors = [
+  "#3195ff",
+  "#3cba9f",
+  "pink",
+  "#c45850",
+  "#ffcc00",
+  "#9966ff",
+  "#ff6666",
+  "#00cc99",
+  "#ff99cc",
+  "#66ff66",
+  "#0099cc",
+  "#ff9933",
+];
+
+// Nếu cần thêm màu thì tạo mới màu HEX ngẫu nhiên
+const generateColorSet = (count) => {
+  const colors = [...baseColors];
+  const usedColors = new Set(colors);
+
+  while (colors.length < count) {
+    let color;
+    do {
+      color =
+        "#" +
+        Math.floor(Math.random() * 16777215)
+          .toString(16)
+          .padStart(6, "0");
+    } while (usedColors.has(color));
+    usedColors.add(color);
+    colors.push(color);
+  }
+
+  return colors.slice(0, count);
 };

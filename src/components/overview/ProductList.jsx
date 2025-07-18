@@ -9,8 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { fetchProductCatalog } from "../../backendCalls/productCatalog";
 import ProductEdit from "./ProductEdit";
-
-const ITEMS_PER_PAGE = 15;
+import { fetchCatalog } from "../../backendCalls/catalog";
 
 const ProductList = () => {
   const [productCatalog, setProductCatalog] = useState([]);
@@ -18,22 +17,31 @@ const ProductList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [catalog, setCatalog] = useState([]);
 
   useEffect(() => {
     const getData = async () => {
       const response = await fetchProductCatalog();
       setProductCatalog(response);
+      console.log(response);
     };
     getData();
   }, []);
 
-  // Mở form sửa sản phẩm
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetchCatalog();
+      setCatalog(response);
+      console.log(response);
+    };
+    getData();
+  }, []);
+
   const handleEdit = (product) => {
     setSelectedProduct(product);
     setOpen(true);
   };
 
-  // Mở form thêm sản phẩm mới
   const handleAddNew = () => {
     const emptyProduct = {
       id: null,
@@ -87,7 +95,6 @@ const ProductList = () => {
     reader.readAsArrayBuffer(file);
   };
 
-  // Search
   const filteredData = productCatalog.filter((item) => {
     const name = item.name?.toLowerCase() || "";
     const namedetail = item.namedetail?.toLowerCase() || "";
@@ -95,7 +102,7 @@ const ProductList = () => {
     return name.includes(search) || namedetail.includes(search);
   });
 
-  // Pagination
+  const ITEMS_PER_PAGE = 15;
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -169,12 +176,12 @@ const ProductList = () => {
           product={selectedProduct}
           onClose={handleClose}
           onUpdate={handleUpdateProduct}
+          catalog={catalog}
         />
       )}
     </section>
   );
 };
-
 
 const TableList = ({ data, onEdit, setSelectedProduct }) => {
   return (
@@ -186,7 +193,7 @@ const TableList = ({ data, onEdit, setSelectedProduct }) => {
             <th className="border border-black px-1">Mã hàng hóa</th>
             <th className="border border-black">Tên hàng hóa</th>
             <th className="border border-black">Tên đối tác</th>
-            <th className="border border-black">Tên nhà cung</th>
+            <th className="border border-black">Tên hãng thép</th>
             <th className="border border-black">Loại thép</th>
             <th className="border border-black">Mã thép</th>
             <th className="border border-black">Số lượng </th>
@@ -207,31 +214,30 @@ const TableList = ({ data, onEdit, setSelectedProduct }) => {
         </thead>
         <tbody>
           {data.map((item, index) => {
-            const length = item.catalog
-              ? item.catalog.length
-              : item.length || 0;
-            const weight = item.catalog
-              ? item.catalog.weightperbundle / item.catalog.barsperbundle
+            const length = item ? item.length : item.length || 0;
+            const weight = item
+              ? item.weightperbundle / item.barsperbundle
               : item.weight || 0;
-            const totalWeight = item.catalog
-              ? item.totalbar * weight
-              : item.total || 0;
+            // const totalWeight = item ? item.totalbar * weight : item.total || 0;
 
             return (
-              <tr key={item.id || index}>
+              <tr key={index}>
                 <td className="border border-black py-0.5">{index + 1}</td>
-                <td className="border border-black px-2">{item.name}</td>
+                <td className="border border-black px-2">{item.pd}</td>
                 <td className="border border-black">{item.namedetail}</td>
-                <td className="border border-black px-2">{item.partner.name}</td>
+                <td className="border border-black px-2">{item.name}</td>
                 <td className="border border-black px-2">{item.brandname}</td>
                 <td className="border border-black px-2">{item.type}</td>
                 <td className="border border-black px-2">{item.steeltype}</td>
                 <td className="border border-black px-2">{item.totalbar}</td>
                 <td className="border border-black px-2">{length}</td>
-                <td className="border border-black px-2">{weight.toFixed(2)}</td>
-                <td className="border border-black">
-                  {totalWeight.toFixed(2)}
+                <td className="border border-black px-2">
+                  {weight.toFixed(2)}
                 </td>
+                <td className="border border-black">
+                  {(Number(item.totalweight) || 0).toFixed(2)}
+                </td>
+
                 <td className="border border-black">{item.note}</td>
                 <td className="border border-black text-center py-1">
                   <FontAwesomeIcon
