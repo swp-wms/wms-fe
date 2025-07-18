@@ -12,9 +12,9 @@ const PartnerDetailModal = ({
 
   if (!isOpen || !partner) return null;
 
-  const handleEditClick = () => {
-    setIsEditModalOpen(true);
-  };
+  // const handleEditClick = () => {
+  //   setIsEditModalOpen(true);
+  // };
 
   return (
     <>
@@ -134,13 +134,13 @@ const PartnerDetailModal = ({
             >
               Đóng
             </button>
-            <button
+            {/* <button
             //   onClick
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
             >
               <FontAwesomeIcon icon={faPenToSquare} />
               Chỉnh sửa
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
