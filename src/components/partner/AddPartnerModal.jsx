@@ -17,7 +17,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
     isfactory: false,
   });
 
-  // const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -49,7 +49,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // setLoading(true);
+    setLoading(true);
     setError("");
     setSuccess("");
 
@@ -72,21 +72,18 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
       console.error("Error adding partner:", error);
 
       if (error.response) {
-        // Server responded with error status
         const errorMessage =
           error.response.data?.message || "Có lỗi xảy ra khi thêm đối tác";
         setError(errorMessage);
       } else if (error.request) {
-        // Request was made but no response received
         setError("Không thể kết nối đến server. Vui lòng thử lại.");
       } else {
-        // Something else happened
         setError("Có lỗi không xác định xảy ra. Vui lòng thử lại.");
       }
     } 
-    // finally {
-    //   setLoading(false);
-    // }
+    finally {
+      setLoading(false);
+    }
   };
 
   const handleBack = () => {
@@ -95,10 +92,10 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   const handleClose = () => {
-    // if (!loading) {
+    if (!loading) {
       resetForm();
       onClose();
-    // }
+    }
   };
 
   if (!isOpen) return null;
@@ -106,25 +103,25 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
   return (
     <div className="fixed inset-0 bg-opacity-50 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-200 rounded-lg p-6 w-full max-w-2xl mx-4 shadow-lg">
-        {/* Header with close button */}
+        {/* Closed BTN */}
         <div className="flex justify-end mb-4">
           <button
             onClick={handleClose}
-            // disabled={loading}
+            disabled={loading}
             className="text-red-500 hover:text-red-700 text-xl font-bold w-8 h-8 flex items-center justify-center border border-red-500 rounded disabled:opacity-50 disabled:cursor-not-allowed"
           >
             ×
           </button>
         </div>
 
-        {/* Success Message */}
+        {/* Noti */}
         {success && (
           <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
             {success}
           </div>
         )}
 
-        {/* Error Message */}
+        {/* Error Mess*/}
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
@@ -143,7 +140,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
                 name="id"
                 value={formData.id}
                 onChange={handleInputChange}
-                // disabled={loading}
+                disabled={loading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 required
               />
@@ -157,7 +154,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                // disabled={loading}
+                disabled={loading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 required
               />
@@ -175,7 +172,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
                 name="address"
                 value={formData.address}
                 onChange={handleInputChange}
-                // disabled={loading}
+                disabled={loading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
@@ -188,7 +185,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
                 name="taxcode"
                 value={formData.taxcode}
                 onChange={handleInputChange}
-                // disabled={loading}
+                disabled={loading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
@@ -205,7 +202,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
                 name="phonenumber"
                 value={formData.phonenumber}
                 onChange={handleInputChange}
-                // disabled={loading}
+                disabled={loading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
@@ -218,7 +215,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
                 name="bankaccount"
                 value={formData.bankaccount}
                 onChange={handleInputChange}
-                // disabled={loading}
+                disabled={loading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
@@ -235,7 +232,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                // disabled={loading}
+                disabled={loading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
@@ -248,7 +245,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
                 name="bankname"
                 value={formData.bankname}
                 onChange={handleInputChange}
-                // disabled={loading}
+                disabled={loading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
@@ -264,7 +261,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
                 name="note"
                 value={formData.note}
                 onChange={handleInputChange}
-                // disabled={loading}
+                disabled={loading}
                 rows="3"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
@@ -279,7 +276,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
                   name="isfactory"
                   checked={formData.isfactory}
                   onChange={handleInputChange}
-                  // disabled={loading}
+                  disabled={loading}
                   className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:cursor-not-allowed"
                 />
                 <span className="text-sm text-gray-700">Là nhà máy</span>
@@ -292,7 +289,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
             <button
               type="button"
               onClick={handleBack}
-              // disabled={loading}
+              disabled={loading}
               className="px-4 py-2 text-gray-600 hover:text-gray-800 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FontAwesomeIcon icon={faBackward} />
@@ -300,11 +297,11 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
             </button>
             <button
               type="submit"
-              // disabled={loading}
+              disabled={loading}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FontAwesomeIcon icon={faSave} />
-              {/* {loading ? "Đang lưu..." : "Lưu"} */}
+              {loading ? "Đang lưu..." : "Lưu"}
             </button>
           </div>
         </form>
