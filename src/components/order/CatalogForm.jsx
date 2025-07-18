@@ -61,18 +61,25 @@ export const CatalogForm = ({
         break;
 
       case "length":
-        if (value === "" || value === null) return "Bắt buộc";
-        if (isNaN(value) || Number(value) < 0) return "Không được nhập số âm";
+        if(catalog.type === "Thép Thanh") {
+          if (value === "" || value === null) return "Bắt buộc";
+          if (isNaN(value) || Number(value) < 0) return "Không được nhập số âm";
+        }
         break;
 
       case "barsperbundle":
-        if (value === "" || value === null) return "Bắt buộc";
-        if (!/^\d+$/.test(value) || Number(value) <= 0)
-          return "Phải là số nguyên dương";
+        if(catalog.type === "Thép Thanh") {
+          if (value === "" || value === null) return "Bắt buộc";
+          if (!/^\d+$/.test(value) || Number(value) <= 0)
+            return "Phải là số nguyên dương";
+        }
         break;
 
       case "weightpermeter":
-        if (Number(value) <= 0) return "Phải là số thực dương";
+        if(catalog.type === "Thép Thanh") {
+            if (value === "" || value === null) return "Bắt buộc cho Thép Thanh";
+            if (Number(value) <= 0) return "Phải là số thực dương";
+        }
         break;
 
       case "type":

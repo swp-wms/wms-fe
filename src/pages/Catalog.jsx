@@ -225,24 +225,26 @@ const Catalog = ({user, setUser}) => {
                                                     <td className="p-0 border border-gray-400 hover:bg-gray-300">
                                                         <input 
                                                         type="text" 
-                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0" 
-                                                        value={item?.barsperbundle}
+                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0 disabled:bg-gray-200" 
+                                                        value={item?.type === "Thép Thanh"? item?.barsperbundle : ""}
+                                                        disabled={ item?.type !== "Thép Thanh"}
                                                         onChange={(e)=> handleInputChange(e, item.steeltype, item.brandname,'barsperbundle')}
                                                         />
                                                     </td>
                                                     <td className="p-0 border border-gray-400 hover:bg-gray-300">
                                                         <input 
                                                         type="text" 
-                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0" 
-                                                        value={(item?.weightperbundle / item?.barsperbundle / item?.length).toFixed(3)}
+                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0 disabled:bg-gray-200" 
+                                                        value={item?.type === "Thép Thanh"?(item?.weightperbundle / item?.barsperbundle / item?.length).toFixed(3):""}
                                                         onChange={(e)=> handleInputChange(e, item.steeltype, item.brandname,'weightpermeter')}
+                                                        disabled={ item?.type !== "Thép Thanh"}
                                                         />
                                                     </td>
                                                     <td className="p-0 border border-gray-400 hover:bg-gray-300">
                                                         <input 
                                                         type="text" 
-                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0" 
-                                                        value={(item?.weightperbundle / item?.barsperbundle).toFixed(2)}
+                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0 " 
+                                                        value={item?.type === "Thép Thanh"?(item?.weightperbundle / item?.barsperbundle).toFixed(2):""}
                                                         disabled
                                                         />
                                                     </td>
