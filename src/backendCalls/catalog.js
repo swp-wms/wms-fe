@@ -2,7 +2,7 @@ import axios from 'axios';
 import {api} from '../config/api';
 const accessToken = localStorage.getItem('token');
 
-const fetchCatalog = async () => {
+export const fetchCatalog = async () => {
     try {
         const response = await axios.get(`${api.GET_CATALOGS}`, {
             headers: {

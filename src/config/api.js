@@ -31,6 +31,11 @@ export const api = {
   ADD_PRODUCT: `${baseUrl}/products`,
   UPDATE_PRODUCT: (productid) => `${baseUrl}/products/${productid}`,
 
+  //product catalog API
+  GET_PRODUCT_CATALOG: `${baseUrl}/product-catalog`,
+  ADD_PRODUCT_CATALOG: `${baseUrl}/product-catalog`,
+  UPDATE_PRODUCT_CATALOG: (productid) => `${baseUrl}/product-catalog/${productid}`,
+
 
   //warehouse API
   GET_WAREHOUSE: `${baseUrl}/warehouse`,
