@@ -133,12 +133,12 @@ const ImportOrder = ({ user, setUser }) => {
                             </div>
 
                                 {order.status === cancelledStatus && (
-                                 <div className="bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-3 py-1 rounded-full text-sm font-bold inline-block">
+                                 <div className="bg-red-100 text-red-600  px-3 py-1 rounded-full text-sm font-bold inline-block">
                                     Đơn hàng đã bị hủy
                                 </div>
                                 )}
                                 {order.status == finishedStatus && (
-                                 <div className="text-center font-bold bg-green-300 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-3 py-1 rounded-full text-sm  inline-block">
+                                 <div className="text-center font-bold bg-green-300 text-green-600  px-3 py-1 rounded-full text-sm  inline-block">
                                    Hoàn thành
                                 </div>
                                 )}

@@ -124,17 +124,7 @@ const Catalog = ({user, setUser}) => {
                     <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <input
-                        // ref={inputRef}
-                        type="text"
-                        placeholder="Tìm kiếm mã khách hàng, tên công ty"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                        // value={inputpartner}
-                        // onChange={e => { handlePartnerInputChange(e); setShowSuggestions(true); }}
-                        // onFocus={() => setShowSuggestions(true)}
-                        // onBlur={handleBlur}
-                        // onKeyDown={handleKeyDown}
-                    />
+                   
                 </div>
                 <div className="flex ml-auto gap-2">
                   <button onClick={toggleEdit} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg">
@@ -197,13 +187,14 @@ const Catalog = ({user, setUser}) => {
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700 " rowSpan={2}>Loại</th>
+                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700" rowSpan={2}>Loại thép</th>
                                             <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700" rowSpan={2}>QD cây / bó</th>
                                             <th className="px-4 py-1 text-center border border-gray-400 font-medium text-gray-700" colSpan={4}>{brand.standard}</th>
                                         </tr>
                                         <tr>
                                             <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Kg/m</th>
-                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Kg / cay bazem</th>
-                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Khối lượng bó bazem</th>
+                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Kg / cây </th>
+                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Khối lượng bó/ cuộn</th>
                                             {/* <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Dung sai %</th> */}
                                         </tr>
                                     </thead>
@@ -218,6 +209,15 @@ const Catalog = ({user, setUser}) => {
                                                         type="text" 
                                                         className="w-full h-full px-4 py-3 font-medium text-gray-900 border-0 bg-transparent focus:outline-none focus:ring-0" 
                                                         value={item.steeltype}
+                                                        disabled
+                                                        
+                                                        />
+                                                    </td>
+                                                    <td className="p-0 border border-gray-400">
+                                                        <input 
+                                                        type="text" 
+                                                        className="w-full h-full px-4 py-3 font-medium text-gray-900 border-0 bg-transparent focus:outline-none focus:ring-0" 
+                                                        value={item.type}
                                                         disabled
                                                         
                                                         />
@@ -272,10 +272,11 @@ const Catalog = ({user, setUser}) => {
                                             .map((item) => (
                                                 <tr key={item.id || item.steeltype} className=  "hover:bg-gray-200 border border-gray-400">
                                                     <td className="px-4 py-3 font-medium text-gray-900">{item.steeltype}</td>
-                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{item?.barsperbundle}</td>
-                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{(item?.weightperbundle / item?.barsperbundle / item?.length).toFixed(3)}</td>
-                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{(item?.weightperbundle / item?.barsperbundle).toFixed(2)}</td>
-                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{item?.weightperbundle}</td>
+                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400" >{item.type}</td>
+                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh"? item?.barsperbundle : null}</td>
+                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh"? (item?.weightperbundle / item?.barsperbundle / item?.length).toFixed(3) : null}</td>
+                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh"? (item?.weightperbundle / item?.barsperbundle).toFixed(2) : null}</td>
+                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh"? item?.weightperbundle : item?.weightperroll}</td>
                                                     {/* <td className="px-4 py-3 text-gray-700 border border-gray-400">007</td> */}
                                                 </tr>
                                             ))}
