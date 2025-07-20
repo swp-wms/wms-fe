@@ -184,6 +184,7 @@ export const CatalogForm = ({
       name: "steeltype",
       placeholder: "Nhập D + số (VD: D10, D12, D16)",
       onchange: "",
+      
     },
 
     {

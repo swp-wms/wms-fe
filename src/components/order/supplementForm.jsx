@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import ProductSearch from "./ProductSearch";
+import ProductSearch from "./ProductSearchOld";
 import OrderTable from "./OrderTable";
 import product from "../../backendCalls/product";
 import order from "../../backendCalls/order";
@@ -13,6 +13,11 @@ const SupplementForm = ({
   activeSupplementForm,
   setActiveSupplementForm,
   setUser,
+  orderTotalWeight,
+  orderTotalBars,
+  supplementOrder,
+  setSupplementOrder
+  
 }) => {
   const [selectedProducts, setSelectedProducts] = useState([]); // store products that are added to the order
   const [productList, setProductList] = useState([]);
@@ -46,6 +51,17 @@ const SupplementForm = ({
     const value = Number(item.weight);
     return !isNaN(value) ? sum + value : sum;
   }, 0);
+
+
+  const total = (array, criteria) => {
+    let sum = 0;
+    array.forEach(item => {
+      if (item[criteria]) sum += item[criteria];
+
+    });
+    return sum;
+  }
+
   let checkNumberOfBars = () => {
     const invalidProducts = selectedProducts.filter(
       (product) => product.numberofbars <= 0 || product.numberofbars == null
@@ -57,7 +73,7 @@ const SupplementForm = ({
   };
 
   const handleSubmitSupplement = async () => {
-    const supplementOrder = {
+    const supplement = {
       type: type,
       warehousekeeperid: user.id,
       orderid: orderDetail.id,
@@ -73,15 +89,17 @@ const SupplementForm = ({
       totalWeight: totalWeight,
       totalBars: totalBars,
     };
-    if(orderDetail.totalWeight < totalWeight){
-      toast.error(`Tổng trọng lượng đơn bù: ${totalWeight} kg không được lớn hơn tổng trọng lượng đơn hàng ${orderDetail.totalWeight} kg`);
+    console.log("order weight", orderTotalWeight);
+    if(totalWeight < orderTotalWeight/100*90 && totalWeight > orderTotalWeight/100*110){
+      toast.error(`Tổng trọng lượng đơn bù: ${totalWeight} kg không được chênh lệch quá 10% tổng trọng lượng đơn hàng ${orderTotalWeight} kg`);
       return;
     }else{
-      const response = await supplement.addSupplementOrder(supplementOrder);
+      const response = await supplement.addSupplementOrder(supplement);
       console.log("Response from supplement order:", response);
       if (response.success) {
         toast.success("Tạo đơn bù thành công");
         setSelectedProducts([]);
+        setSupplementOrder(prev =>[ ...prev, supplement]);
       }
     }
   };

@@ -137,6 +137,10 @@ useEffect(() => {
               activeSupplementForm={activeSupplementForm} 
               setActiveSupplementForm={setActiveSupplementForm}
               setUser={setUser}
+              orderTotalWeight={Number(total(orderDetail?.orderdetail || [], 'weight')).toFixed(2)}
+              orderTotalBars={total(orderDetail?.orderdetail || [], 'numberofbars')}
+              supplementOrder={supplementOrder}
+              cc={setSupplementOrder}
             />
           )}
           

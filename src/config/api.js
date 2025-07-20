@@ -87,6 +87,9 @@ export const api = {
   GET_NOTIFS: `${baseUrl}/notification`,
   GET_SEEN_NOTIF: (index) => `${baseUrl}/notification/seen/${index}`,
   SEEN_NOTIF: (notifId) => `${baseUrl}/notification/${notifId}`,
+
+  //report
+  GET_INVENTORY_REPORT: `${baseUrl}/report`,
 }
 
   
