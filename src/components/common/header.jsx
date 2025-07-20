@@ -37,7 +37,7 @@ const NavBar = ({ user, data }) => {
   }, []);
 
   useEffect(() => {
-    if (!isConnect) {      
+    if (!isConnect) {
       console.log('Socket not connected, delaying listener registration.');
       return;
     }
@@ -90,18 +90,19 @@ const NavBar = ({ user, data }) => {
         <span className=" text-gray-600 py-2 font-medium">{data}</span>
       </div>
       <div className="flex flex-row gap-8 items-center">
-        <div onClick={() => setShowNotif(!showNotif)} className="relative cursor-pointer">
-          <FontAwesomeIcon icon={faBell} size="lg" />
-          <span className="absolute text-[10px] font-bold border-[1.5px] border-white px-1 right-[-9px] top-[-3px] bg-red-700 text-white text-center rounded-full">
-            {notifs.length}
-          </span>
-          {showNotif &&
-            <Notification
-              notifs={notifs}
-              setNotifs={setNotifs}
-            />
-          }
-        </div>
+        {user.roleid !== 1 &&
+          <div onClick={() => setShowNotif(!showNotif)} className="relative cursor-pointer">
+            <FontAwesomeIcon icon={faBell} size="lg" />
+            <span className="absolute text-[10px] font-bold border-[1.5px] border-white px-1 right-[-9px] top-[-3px] bg-red-700 text-white text-center rounded-full">
+              {notifs.length}
+            </span>
+            {showNotif &&
+              <Notification
+                notifs={notifs}
+                setNotifs={setNotifs}
+              />
+            }
+          </div>}
         <FontAwesomeIcon icon={faGear} size="lg" />
         <Link to={"/thong-tin-ca-nhan"} className="flex flex-row rounded-full bg-white shadow-btn p-1.5 w-fit justify-between items-center gap-2">
           <div className="size-8 rounded-full bg-gray-200"></div>
