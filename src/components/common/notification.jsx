@@ -5,16 +5,14 @@ import NotificationList from "./notification/NotificationList";
 const Notification = ({ notifs, setNotifs }) => {
   const [notifType, setNotifType] = useState(1);
   const [seenNotif, setSeenNotif] = useState([]);
-  const [index, setIndex] = useState(0);
 
   const getSeenNotifs = async () => {
-    const response = await getSeenNotifcations(index);
+    const response = await getSeenNotifcations(seenNotif.length);
     const seenNotifs = response.data;
 
     console.log('seen: ', seenNotifs);
 
     setSeenNotif(seenNotifs);
-    setIndex(prev => prev + seenNotifs.length);
   }
 
   useEffect(() => {
