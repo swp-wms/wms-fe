@@ -1,11 +1,11 @@
 import axios from "axios";
 import { useState } from "react";
 import { api } from "../config/api";
+import toast from "react-hot-toast";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [step, setStep] = useState(1);
-    const [error, setError] = useState('');
 
     const [password, setPassword] = useState('');
     const [show1, setShow1] = useState(false);
@@ -14,37 +14,40 @@ const ForgotPassword = () => {
     const [show2, setShow2] = useState(false);
 
     const [otp, setOtp] = useState({
-        1: '',
-        2: '',
-        3: '',
-        4: '',
-        5: '',
-        6: ''
+        first: '',
+        second: '',
+        third: '',
+        forth: '',
+        fifth: '',
+        sixth: ''
     });
 
     const handleCheckEmail = async (e) => {
         e.preventDefault();
         if (document.querySelector('.email-field').checkValidity()) {
-            setError('');
+            
             try {
                 await axios.post(api.GET_OTP, {
                     email: email
                 });
                 setStep(2);
             } catch (error) {
-                setError(error.response.data.message);
+                toast.error(error.response.data.message);
             }
         } else {
-            setError('Email không đúng định dạng!');
+            toast.error('Email không đúng định dạng!');
         }
     }
 
     const handleCheckOtp = async (e) => {
         e.preventDefault();
-        if (otp.length < 6) {
-            setError('Not valid otp');
+
+        const otpString = otp.first + otp.second + otp.third + otp.forth + otp.fifth + otp.sixth;
+
+        if (!/^\d{6}$/.test(otpString)) {
+            toast.error('OTP không chính xác.');
+            return;
         }
-        const otpString = otp[1] + otp[2] + otp[3] + otp[4] + otp[5] + otp[6];
 
         try {
             await axios.post(api.VERIFY_OTP, {
@@ -52,24 +55,26 @@ const ForgotPassword = () => {
                 email: email
             });
             setStep(3);
+            toast.success('OTP chính xác')
         } catch (error) {
-            setError(error.response.data.message);
+            toast.error(error.response.data.message);
         }
     }
 
     const handleCheckNewPass = async (e) => {
         e.preventDefault();
         if (password.length < 8 || password.length > 30) {
-            setError('Mật khẩu tối thiểu 8 ký tự. Tối đa 30 ký tự.')
-        } else if (!/^(?=.*\d)(?=.*[a-zA-Z]).*$/.test(password)) {
-            setError('Mật khẩu phải chứa cả chữ và số.')
+            toast.error('Mật khẩu tối thiểu 8 ký tự. Tối đa 30 ký tự.')
+        } else if (!/^[a-zA-Z0-9]{8,30}$/.test(password)) {
+            toast.error('Mật khẩu chứa chữ và số.')
         } else if (password !== retype) {
-            setError('Nhập lại mật khẩu chưa chính xác.')
+            toast.error('Nhập lại mật khẩu chưa chính xác.')
         } else {
             await axios.post(api.RESET_PASSWORD, {
                 password: password,
                 email: email
             });
+            toast.success('Đổi mật khẩu thành công.');
             window.location.href = '/dang-nhap';
         }
     }
@@ -82,8 +87,6 @@ const ForgotPassword = () => {
                 <form className="bg-white p-8 rounded-md w-[360px] flex flex-col items-center"
                     style={{ boxShadow: '0 0 5px #c1bfbf' }}>
                     <img className="mb-4" src="/logo.png" width={'160px'} alt="logo" />
-
-                    {error && <p className="text-red-700 pb-2">{error}</p>}
 
                     {step === 1 &&
                         <>
@@ -108,27 +111,27 @@ const ForgotPassword = () => {
                     {step === 2 &&
                         <>
                             <div className="flex justify-between">
-                                <input className="login-input text-center text-xl font-bold" autoFocus={true} style={{ width: '15%', padding: '8px 0' }} type="text" inputMode="numeric" maxLength={1} onChange={(e) => setOtp({ ...otp, 1: e.target.value })} value={otp[1]} />
-                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} inputMode="numeric" type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, 2: e.target.value })} value={otp[2]} />
-                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" inputMode="numeric" maxLength={1} onChange={(e) => setOtp({ ...otp, 3: e.target.value })} value={otp[3]} />
-                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" inputMode="numeric" maxLength={1} onChange={(e) => setOtp({ ...otp, 4: e.target.value })} value={otp[4]} />
-                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" inputMode="numeric" maxLength={1} onChange={(e) => setOtp({ ...otp, 5: e.target.value })} value={otp[5]} />
-                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" inputMode="numeric" maxLength={1} onChange={(e) => setOtp({ ...otp, 6: e.target.value })} value={otp[6]} />
+                                <input className="login-input text-center text-xl font-bold" autoFocus={true} style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, first: e.target.value })} value={otp.first} />
+                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, second: e.target.value })} value={otp.second} />
+                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, third: e.target.value })} value={otp.third} />
+                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, forth: e.target.value })} value={otp.forth} />
+                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, fifth: e.target.value })} value={otp.fifth} />
+                                <input className="login-input text-center text-xl font-bold" style={{ width: '15%', padding: '8px 0' }} type="text" maxLength={1} onChange={(e) => setOtp({ ...otp, sixth: e.target.value })} value={otp.sixth} />
                             </div>
                             <p className="text-xs py-2">Kiểm tra hòm thư của bạn để lấy mã OTP</p>
-                            <button className="login-button" onClick={(e) => { handleCheckOtp(e) }}>
+                            <button type="submit" className="login-button" onClick={(e) => { handleCheckOtp(e) }}>
                                 XÁC NHẬN
                             </button>
                             <p className="text-xs pt-4">Nếu chưa nhận được email hoặc mã đã hết hạn</p>
-                            <button className="login-button" onClick={(e) => {
+                            <button type="button" className="login-button" onClick={(e) => {
                                 handleCheckEmail(e);
                                 setOtp({
-                                    1: '',
-                                    2: '',
-                                    3: '',
-                                    4: '',
-                                    5: '',
-                                    6: ''
+                                    first: '',
+                                    second: '',
+                                    third: '',
+                                    forth: '',
+                                    fifth: '',
+                                    sixth: ''
                                 });
                             }} style={{ backgroundColor: 'black' }}>
                                 GỬI LẠI OTP
