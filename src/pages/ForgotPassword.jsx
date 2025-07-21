@@ -2,6 +2,9 @@ import axios from "axios";
 import { useState } from "react";
 import { api } from "../config/api";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
@@ -25,7 +28,7 @@ const ForgotPassword = () => {
     const handleCheckEmail = async (e) => {
         e.preventDefault();
         if (document.querySelector('.email-field').checkValidity()) {
-            
+
             try {
                 await axios.post(api.GET_OTP, {
                     email: email
@@ -81,7 +84,7 @@ const ForgotPassword = () => {
 
     return (
         <div className='ForgotPassword min-h-screen flex items-center'>
-            <div className="bg-white h-[80vh] w-screen flex items-center justify-center"
+            <div className="relative bg-white h-[80vh] w-screen flex items-center justify-center"
                 style={{ boxShadow: '0 0 10px #c1bfbf' }}
             >
                 <form className="bg-white p-8 rounded-md w-[360px] flex flex-col items-center"
@@ -173,6 +176,11 @@ const ForgotPassword = () => {
                         </>
                     }
                 </form>
+
+                <Link to="/dang-nhap" className="mt-4 absolute top-0 left-[20px]">
+                    <FontAwesomeIcon icon={faArrowLeft}/>
+                    <span className="ml-4">Đăng nhập</span>
+                </Link>
             </div>
         </div>
     )
