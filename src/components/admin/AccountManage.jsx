@@ -1,9 +1,9 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { getAllUserInfo, updateUserInfo } from "../../backendCalls/userInfo";
 import toast from "react-hot-toast";
 import EditUserModal from "./EditUserModal";
@@ -12,7 +12,7 @@ import CreateUserModal from "./CreateUserModal";
 const AccountManage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPosition, setSelectedPosition] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState(""); // New state for status filter
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [users, setUsers] = useState([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -20,6 +20,10 @@ const AccountManage = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const getData = async () => {
@@ -40,29 +44,35 @@ const AccountManage = () => {
     getData();
   }, []);
 
+  // Reset trang 1 khi thực hiện filter/ search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedPosition, selectedStatus]);
+
   const filteredUsers = users
     .filter((user) => {
       const matchesSearch =
         user?.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
         user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase());
-
       const matchesPosition =
         selectedPosition === "" || user?.role?.rolename === selectedPosition;
-
-      // New status filter logic
       const matchesStatus =
         selectedStatus === "" ||
         (selectedStatus === "active" && user?.status === "1") ||
         (selectedStatus === "inactive" && user?.status === "0");
-
       return matchesSearch && matchesPosition && matchesStatus;
     })
-    // Sort by fullname alphabetically
     .sort((a, b) => {
       const nameA = a?.fullname?.toLowerCase() || "";
       const nameB = b?.fullname?.toLowerCase() || "";
       return nameA.localeCompare(nameB);
     });
+
+  // PAGING STUFFS
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentUsers = filteredUsers.slice(startIndex, endIndex);
 
   const positions = [
     "Salesman",
@@ -135,7 +145,6 @@ const AccountManage = () => {
   };
 
   const handleCreateSuccess = async () => {
-    // Refresh user list
     try {
       const getUsersResponse = await getAllUserInfo();
       if (getUsersResponse.status === 200) {
@@ -149,12 +158,65 @@ const AccountManage = () => {
     setShowCreateModal(false);
   };
 
+  // PAGING HANDLER
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // TỔNG TRANG
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push("...");
+        pageNumbers.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pageNumbers.push(1);
+        pageNumbers.push("...");
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        pageNumbers.push(1);
+        pageNumbers.push("...");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push("...");
+        pageNumbers.push(totalPages);
+      }
+    }
+
+    return pageNumbers;
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen mt-20 ml-75">
-      {/* Search + Filter + Add */}
+      {/* SEARCH + FILTER + ADD */}
       <div className="flex items-center justify-between mb-6 gap-4">
-        {/* Search */}
-        <div className="flex-1 max-w-md">
+        {/* SEARCH */}
+        <div className="flex-1 max-w-md relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FontAwesomeIcon
               icon={faMagnifyingGlass}
@@ -169,10 +231,9 @@ const AccountManage = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-
-        {/* Filters */}
+        {/* FILTER */}
         <div className="flex gap-3">
-          {/* Position Filter */}
+          {/* FILTER VỊ TRÍ */}
           <div className="flex-shrink-0">
             <select
               value={selectedPosition}
@@ -187,8 +248,7 @@ const AccountManage = () => {
               ))}
             </select>
           </div>
-
-          {/* Status Filter */}
+          {/* FILTER TRẠNG THÁI */}
           <div className="flex-shrink-0">
             <select
               value={selectedStatus}
@@ -204,8 +264,7 @@ const AccountManage = () => {
             </select>
           </div>
         </div>
-
-        {/* Add */}
+        {/* ADD */}
         <button
           onClick={handleCreateClick}
           className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -213,6 +272,12 @@ const AccountManage = () => {
           <span className="text-lg">+</span>
           <span>Thêm tài khoản</span>
         </button>
+      </div>
+
+      {/* Results Info */}
+      <div className="mb-4 text-sm text-gray-600">
+        Hiển thị {startIndex + 1}-{Math.min(endIndex, filteredUsers.length)} của{" "}
+        {filteredUsers.length} kết quả
       </div>
 
       {/* Table */}
@@ -241,14 +306,14 @@ const AccountManage = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredUsers.length === 0 ? (
+            {currentUsers.length === 0 ? (
               <tr>
                 <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                   Không tìm thấy nhân viên nào
                 </td>
               </tr>
             ) : (
-              filteredUsers.map((user, index) => (
+              currentUsers.map((user, index) => (
                 <tr key={user?.id || index} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {user?.id || "N/A"}
@@ -294,10 +359,70 @@ const AccountManage = () => {
         </table>
       </div>
 
+      {/* PAGINATION */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm text-gray-700">
+            Trang {currentPage} của {totalPages}
+          </div>
+          <div className="flex items-center gap-2">
+            {/* PREV BTN */}
+            <button
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                currentPage === 1
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4 mr-1" />
+              Trước
+            </button>
+
+            {/* Page Numbers */}
+            <div className="flex items-center gap-1">
+              {getPageNumbers().map((pageNum, index) => (
+                <div key={index}>
+                  {pageNum === "..." ? (
+                    <span className="px-3 py-2 text-sm text-gray-500">...</span>
+                  ) : (
+                    <button
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                        currentPage === pageNum
+                          ? "bg-blue-600 text-white"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* NEXT BTN */}
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                currentPage === totalPages
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              Sau
+              <FontAwesomeIcon icon={faChevronRight} className="h-4 w-4 ml-1" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Status Confirmation Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-300 rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Xác nhận thay đổi trạng thái
             </h3>
