@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { api } from '../config/api';
 
-const accessToken = localStorage.getItem('accessToken');
+const accessToken = localStorage.getItem('token');
 
 /**
  * Fetch data based on the provided parameterz

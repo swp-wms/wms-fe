@@ -3,12 +3,12 @@ import { useSearchParams } from "react-router-dom";
 import React from "react";
 import product from "../backendCalls/product";
 import partner from "../backendCalls/partner";
-
+import toast from "react-hot-toast";
 import report from "../backendCalls/report";
+import { getUser } from "../backendCalls/user";
 
 
-
-const InventoryInOutReport = () => {
+const InventoryInOutReport = ({ user, setUser }) => {
 
     const [reportList, setReportList] = useState([]);
     const [partnerList, setPartnerList] = useState([]);
@@ -20,6 +20,22 @@ const InventoryInOutReport = () => {
     const [searchKeyword, setSearchKeyword] = useState(searchParams.get('searchKeyword') || '');
 
     const [loading, setLoading] = useState(false);
+    
+    useEffect(() => {
+        console.log("Current user:", user);
+        if (user == null) {
+          const getData = async () => {
+            const response = await getUser();
+            if (response.status !== 200) {
+              window.location.href = '/dang-nhap';
+            } else {
+              const user = response.data;
+              setUser(user);
+            }
+          };
+          getData();
+        }
+      }, [user]);
 
     useEffect(() => {
         const fetchPartners = async () => {
@@ -63,7 +79,7 @@ const InventoryInOutReport = () => {
             });
 
             const response = await report.fetchInventoryInOutReport(params);
-            setReportList(response);
+            setReportList(response.data);
             
         }catch(error){
               console.error("Error fetching inventory data:", error);
@@ -81,7 +97,7 @@ const InventoryInOutReport = () => {
     return (
         <>
             {/* Main Content */}
-            <div className="flex-1 p-6">
+            <div className="flex-1 ml-80 pt-25">
                 {/* Page Header */}
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">Thống kê xuất nhập tồn</h1>
@@ -105,12 +121,10 @@ const InventoryInOutReport = () => {
                         </div>
                         
                         <button onClick={handleSearch}
-                                className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                                className="bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-700">
                             <i className="fas fa-search mr-2"></i>Tìm kiếm
                         </button>
-                        <button className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700">
-                            <i className="fas fa-file-excel mr-2"></i>Xuất Excel
-                        </button>
+                        
                     </div>
                     <div className="flex items-center space-x-2 mt-2">
                         <label className="text-sm text-gray-600">Đối tác:</label>
@@ -140,7 +154,7 @@ const InventoryInOutReport = () => {
                                     <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">Tồn đầu</th>
                                     <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">SL Nhập</th>
                                     <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">SL Xuất</th>
-                                    <th className="px-4 py-3 text-right font-medium text-gray-700">Tồn cuối</th>
+                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">Tồn cuối</th>
                                     <th className="px-4 py-3 text-center font-medium text-gray-700 border-r">ĐVT</th>
                                     <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">Tồn đầu</th>
                                     <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">SL Nhập</th>
@@ -150,10 +164,10 @@ const InventoryInOutReport = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                               {reportList.map((item,index) => (
+                               {reportList?.map((item,index) => (
                                 <tr className="hover:bg-gray-50">
                                     <td className="px-4 py-3 border-r">{item.id}</td>
-                                    <td className="px-4 py-3 border-r font-medium text-blue-600">{item.name}</td>
+                                    <td className="px-4 py-3 border-r font-medium text-red-600">{item.name}</td>
                                     <td className="px-4 py-3 border-r">{item.namedetail}</td>
                                     <td className="px-4 py-3 text-center border-r">{item.unit1}</td>
                                     <td className="px-4 py-3 text-right border-r">{item.OpStockUnit1}</td>
@@ -175,15 +189,7 @@ const InventoryInOutReport = () => {
                                ))}
                             </tbody>
                                
-                            <tfoot className="bg-gray-100 font-semibold">
-                                <tr>
-                                    <td className="px-4 py-3 border-r" colSpan={4}>Tổng cộng</td>
-                                    <td className="px-4 py-3 text-right border-r">113.1</td>                                
-                                    <td className="px-4 py-3 text-right border-r">52.2</td>
-                                    <td className="px-4 py-3 text-right border-r">88.9</td>                                    
-                                    <td className="px-4 py-3 text-right border-r">76.4</td>                                    
-                                </tr>
-                            </tfoot>
+                            
                         </table>
                     </div>
 
@@ -196,7 +202,7 @@ const InventoryInOutReport = () => {
                             <button className="px-3 py-1 border rounded text-sm hover:bg-gray-50 disabled:opacity-50" disabled>
                                 <i className="fas fa-chevron-left"></i>
                             </button>
-                            <button className="px-3 py-1 border rounded text-sm bg-blue-600 text-white">1</button>
+                            <button className="px-3 py-1 border rounded text-sm bg-red-600 text-white">1</button>
                             <button className="px-3 py-1 border rounded text-sm hover:bg-gray-50">2</button>
                             <button className="px-3 py-1 border rounded text-sm hover:bg-gray-50">3</button>
                             <button className="px-3 py-1 border rounded text-sm hover:bg-gray-50">
