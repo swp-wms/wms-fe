@@ -87,8 +87,8 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
         //if creating an Export Order, we need to check if the product quantity is available for export or not
         if(TYPE === "E"){
           const selectedProduct = productList.find(product => product.trueId === id);
-          const totalBarAvailable = selectedProduct?.totalbar || 0 // the total bars available in the inventory
-          const totalWeightAvailable = selectedProduct?.totalweight || 0 // the total weight available in the inventory
+          let totalBarAvailable = selectedProduct?.totalbar || 0 // the total bars available in the inventory
+          let totalWeightAvailable = selectedProduct?.totalweight || 0 // the total weight available in the inventory
           
           // gathering unfinished export orders in the same day
           // to get the total number of bars and weight that gonna be exported

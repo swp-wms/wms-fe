@@ -202,8 +202,8 @@ const Catalog = ({user, setUser}) => {
                                         <tbody className="divide-y border border-gray-400 divide-gray-100">
                                         {catalogDataEdit
                                             .filter(item => item.brandname === brand.brandname && item.standard === brand.standard)
-                                            .map((item) => (
-                                                <tr key={item.id || item.steeltype} className="hover:bg-gray-50 border border-gray-400">
+                                            .map((item,id) => (
+                                                <tr key={id} className="hover:bg-gray-50 border border-gray-400">
                                                     <td className="p-0 border border-gray-400">
                                                         <input 
                                                         type="text" 
@@ -271,8 +271,8 @@ const Catalog = ({user, setUser}) => {
                                     <tbody className="divide-y border border-gray-400 divide-gray-200">
                                         {catalogData
                                             .filter(item => item.brandname === brand.brandname && item.standard === brand.standard)
-                                            .map((item) => (
-                                                <tr key={item.id || item.steeltype} className=  "hover:bg-gray-200 border border-gray-400">
+                                            .map((item,id) => (
+                                                <tr key={id} className=  "hover:bg-gray-200 border border-gray-400">
                                                     <td className="px-4 py-3 font-medium text-gray-900">{item.steeltype}</td>
                                                     <td className="px-4 py-3 text-gray-700 border border-gray-400" >{item.type}</td>
                                                     <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh"? item?.barsperbundle : null}</td>
