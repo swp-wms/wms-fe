@@ -11,20 +11,34 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
 
     const addTruck = async (e) => {
         e.preventDefault();
-        console.log(currentDelivery.gettime);
-        
+
+        const gett = new Date(`${currentDelivery.getdate}T${currentDelivery.gettime}`);
+        const deliveryt = new Date(`${currentDelivery.deliverydate}T${currentDelivery.deliverytime}`);
+
+        console.log('Pickup Date/Time:', gett);
+        console.log('Delivery Date/Time:', deliveryt);
+        console.log('Is Pickup < Delivery (full comparison)?', gett < deliveryt);
+
         try {
             if (!driver.drivername || !driver.drivercode || !driver.licenseplate || !driver.driverphonenumber) {
                 setError('Bạn cần điền đầy đủ thông tin tài xế.');
             } else if (driver.drivername.trim().length <= 0 || driver.drivercode.trim().length <= 0 || driver.driverphonenumber.trim().length <= 0 || driver.licenseplate.trim().length <= 0) {
                 setError('Bạn cần điền đầy đủ thông tin tài xế.');
-            } else if (!(/^\d+$/.test(driver.drivercode)) || !(/^\d+$/.test(driver.driverphonenumber)) || !(/^\d+$/.test(driver.drivercode))) {
-                setError('CCCD, GPLX và số điện thoại chỉ chứa số.');
+            } else if (driver.drivercode.length !== 12 || !(/^\d+$/.test(driver.drivercode))) {
+                setError('CCCD/GPLX bao gồm 12 chữ số.');
+            } else if (!(/^0\d{9,10}$/.test(driver.driverphonenumber))) {
+                setError('Số điện thoại gồm 10 hoặc 11 chữ số, bắt đầu bằng số 0.');
             } else if (!currentDelivery.deliverytime || !currentDelivery.gettime) {
                 setError('Thời gian bốc hàng và giao hàng cần được điền.');
-            } else {
-                await handleAddTruck(currentDelivery.id, {...driver, deliverytime: currentDelivery.deliverytime, gettime: currentDelivery.gettime});
-                setError();
+            }
+            // --- START OF FIX ---
+            else if (gett.getTime() >= deliveryt.getTime()) { // This checks if pickup is *after* delivery
+                setError('Thời gian giao hàng không thể sớm hơn thời gian bốc hàng.');
+            }
+            // --- END OF FIX ---
+            else {
+                await handleAddTruck(currentDelivery.id, { ...driver, deliverytime: currentDelivery.deliverytime, gettime: currentDelivery.gettime });
+                setError(); // Clear any previous errors
                 setCurrentDelivery({
                     ...currentDelivery,
                     drivername: driver.drivername,
@@ -40,9 +54,8 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
                 setDriver({});
             }
         } catch (error) {
-            console.log(error);
-
-            setError(error);
+            console.error("Error in addTruck:", error); // Use console.error for errors
+            setError('Có lỗi xảy ra khi thêm tài xế.'); // Generic error message for the user
         }
     }
 

@@ -3,11 +3,18 @@ import orderBeCall from '../../backendCalls/order.js'
 
 const OrderPopUp = ({ setShowOrderPopup, currentOrder }) => {
     const [orderDetail, setOrderDetail] = useState();
+    const [totalWeight, setTotalWeight] = useState();
 
     useEffect(() => {
         const getData = async () => {
             const response = await orderBeCall.getOrderDetail(currentOrder.orderid);
-            setOrderDetail(response[0].orderdetail);
+            const productList = response[0].orderdetail;
+            setOrderDetail(productList);
+            let sum = 0;
+            for (let index = 0; index < productList.length; index++) {
+                sum += productList[index].weight;
+            }
+            setTotalWeight(sum);
         }
         getData();
     }, []);
@@ -17,6 +24,7 @@ const OrderPopUp = ({ setShowOrderPopup, currentOrder }) => {
             onClick={() => { setShowOrderPopup(false) }}
         >
             <div className="bg-white p-5 rounded">
+                <h1 className="font-bold uppercase text-center mb-3 text-lg">{window.location.pathname.split('/')[2] === 'nhap' ? 'Đơn nhập hàng':'Đơn xuất hàng'}</h1>
                 <div className="font-semibold flex justify-between mb-3">
                     <h1 className="max-w-[75%]">Công ty: {currentOrder.partnername}</h1>
                     <h1>Mã đơn: {currentOrder.orderid}</h1>
@@ -47,6 +55,7 @@ const OrderPopUp = ({ setShowOrderPopup, currentOrder }) => {
                         ))}
                     </tbody>
                 </table>
+                <p className="font-bold text-sm float-end mt-2">Tổng khối lượng: {totalWeight && totalWeight.toFixed(2)} kg</p>
             </div>
         </div>
     )

@@ -42,7 +42,7 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
     let updateProduct = selectedProducts.find(product => product.trueId === id);
     
     if(updateProduct)  {
-      
+      updateProduct = {...updateProduct}; // Remember the lost attribute bug? this preserves the original object 's attributes
       
 //-----------------HANDLE NUMBER OF BARS AND WEIGHT-----------------
       if(field === "numberofbars") {
@@ -75,8 +75,7 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
         if(brand.trim() !== ''){
           const foundProduct = productList.find(product => product.brandname === brand && product.name === value)
           if(foundProduct){
-            updateProduct = foundProduct; // Update the product with the found one
-            updateProduct.trueId = id; // Re attach trueId to the updated product
+            updateProduct = { ...updateProduct, ...foundProduct, trueId: id };
             
           }
         }
@@ -90,9 +89,7 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
         if(name.trim() !== ''){
           const foundProduct = productList.find(product => product.brandname === value && product.name === name)
           if(foundProduct){
-            updateProduct = foundProduct; // Update the product with the found one
-            updateProduct.trueId = id; // Re attach trueId to the updated product
-            
+            updateProduct = { ...updateProduct, ...foundProduct, trueId: id };
           }
         }
 
@@ -173,39 +170,19 @@ const EditTable = ({ selectedProducts, setSelectedProducts, productList, totalBa
               <tr key={orderDetail.trueId || index}>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-4">{orderDetail.trueId}</td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-16">
-                    {/* <input
-                      type="text"
-                      className="w-full h-full focus:outline-none"
-                      value={orderDetail.name || ''}
-                      onChange={e => handleProductFieldChange(orderDetail.trueId, "name", e.target.value)}
-                    /> */}
+                    
                     {orderDetail.name}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
-                    {/* <input
-                      type="text"
-                      className="w-full h-full focus:outline-none"
-                      value={orderDetail.brandname || ''}
-                      onChange={e => handleProductFieldChange(orderDetail.trueId, "brandname", e.target.value)}
-                    /> */}
+                    
                     {orderDetail.brandname}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
-                  {/* <input
-                    type="text"
-                    className="w-full h-full focus:outline-none"
-                    value={orderDetail.namedetail || ''}
-                    onChange={e => handleProductFieldChange(orderDetail.trueId, "namedetail", e.target.value)}
-                  /> */}
+           
                   {orderDetail.namedetail}
                 </td>
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-9">
-                  {/* <input
-                    type="text"
-                    className="w-full h-full focus:outline-none"
-                    value={orderDetail.catalog?.length || ''}
-                    onChange={e => handleProductFieldChange(orderDetail.trueId, "catalog.length", e.target.value)}
-                  /> */}
+                 
                   {orderDetail.catalog?.length}
                 </td>
                 <td className="border border-gray-800  py-2 text-xs text-black w-9">

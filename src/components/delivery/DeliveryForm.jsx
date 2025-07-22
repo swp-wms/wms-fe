@@ -21,7 +21,7 @@ const DeliveryForm = ({
 
     const [newDeliveryList, setNewDeliveryList] = useState([]);  //product list of delivery
     const [error, setError] = useState();
-
+    
     const handleEmptyForm = (e) => {
         e.preventDefault();
         setNewDelivery({
@@ -65,6 +65,11 @@ const DeliveryForm = ({
         e.preventDefault();
         if (document.querySelector('.DeliveryForm').checkValidity()) {
             setError();
+            
+            if((new Date()) > new Date(newDelivery.getdate)) {
+                setError('Ngày vận chuyển không thể sớm hơn thời gian hiện tại.');
+                return;
+            }
             if (newDelivery.getdate > newDelivery.deliverydate) {
                 setError('Ngày vận chuyển không thể sớm hơn ngày bốc hàng.');
                 return;
@@ -106,6 +111,8 @@ const DeliveryForm = ({
                 setNewDelivery={setNewDelivery}
             />}
             {currentDelivery && <StatusButton
+                currentOrder={currentOrder}
+                currentDeliveryDetail={currentDeliveryDetail}
                 setIsChangePercent={setIsChangePercent}
                 setCurrentDelivery={setCurrentDelivery}
                 currentDelivery={currentDelivery} user={user}

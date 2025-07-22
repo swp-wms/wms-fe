@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const PartnerSearch = ({
   inputpartner,
@@ -10,11 +10,21 @@ const PartnerSearch = ({
   setSelectedPartner,
   focused,
   setFocused,
-  setActiveTab
+  setActiveTab,
+  refresh,
+  setRefresh,
+  TYPE
+
 }) => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const inputRef = useRef(null);
     const dropdownRef = useRef(null);
+
+    useEffect(() => {
+      if(selectedPartner) 
+        setInputpartner(selectedPartner.name || selectedPartner.id);
+      
+    },[]);
 
 
   const handleBlur = () => {
@@ -32,6 +42,9 @@ const PartnerSearch = ({
   const handlePartnerInputChange = (e) => {
     const value = e.target.value;
     setInputpartner(value);
+    if(value.trim() === "" && selectedPartner) {
+      setSelectedPartner(null);
+    }
     const filteredSuggestions = partnerList.filter(
       partner =>
         partner.name.trim().toLowerCase().includes(value.toLowerCase().trim()) ||
@@ -44,6 +57,10 @@ const PartnerSearch = ({
     setInputpartner(partner.name || partner.id || "");
     setpartnerFilteredSuggestions([]);
     setSelectedPartner(partner);
+    setRefresh(prev => !prev); // Trigger re-rendering of the table
+    setTimeout(() => {
+      console.log("Selected Partner: ", selectedPartner);
+    }, 500);
   };
 
   const handleKeyDown = (e) => {
@@ -54,10 +71,14 @@ const PartnerSearch = ({
       );
       if (matched) {
         setSelectedPartner(matched);
+        setpartnerFilteredSuggestions([]);
+        setRefresh(prev => !prev); // Trigger re-rendering of the table
+      
       }
+      console.log("selectedPartner: ", selectedPartner);
     }
   };
-
+  console.log("selected partner: ", selectedPartner);
   return (
     <div className="bg-white border-2 border-gray-600 rounded-md p-4">
       <div className="space-y-4">
@@ -103,7 +124,7 @@ const PartnerSearch = ({
         </div>
             <button className=" ml-1 size-9.5  aspect-square justify-center border border-gray-300 rounded text-sm bg-white hover:bg-gray-100 hover:border-gray-400 align-bottom "
             onClick={()=>setActiveTab('partner')}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 ml-1 text-gray-500" >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="c urrentColor" className="size-6 ml-1 text-gray-500" >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
           </button>

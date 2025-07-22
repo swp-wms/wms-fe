@@ -1,17 +1,24 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faBackward } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSave,
+  faBackward,
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import { updateUserInfo } from "../../backendCalls/userInfo";
 import toast from "react-hot-toast";
 
 const EditUserModal = ({ user, onSuccess, onCancel }) => {
   const [editFormData, setEditFormData] = useState({
-    fullname: user?.fullname || "",
     username: user?.username || "",
     password: "",
     role: user?.role?.rolename || "",
   });
   const [isEditUpdating, setIsEditUpdating] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const positions = [
     "Salesman",
@@ -35,39 +42,76 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
     }
   };
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    // Check khi nhập mk
+    if (password === "") return "";
+
+    if (password.length < 8 || password.length > 30) {
+      return "Mật khẩu tối thiểu 8 ký tự. Tối đa 30 ký tự.";
+    } else if (!/^(?=.*\d)(?=.*[a-zA-Z]).*$/.test(password)) {
+      return "Mật khẩu phải chứa cả chữ và số.";
+    }
+    return "";
+  };
+
   const handleEditFormChange = (field, value) => {
     setEditFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+
+    if (field === "username") {
+      if (value && !validateEmail(value)) {
+        setEmailError("Tên đăng nhập phải có định dạng email hợp lệ");
+      } else {
+        setEmailError("");
+      }
+    }
+
+    if (field === "password") {
+      const error = validatePassword(value);
+      setPasswordError(error);
+    }
   };
 
   const handleSaveEdit = async () => {
     if (!user) return;
+
+    if (!editFormData.username || !editFormData.role) {
+      toast.error("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
+
+    // if (emailError || passwordError) {
+    //   toast.error("HHHHHHHHHHHHHHHH")
+    //   return
+    // }
+
     setIsEditUpdating(true);
+
     try {
       const updatedUserData = {
         ...user,
         username: editFormData.username,
-        // Chỉ gửi password nếu nhập
-        ...(editFormData.password &&
-          editFormData.password.trim() !== "" && {
-            password: editFormData.password,
-          }),
-        roleid: getRoleIdFromName(editFormData.role),
+        ...(editFormData.password && { password: editFormData.password }),
+        role: getRoleIdFromName(editFormData.role),
       };
-
-      delete updatedUserData.role;
-
       const response = await updateUserInfo(updatedUserData);
       if (response.status === 200) {
         const updatedUser = {
           ...user,
-          username: editFormData.username,
+          ...updatedUserData,
           role: { ...user.role, rolename: editFormData.role },
         };
         onSuccess(updatedUser);
         toast.success("Cập nhật thông tin thành công!");
+      } else if (response.status === 400) {
+        toast.error("TÊN ĐĂNG NHẬP đã tồn tại!");
       } else {
         toast.error("Có lỗi xảy ra khi cập nhật thông tin!");
       }
@@ -132,7 +176,7 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
               </label>
               <input
                 type="text"
-                value={editFormData.fullname}
+                value={user?.fullname || ""}
                 disabled
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
               />
@@ -141,35 +185,62 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
               <label className="w-32 text-sm font-medium text-gray-700">
                 TÊN ĐĂNG NHẬP:
               </label>
-              <input
-                type="text"
-                value={editFormData.username}
-                onChange={(e) =>
-                  handleEditFormChange("username", e.target.value)
-                }
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <div className="flex-1">
+                <input
+                  placeholder="example@email.com"
+                  type="email"
+                  value={editFormData.username}
+                  onChange={(e) =>
+                    handleEditFormChange("username", e.target.value)
+                  }
+                  className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    emailError ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                {emailError && (
+                  <p className="text-red-500 text-xs mt-1">{emailError}</p>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <label className="w-32 text-sm font-medium text-gray-700">
                 MẬT KHẨU:
               </label>
-              <input
-                type="password"
-                value={editFormData.password}
-                onChange={(e) =>
-                  handleEditFormChange("password", e.target.value)
-                }
-                placeholder="Để trống nếu không muốn thay đổi"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <div className="flex-1">
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={editFormData.password}
+                    onChange={(e) =>
+                      handleEditFormChange("password", e.target.value)
+                    }
+                    placeholder="Để trống nếu không muốn thay đổi"
+                    className={`w-full px-3 py-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      passwordError ? "border-red-500" : "border-gray-300"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    <FontAwesomeIcon
+                      icon={showPassword ? faEyeSlash : faEye}
+                      className="h-4 w-4"
+                    />
+                  </button>
+                </div>
+                {passwordError && (
+                  <p className="text-red-500 text-xs mt-1">{passwordError}</p>
+                )}
+              </div>
             </div>
           </div>
           {/* Buttons */}
           <div className="flex flex-col gap-3">
             <button
               onClick={handleSaveEdit}
-              disabled={isEditUpdating}
+              disabled={isEditUpdating || emailError || passwordError}
               className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 min-w-[100px]"
             >
               <FontAwesomeIcon icon={faSave} />

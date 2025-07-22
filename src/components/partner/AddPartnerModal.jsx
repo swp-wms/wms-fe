@@ -5,6 +5,7 @@ import partner from "../../backendCalls/partner";
 
 const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
+    id:"",
     name: "",
     address: "",
     taxcode: "",
@@ -22,6 +23,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
 
   const resetForm = () => {
     setFormData({
+      id:"",
       name: "",
       address: "",
       taxcode: "",
@@ -42,7 +44,6 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-    // Clear error when user starts typing
     if (error) setError("");
   };
 
@@ -58,11 +59,10 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
       if (response.status === 200 || response.status === 201) {
         setSuccess("Thêm đối tác thành công!");
 
-        // Reset form after successful submission
         setTimeout(() => {
           resetForm();
           onClose();
-          // Call onSuccess callback to refresh the partner list
+
           if (onSuccess) {
             onSuccess();
           }
@@ -71,20 +71,17 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
     } catch (error) {
       console.error("Error adding partner:", error);
 
-      // Handle different types of errors
       if (error.response) {
-        // Server responded with error status
         const errorMessage =
           error.response.data?.message || "Có lỗi xảy ra khi thêm đối tác";
         setError(errorMessage);
       } else if (error.request) {
-        // Request was made but no response received
         setError("Không thể kết nối đến server. Vui lòng thử lại.");
       } else {
-        // Something else happened
         setError("Có lỗi không xác định xảy ra. Vui lòng thử lại.");
       }
-    } finally {
+    } 
+    finally {
       setLoading(false);
     }
   };
@@ -106,7 +103,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
   return (
     <div className="fixed inset-0 bg-opacity-50 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-200 rounded-lg p-6 w-full max-w-2xl mx-4 shadow-lg">
-        {/* Header with close button */}
+        {/* Closed BTN */}
         <div className="flex justify-end mb-4">
           <button
             onClick={handleClose}
@@ -117,14 +114,14 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
           </button>
         </div>
 
-        {/* Success Message */}
+        {/* Noti */}
         {success && (
           <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
             {success}
           </div>
         )}
 
-        {/* Error Message */}
+        {/* Error Mess*/}
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
@@ -132,8 +129,22 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
         )}
 
         <form onSubmit={handleSubmit}>
-          {/* First row - Company Name */}
+          {/* ID + NAME */}
           <div className="grid grid-cols-1 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                MÃ DOANH NGHIỆP <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="id"
+                value={formData.id}
+                onChange={handleInputChange}
+                disabled={loading}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                required
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 TÊN DOANH NGHIỆP <span className="text-red-500">*</span>
@@ -150,7 +161,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          {/* Second row - Address and Tax Code */}
+          {/* ADDRESS + TAX NUMB */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -180,7 +191,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          {/* Third row - Phone and Bank Account */}
+          {/* PHONE + BANK ACC */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -210,7 +221,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          {/* Fourth row - Email and Bank Name */}
+          {/* MAIL + BANK NAME */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -240,7 +251,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          {/* Fifth row - Note and Factory checkbox */}
+          {/* NOTE + isFactory */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -273,7 +284,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          {/* Action buttons */}
+          {/* BTNS */}
           <div className="flex justify-end gap-3">
             <button
               type="button"

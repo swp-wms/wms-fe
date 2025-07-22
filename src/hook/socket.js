@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 
 const baseUrl = "http://localhost:3800";
 
-export const useSocket = (roleid) => {
+export const useSocket = (roleid, userid) => {
     const socketRef = useRef(null);
     const [isConnect, setIsConnect] = useState(false);
 
@@ -17,7 +17,7 @@ export const useSocket = (roleid) => {
             withCredentials: true,
             reconnectionAttempts: 5,
             reconnectionDelay: 1000, //delay between reconnection attempts 
-            auth: { roleid: roleid }
+            auth: { roleid: roleid, userid: userid }
         });
 
         socketRef.current = socket;
