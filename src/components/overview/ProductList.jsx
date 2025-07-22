@@ -7,9 +7,13 @@ import {
   faSquarePlus,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
-import { fetchProductCatalog } from "../../backendCalls/productCatalog";
+import {
+  fetchProductCatalog,
+  addProduct,
+} from "../../backendCalls/productCatalog";
 import ProductEdit from "./ProductEdit";
 import { fetchCatalog } from "../../backendCalls/catalog";
+import toast from "react-hot-toast";
 
 const ProductList = ({ user }) => {
   const [productCatalog, setProductCatalog] = useState([]);
@@ -18,6 +22,8 @@ const ProductList = ({ user }) => {
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [catalog, setCatalog] = useState([]);
+  const [excelProducts, setExcelProducts] = useState([]);
+  const [showExcelConfirm, setShowExcelConfirm] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -78,21 +84,6 @@ const ProductList = ({ user }) => {
     });
   };
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const bstr = evt.target.result;
-      const wb = XLSX.read(bstr, { type: "binary" });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      const data = XLSX.utils.sheet_to_json(ws);
-      setProductCatalog((prev) => [...prev, ...data]);
-      setCurrentPage(1);
-    };
-    reader.readAsArrayBuffer(file);
-  };
-
   const filteredData = productCatalog.filter((item) => {
     const name = item.name?.toLowerCase() || "";
     const namedetail = item.namedetail?.toLowerCase() || "";
@@ -100,13 +91,110 @@ const ProductList = ({ user }) => {
     return name.includes(search) || namedetail.includes(search);
   });
 
-  const ITEMS_PER_PAGE = 15;
+  const ITEMS_PER_PAGE = 10;
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
 
+    reader.onload = (evt) => {
+      const bstr = evt.target.result;
+      const wb = XLSX.read(bstr, { type: "binary" });
+      const wsname = wb.SheetNames[0];
+      const ws = wb.Sheets[wsname];
+      const rawData = XLSX.utils.sheet_to_json(ws);
+
+      const mappedData = rawData.map((row) => ({
+        pd: row["Mã hàng hóa"] || "",
+        type: row["Loại thép"] || "",
+        brandname: row["Tên hãng thép"] || "",
+        name: row["Tên đối tác"] || row["Đối tác"] || "",
+        namedetail: row["Tên hàng hóa"] || "",
+        steeltype: row["Mã thép"] || "",
+        totalbar: Number(row["Số lượng"] || 0),
+        length: Number(row["Độ dài"] || 0),
+        weight: Number(row["Đơn trọng"] || 0),
+        totalweight: Number(row["Tổng khối lượng"] || 0),
+      }));
+
+      setExcelProducts(mappedData);
+      setShowExcelConfirm(true);
+    };
+
+    reader.readAsArrayBuffer(file);
+  };
+
+  const handleConfirmImport = async () => {
+    const generateKey = (item) => item;
+    const existingKeySet = productCatalog.map(generateKey);
+    console.log(existingKeySet);
+
+    const newItems = [];
+    const duplicates = [];
+
+    console.log("Excel products:", excelProducts);
+    for (const item of excelProducts) {
+      const key = generateKey(item);
+      console.log("Key: ", key);
+
+      if (
+        existingKeySet.some(
+          (existingKey) =>
+            existingKey.pd?.trim().toLowerCase() ===
+              key.pd?.trim().toLowerCase() &&
+            existingKey.name?.trim().toLowerCase() ===
+              key.name?.trim().toLowerCase() &&
+            existingKey.brandname?.trim().toLowerCase() ===
+              key.brandname?.trim().toLowerCase() &&
+            existingKey.type?.trim().toLowerCase() ===
+              key.type?.trim().toLowerCase()
+        )
+      ) {
+        duplicates.push(item);
+        console.log("Sản phẩm trùng mã:", item);
+      } else {
+        newItems.push(item);
+        existingKeySet.push(key);
+        console.log("Sản phẩm gửi lên:", item);
+      }
+    }
+
+    if (duplicates.length > 0) {
+      toast.error(`${duplicates.length} mặt hàng đã tồn tại trong hệ thống`);
+    }
+
+    if (newItems.length === 0) {
+      setShowExcelConfirm(false);
+      setExcelProducts([]);
+      return;
+    }
+
+    const successList = [];
+    for (const product of newItems) {
+      console.log("Product: ", product);
+      try {
+        const savedProduct = await addProduct(product);
+        console.log("Product added:", savedProduct);
+        successList.push(savedProduct);
+      } catch (err) {
+        console.error("Lỗi khi thêm:", product, err);
+        toast.error(`Lỗi khi thêm sản phẩm mã: ${product.pd}`);
+      }
+    }
+
+    if (successList.length > 0) {
+      setProductCatalog((prev) => [...prev, ...successList]);
+      toast.success(`Đã thêm ${successList.length} mặt hàng vào hệ thống.`);
+    }
+
+    setShowExcelConfirm(false);
+    setExcelProducts([]);
+  };
+  
   return (
     <section>
       <div className="flex justify-between">
@@ -182,6 +270,36 @@ const ProductList = ({ user }) => {
           catalog={catalog}
           user={user}
         />
+      )}
+      {showExcelConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 ms-[20%] ">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] border border-black">
+            <h2 className="text-lg font-semibold mb-4">
+              Xác nhận thêm hàng hóa
+            </h2>
+            <p>
+              Bạn có chắc chắn muốn thêm <strong>{excelProducts.length}</strong>{" "}
+              mặt hàng từ file Excel không?
+            </p>
+            <div className="mt-4 flex justify-end gap-4 font-medium">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded hover:scale-105 transition duration-300 ease-in-out cursor-pointer"
+                onClick={() => {
+                  setShowExcelConfirm(false);
+                  setExcelProducts([]);
+                }}
+              >
+                Hủy
+              </button>
+              <button
+                className="px-4 py-2 bg-red-800 text-white rounded hover:scale-105 transition duration-300 ease-in-out cursor-pointer"
+                onClick={handleConfirmImport}
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </section>
   );

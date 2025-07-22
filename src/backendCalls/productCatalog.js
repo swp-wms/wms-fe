@@ -27,7 +27,7 @@ export const addProduct = async(productInfo) => {
             }
         });
         console.log('Product added:', response.data);
-        return response;
+        return response.data;
 
     }catch(error){
         console.error("Error adding product:", error);
