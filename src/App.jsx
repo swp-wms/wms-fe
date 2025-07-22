@@ -25,6 +25,7 @@ import Error404 from "./pages/Error-404";
 import Error403 from "./pages/Error-403";
 
 import Catalog from "./pages/Catalog";
+import InventoryInOutReport from "./pages/InventoryInOutReport";
 
 function App() {
   const [user, setUser] = useState();
@@ -102,6 +103,8 @@ function App() {
 
         <Route path="/error403" element={<Error403 user={user} setUser={setUser} />} />
         <Route path="/error404" element={<Error404 user={user} setUser={setUser} />} />
+
+        <Route path="/thong-ke-kho/bao-cao-nhap-xuat-ton" element={<InventoryInOutReport user={user} setUser={setUser} />} />
 
       </Routes>
     </div>

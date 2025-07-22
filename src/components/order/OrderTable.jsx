@@ -6,7 +6,22 @@ import '../../index.css';
 
 const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, productList, totalBars, totalWeight, setActiveTab,TYPE }) => {
   // Handler for changing product fields (e.g. quantity)
-  
+     const [exportOrders, setExportOrders] = useState(null); // store export order details
+
+      useEffect(() => {
+         const fetchExportOrders = async () => {
+           try {
+             const response = await orderCalls.fetchExportOrders();
+             setExportOrders(response.filter((order => 
+                                                      order.date.split("T")[0] === new Date().toISOString().split("T")[0]
+                                                    && order.status !== "XONG" 
+                                                    && order.status !=="HỦY" ))); // filter orders by today's date and not completed
+           } catch (error) {
+             console.error("Error fetching export orders:", error);
+           }
+         };
+         fetchExportOrders();
+       }, []);
   useEffect(() => {
 
     // const filtered = new Map();
@@ -66,8 +81,45 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
         } else if (value === '') {
           // ✅ Clear weight when number of bars is cleared
           updateProduct.weight = '';
+
         }
-        
+
+        //if creating an Export Order, we need to check if the product quantity is available for export or not
+        if(TYPE === "E"){
+          const selectedProduct = productList.find(product => product.trueId === id);
+          let totalBarAvailable = selectedProduct?.totalbar || 0 // the total bars available in the inventory
+          let totalWeightAvailable = selectedProduct?.totalweight || 0 // the total weight available in the inventory
+          
+          // gathering unfinished export orders in the same day
+          // to get the total number of bars and weight that gonna be exported
+          if(exportOrders){
+            const similarProducts = exportOrders.map(order =>{
+              const similarProductInAnotherOrder = order.orderdetail.find(detail => detail.productid === id);
+              
+              return similarProductInAnotherOrder;
+            })
+            .filter(product => product !== undefined);
+            console.log("similarProducts: ", similarProducts);
+            
+            
+            const totalExportBars = similarProducts.reduce((sum, product) => (sum += product.numberofbars || sum),0)
+            const totalExportWeight = similarProducts.reduce((sum, product) => (sum += product.weight || sum),0)
+            totalBarAvailable -= totalExportBars  ;
+            totalWeightAvailable -= totalExportWeight;
+          }
+          totalBarAvailable < 0? 0: totalBarAvailable;
+          totalWeightAvailable < 0? 0: totalWeightAvailable;
+          if(value > totalBarAvailable){
+            toast.error(`Số lượng hàng hóa không đủ để xuất, chỉ còn ${totalBarAvailable} cây`);
+            updateProduct.numberofbars = totalBarAvailable;
+            updateProduct.weight = (totalWeightAvailable / totalBarAvailable * totalBarAvailable).toFixed(2);
+          } 
+          
+          else if(value * updateProduct.catalog?.weightperbundle / updateProduct.catalog?.barsperbundle > totalWeightAvailable){
+            toast.error(`Khối lượng hàng hóa không đủ để xuất, chỉ còn ${totalWeightAvailable} KG`);
+            updateProduct.weight = totalWeightAvailable;
+          }
+        }
       }
     
       if(field === "name"){

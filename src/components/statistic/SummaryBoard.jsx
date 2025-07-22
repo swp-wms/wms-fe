@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate,Link } from "react-router-dom";
 import { Bar, Doughnut } from "react-chartjs-2";
+
 import {
   Chart as ChartJS,
   ArcElement,
@@ -40,6 +42,7 @@ const SummaryBoard = () => {
   const [weightBrands, setWeightBrands] = useState([]);
   const [weightPartners, setWeightPartners] = useState([]);
   const [weightTypes, setWeightTypes] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getData = async () => {
@@ -108,6 +111,11 @@ const SummaryBoard = () => {
 
   return (
     <>
+       <div className="bg-white p-5 rounded-lg mb-5 shadow-md flex justify-between items-center">
+                <h1 className="text-2xl font-bold text-gray-700">Dashboard Tổng Quan</h1>
+                <Link to="./bao-cao-nhap-xuat-ton" className="stats-button bg-red-500 text-white border-none px-6 py-3 rounded-md  font-semibold cursor-pointer shadow-md hover:shadow-lg"> Xem Thống Kê Xuất Nhập Tồn
+               </Link>
+      </div>
       <div className="grid grid-cols-4 gap-12 mb-10">
         <Board
           number={importBars === null ? 0 : importBars}

@@ -2,6 +2,7 @@ import React from "react";
 
 import { useState,useEffect} from "react";
 import order from '../backendCalls/order';
+import toast from "react-hot-toast";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getUser } from "../backendCalls/user";
 import SupplementOrderList from "../components/order/SupplementOrderList";
@@ -91,37 +92,34 @@ useEffect(() => {
     navigate(`${window.location.pathname}/cap-nhat`, { state: { orderDetail, id } });
   }
 
-        const handleCancel = async (e) => {
+  const handleCancel = async (e) => {
         e.preventDefault();
-        if (!selectedPartner || !selectedProducts || selectedProducts.length === 0) {
-          alert("Please select a partner and at least one product.");
-          return;
-        }
-        // Here you would typically send the order data to your backend
-        const orderData = {
-          type: orderDetail.type,
-          partnerid: orderDetail.partnerid,
-          address: orderDetail.partner.address,
-          totalbars: orderDetail.totalbars,
-          totalweight: orderDetail.totalweight,
-          date: orderDetail.date,
-          salesmanid: orderDetail.salesmanid,
-          note: orderDetail.note,
-          status: "Hủy",
+        
+    try {
+    const orderData = {
+      type: orderDetail.type,
+      partnerid: orderDetail.partnerid,
+      address: orderDetail.partner?.address || '',
+      totalbars: orderDetail.totalbars || 0,
+      totalweight: orderDetail.totalweight || 0,
+      date: orderDetail.date,
+      salesmanid: orderDetail.salesmanid,
+      note: orderDetail.note || '',
+      status: "Hủy",
+      orderdetail: orderDetail.orderdetail || []
+    };
     
-          orderdetail: selectedProducts.map(product => ({
-            productid: product?.id,
-            numberofbars: product?.numberofbars,
-            weight: product?.weight
-            
-            }))
-        };
-        console.log("Order Data:", orderData);
-        orderCalls.createImportOrder(orderData);
-        setSelectedProducts([]);
-        setSelectedPartner(null);
-      };
-  
+    await orderCalls.updateOrder(id, orderData);
+    
+    
+    setOrderDetail(prev => ({ ...prev, status: "Hủy" }));
+    toast.success("Đơn hàng đã được hủy thành công");
+    
+  } catch (error) {
+    console.error("Error canceling order:", error);
+    toast.error("Lỗi khi hủy đơn hàng: " + error.message);
+  }
+};
 
   return (
     <>
@@ -137,6 +135,10 @@ useEffect(() => {
               activeSupplementForm={activeSupplementForm} 
               setActiveSupplementForm={setActiveSupplementForm}
               setUser={setUser}
+              orderTotalWeight={Number(total(orderDetail?.orderdetail || [], 'weight')).toFixed(2)}
+              orderTotalBars={total(orderDetail?.orderdetail || [], 'numberofbars')}
+              supplementOrder={supplementOrder}
+              cc={setSupplementOrder}
             />
           )}
           
