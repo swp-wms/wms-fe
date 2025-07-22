@@ -33,6 +33,7 @@ const addProduct = async(productInfo) => {
     }
 }
 
+
 export const updateProduct = async (id,data) => {
     try{
     const response = await axios.put(`${api.UPDATE_PRODUCT(id)}`,data,{
@@ -47,6 +48,7 @@ export const updateProduct = async (id,data) => {
     throw error;
   }
 }
+
 
 export default {
     fetchProducts,

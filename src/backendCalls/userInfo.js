@@ -49,7 +49,7 @@ export const getAllUserInfo = async () => {
 
 export const createNewUser = async (newUserData) => {
     try {
-        const response = await axios.post(api.REGISTER, newUserData, {
+        const response = await axios.post(api.REGISTER_ADMIN, newUserData, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }

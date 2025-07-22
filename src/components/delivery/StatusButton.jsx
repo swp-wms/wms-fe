@@ -4,11 +4,14 @@ import axios from 'axios';
 import { api } from '../../config/api';
 import { handleCancelDelivery } from '../../backendCalls/delivery';
 import toast from 'react-hot-toast';
-const StatusButton = ({ setIsChangePercent, currentDelivery, user, setCurrentDelivery, act, deliverySchedule, setDeliverySchedule }) => {
+import PDFPopup from './PDFPopup';
+const StatusButton = ({ setIsChangePercent, currentOrder, currentDelivery, user, setCurrentDelivery, act, deliverySchedule, setDeliverySchedule, currentDeliveryDetail }) => {
     const notify = () => toast.success("Chuyển trạng thái thành công.");
 
     const [status, setStatus] = useState();
     const [error, setError] = useState();
+
+    const [showNote, setShowNote] = useState(false);
 
     useEffect(() => {
         setStatus(currentDelivery.deliverystatus);
@@ -88,7 +91,15 @@ const StatusButton = ({ setIsChangePercent, currentDelivery, user, setCurrentDel
                         onClick={(e) => handleCancelADelivery(e)}
                     >Hủy vận chuyển</button>
                 }
+
+                {status === '5' && <button className={`w-fit cursor-pointer hover:scale-[1.02] ml-2 hover:shadow-[1px_1px_3px_#aaa] hover:duration-200 rounded-full py-2 px-4 shadow-[0_0_2px_#aaa]`}
+                    onClick={(e) => { e.preventDefault(), setShowNote(true) }}
+                >
+                    {act === 'nhap' ? 'Phiếu nhập kho' : 'Phiếu xuất kho'}
+                </button>}
             </div>}
+
+            {showNote && <PDFPopup setShowNote={setShowNote} currentDelivery={currentDelivery} act={act} currentDeliveryDetail={currentDeliveryDetail} currentOrder={currentOrder}/>}
         </div>
     )
 }
