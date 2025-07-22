@@ -11,7 +11,6 @@ import {
   addProduct,
   updateProductCatalog,
 } from "../../backendCalls/productCatalog";
-import { read } from "xlsx";
 
 const ProductEdit = ({ product, onClose, onUpdate, catalog, user }) => {
   const [formData, setFormData] = useState({ ...product });
