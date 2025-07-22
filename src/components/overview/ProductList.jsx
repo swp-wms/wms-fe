@@ -11,7 +11,7 @@ import { fetchProductCatalog } from "../../backendCalls/productCatalog";
 import ProductEdit from "./ProductEdit";
 import { fetchCatalog } from "../../backendCalls/catalog";
 
-const ProductList = () => {
+const ProductList = ({ user }) => {
   const [productCatalog, setProductCatalog] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -125,22 +125,27 @@ const ProductList = () => {
             }}
           />
         </div>
+        {user?.roleid === 3 && (
+          <div className="flex gap-4">
+            <label className="flex bg-white shadow-btn py-2 px-4 items-center gap-4 rounded-sm cursor-pointer">
+              <FontAwesomeIcon icon={faArrowUpFromBracket} />
+              <span className="font-medium">Nhập từ Excel</span>
+              <input
+                type="file"
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+            </label>
 
-        <div className="flex gap-4">
-          <label className="flex bg-white shadow-btn py-2 px-4 items-center gap-4 rounded-sm cursor-pointer">
-            <FontAwesomeIcon icon={faArrowUpFromBracket} />
-            <span className="font-medium">Nhập từ Excel</span>
-            <input type="file" className="hidden" onChange={handleFileUpload} />
-          </label>
-
-          <button
-            className="flex bg-white shadow-btn py-2 px-4 items-center gap-4 rounded-sm cursor-pointer"
-            onClick={handleAddNew}
-          >
-            <FontAwesomeIcon icon={faSquarePlus} />
-            <span className="font-medium">Thêm hàng hóa</span>
-          </button>
-        </div>
+            <button
+              className="flex bg-white shadow-btn py-2 px-4 items-center gap-4 rounded-sm cursor-pointer"
+              onClick={handleAddNew}
+            >
+              <FontAwesomeIcon icon={faSquarePlus} />
+              <span className="font-medium">Thêm hàng hóa</span>
+            </button>
+          </div>
+        )}
       </div>
 
       <TableList
@@ -177,6 +182,7 @@ const ProductList = () => {
           onClose={handleClose}
           onUpdate={handleUpdateProduct}
           catalog={catalog}
+          user={user}
         />
       )}
     </section>
@@ -208,7 +214,6 @@ const TableList = ({ data, onEdit, setSelectedProduct }) => {
             <th className="border border-black py-2">
               Tổng khối lượng <br /> (kg)
             </th>
-            <th className="border border-black">Ghi chú</th>
             <th className="border border-black">Tùy chọn</th>
           </tr>
         </thead>
@@ -237,8 +242,6 @@ const TableList = ({ data, onEdit, setSelectedProduct }) => {
                 <td className="border border-black">
                   {(Number(item.totalweight) || 0).toFixed(2)}
                 </td>
-
-                <td className="border border-black">{item.note}</td>
                 <td className="border border-black text-center py-1">
                   <FontAwesomeIcon
                     icon={faPenToSquare}

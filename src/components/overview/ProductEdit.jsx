@@ -11,8 +11,9 @@ import {
   addProduct,
   updateProductCatalog,
 } from "../../backendCalls/productCatalog";
+import { read } from "xlsx";
 
-const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
+const ProductEdit = ({ product, onClose, onUpdate, catalog, user }) => {
   const [formData, setFormData] = useState({ ...product });
   const [errors, setErrors] = useState({});
   const [partners, setPartners] = useState([]);
@@ -37,7 +38,6 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     console.log(value);
-    
 
     if (name === "pd") {
       const pdValue = value;
@@ -59,10 +59,7 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
     } else if (name === "type") {
       setFormData((prev) => ({ ...prev, [name]: value }));
     } else if (name === "partner") {
-      const selectedPartner = partners.find(
-        (p) =>
-          p.name === value
-      );
+      const selectedPartner = partners.find((p) => p.name === value);
       console.log(selectedPartner);
       if (selectedPartner) {
         setFormData((prev) => ({ ...prev, [name]: selectedPartner.id }));
@@ -76,8 +73,10 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
 
   const validate = () => {
     const newErrors = {};
-    if (!/^TD/.test(formData.pd || ""))
-      newErrors.pd = "Mã hàng hóa phải bắt đầu bằng 'TD'";
+    if (!/^TD\d{2}CB\d{3}[TV]$/.test(formData.pd || "")) {
+      newErrors.pd =
+        "Mã hàng hóa phải có dạng TDxxCBxxxT hoặc TDxxCBxxxV (với x là chữ số), ví dụ TD16CB300T";
+    }
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length) notify();
@@ -103,6 +102,7 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
       }
 
       toast.success("Lưu thành công");
+
       onUpdate?.(savedProduct);
       onClose();
     } catch (error) {
@@ -121,10 +121,28 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
     getData();
   }, []);
 
-  const length = formData.length || formData?.length || 0;
-  const weight =
-    formData.weight || formData?.weightperbundle / formData?.barsperbundle || 0;
-  // const totalWeight = (formData.totalbar || 0) * weight;
+  useEffect(() => {
+    if (!formData.brandname || !formData.steeltype || !formData.type) return;
+    const matchedProduct = catalog.find(
+      (item) =>
+        item.brandname === formData.brandname &&
+        item.steeltype === formData.steeltype &&
+        item.type === formData.type
+    );
+    console.log("Matched product:", matchedProduct);
+    if (matchedProduct) {
+      setFormData((prev) => ({
+        ...prev,
+        length: matchedProduct.length,
+        weight: matchedProduct.weightperbundle / matchedProduct.barsperbundle,
+        weightperbundle: matchedProduct.weightperbundle,
+        barsperbundle: matchedProduct.barsperbundle,
+      }));
+    }
+  }, [formData.brandname, formData.steeltype, formData.type, catalog]);
+
+  const length = formData.length || 0;
+  const weight = formData.weight || 0;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -148,7 +166,6 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
               name: "steeltype",
               readOnly: true,
             },
-            { label: "Số lượng", name: "totalbar", type: "number" },
             {
               label: "Độ dài (m)",
               name: "length",
@@ -168,9 +185,9 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
               label,
               name,
               type = "text",
-              readOnly = false,
               error,
               value,
+              readOnly = false,
             }) => (
               <div key={name}>
                 <label className="block mb-1 font-medium">{label}:</label>
@@ -180,8 +197,11 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
                   value={value ?? formData[name] ?? ""}
                   onChange={(e) => handleChange(e)}
                   readOnly={readOnly}
+                  disabled={user?.roleid !== 3 ? true : false}
                   className={`w-full border px-2 py-1 rounded ${
-                    readOnly ? "bg-gray-100 cursor-not-allowed" : ""
+                    user?.roleid === 3 && !readOnly
+                      ? ""
+                      : "bg-gray-100 cursor-not-allowed"
                   } ${error ? "border-red-500" : ""}`}
                 />
                 {error && (
@@ -195,13 +215,21 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
             <label className="block mb-1 font-medium">Tên hãng thép:</label>
             <select
               name="brandname"
-              value={formData.brandname || ""}
               onChange={(e) => handleChange(e)}
-              className="w-full border px-2 py-1 rounded"
+              disabled={user?.roleid !== 3 ? true : false}
+              className={`w-full border px-2 py-1 rounded ${
+                user?.roleid === 3 ? "" : "bg-gray-100 cursor-not-allowed"
+              } `}
             >
-              <option value="" disabled>
-                Vui lòng chọn hãng thép
-              </option>
+              {product.brandname !== "" ? (
+                <option value="" className="truncate" disabled selected>
+                  {product.brandname}
+                </option>
+              ) : (
+                <option value="" disabled selected className="truncate">
+                  Vui lòng chọn hãng thép
+                </option>
+              )}
               {validBrands.map((brand, index) => (
                 <option key={index} value={brand}>
                   {brand}
@@ -216,13 +244,28 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
               name="type"
               value={formData.type}
               onChange={(e) => handleChange(e)}
-              className="w-full border px-1 py-1 rounded"
+              disabled={user?.roleid !== 3 ? true : false}
+              className={`w-full border px-2 py-1 rounded ${
+                user?.roleid === 3 ? "" : "bg-gray-100 cursor-not-allowed"
+              } `}
             >
               <option value="Thép Thanh">Thép Thanh</option>
               <option value="Thép Cuộn">Thép Cuộn</option>
             </select>
           </div>
-
+          <div>
+            <label className="block mb-1 font-medium">Số lượng:</label>
+            <input
+              onChange={(e) => handleChange(e)}
+              type="number"
+              name="totalbar"
+              value={formData.totalbar}
+              readOnly={user?.roleid === 4 ? "" : "readOnly"}
+              className={`w-full border px-2 py-1 rounded ${
+                user?.roleid === 4 ? "" : "bg-gray-100 cursor-not-allowed"
+              }`}
+            />
+          </div>
           <div>
             <label className="block mb-1 font-medium">
               Tổng khối lượng (kg):
@@ -232,7 +275,10 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
               type="number"
               name="totalweight"
               value={formData.totalweight}
-              className="w-full border px-2 py-1 rounded"
+              readOnly={user?.roleid === 4 ? "" : "readOnly"}
+              className={`w-full border px-2 py-1 rounded ${
+                user?.roleid === 4 ? "" : "bg-gray-100 cursor-not-allowed"
+              }`}
             />
           </div>
         </div>
@@ -242,9 +288,12 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
             <select
               name="partner"
               onChange={(e) => handleChange(e)}
-              className="w-full border px-2 py-1 rounded"
+              disabled={user?.roleid !== 3 ? true : false}
+              className={`w-full border px-2 py-1 rounded ${
+                user?.roleid === 3 ? "" : "bg-gray-100 cursor-not-allowed"
+              } `}
             >
-              {product.name !== null ? (
+              {product.name !== "" ? (
                 <option value="" className="truncate">
                   {product.name}
                 </option>
@@ -253,23 +302,16 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog }) => {
                   Vui lòng chọn đối tác
                 </option>
               )}
-
-              {partners.map((p) => (
-                <option key={p.id} value={p.name}>
-                  {p.name}
-                </option>
-              ))}
+              {user.roleid === 3 && (
+                <>
+                  {partners.map((p) => (
+                    <option key={p.id} value={p.name}>
+                      {p.name}
+                    </option>
+                  ))}
+                </>
+              )}
             </select>
-          </div>
-
-          <div>
-            <label className="block mb-1 font-medium">Ghi chú:</label>
-            <input
-              onChange={(e) => handleChange(e)}
-              type="text"
-              name="note"
-              className="w-full border px-2 py-1 rounded"
-            />
           </div>
         </div>
 

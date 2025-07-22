@@ -15,8 +15,8 @@ const Sidebar = ({ user, setUser, setPath }) => {
   const logout = async () => {
     await handleLogout();
     setUser(null);
-    navigate('/dang-nhap');
-  }
+    navigate("/dang-nhap");
+  };
   return (
     <div className="flex flex-col h-screen w-[300px] bg-white px-6 shadow-lg justify-between">
       <div>
@@ -29,15 +29,19 @@ const Sidebar = ({ user, setUser, setPath }) => {
           {sideElement.map((item) => {
             if (item.allowed.includes(user.roleid)) {
               return (
-                <li
-                  onClick={() => setPath(item.name)}
-                  key={item.id}
-                  className={`text-gray-600 py-2 hover-btn ${location.pathname === item.path ? 'selected-btn' : ''}`}
-                >
-                  <FontAwesomeIcon icon={item.icon} className="w-1/5" />
-                  <Link to={item.path}>{item.name}</Link>
-                </li>
-              )
+                <Link to={item.path}>
+                  <li
+                    onClick={() => setPath(item.name)}
+                    key={item.id}
+                    className={`text-gray-600 py-2 hover-btn ${
+                      location.pathname === item.path ? "selected-btn" : ""
+                    }`}
+                  >
+                    <FontAwesomeIcon icon={item.icon} className="w-1/5" />
+                    {item.name}
+                  </li>
+                </Link>
+              );
             }
           })}
         </ul>
@@ -46,12 +50,16 @@ const Sidebar = ({ user, setUser, setPath }) => {
       <div className="mb-4 flex flex-row items-center justify-between">
         <div className="flex flex-row rounded-full bg-white shadow-btn p-2 w-fit justify-between items-center gap-2">
           <FontAwesomeIcon icon={faCircleUser} size="xl" />
-          <span className="px-3 font-medium">
-            {user.role.rolename}
-          </span>
+          <span className="px-3 font-medium">{user.role.rolename}</span>
         </div>
         <div className="rounded-full bg-red-500 size-8 flex items-center justify-center shadow-btn">
-          <FontAwesomeIcon icon={faPowerOff} onClick={logout} title="Logout" className="hover:cursor-pointer" color="white" />
+          <FontAwesomeIcon
+            icon={faPowerOff}
+            onClick={logout}
+            title="Logout"
+            className="hover:cursor-pointer"
+            color="white"
+          />
         </div>
       </div>
     </div>

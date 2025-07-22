@@ -82,7 +82,7 @@ const SummaryBoard = () => {
   }, []);
 
   const doughnutDataBrand = {
-    name: "Tổng khối lượng thép phân loại theo nhà cung",
+    name: "Tổng khối lượng thép phân loại theo nhà cung cấp",
     labels: weightBrands.map((item) => item.brandname),
     values: weightBrands.map((item) => item.total_weight),
   };
@@ -184,7 +184,7 @@ const BarChart = ({ chartData }) => {
             legend: { display: false },
             title: {
               display: true,
-              text: "Biểu đồ thống kê tổng khối lượng nhập kho theo nhà cung cấp",
+              text: "Biểu đồ thống kê tổng khối lượng nhập kho theo đối tác",
               font: {
                 size: 14,
               },
@@ -260,7 +260,6 @@ const baseColors = [
   "#ff9933",
 ];
 
-// Nếu cần thêm màu thì tạo mới màu HEX ngẫu nhiên
 const generateColorSet = (count) => {
   const colors = [...baseColors];
   const usedColors = new Set(colors);
