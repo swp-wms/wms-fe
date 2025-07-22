@@ -69,11 +69,9 @@ const ProductList = ({ user }) => {
   const handleUpdateProduct = (updatedProduct) => {
     setProductCatalog((prev) => {
       const index = prev.findIndex((p) => p.id === updatedProduct.id);
-      // Nếu sản phẩm mới (chưa có id trong list), thêm vào
       if (index === -1) {
         return [...prev, updatedProduct];
       }
-      // Nếu đã có, cập nhật
       const updatedList = [...prev];
       updatedList[index] = updatedProduct;
       return updatedList;

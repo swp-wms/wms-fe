@@ -4,14 +4,13 @@ import {
   faSave,
   faSquareXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { fetchPartners } from "../../backendCalls/partner";
 import {
   addProduct,
   updateProductCatalog,
 } from "../../backendCalls/productCatalog";
-import { read } from "xlsx";
 
 const ProductEdit = ({ product, onClose, onUpdate, catalog, user }) => {
   const [formData, setFormData] = useState({ ...product });
@@ -58,14 +57,9 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog, user }) => {
       }));
     } else if (name === "type") {
       setFormData((prev) => ({ ...prev, [name]: value }));
-    } else if (name === "partner") {
+    } else if (name === "name") {
       const selectedPartner = partners.find((p) => p.name === value);
-      console.log(selectedPartner);
-      if (selectedPartner) {
-        setFormData((prev) => ({ ...prev, [name]: selectedPartner.id }));
-      } else {
-        toast.error("Loại thép không khả dụng cho hãng hoặc mã thép đã chọn");
-      }
+      setFormData((prev) => ({ ...prev, [name]: selectedPartner.id }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -88,6 +82,26 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog, user }) => {
 
     if (!validate()) {
       toast.dismiss(loading);
+      return;
+    }
+    console.log("Checking duplicate with:", {
+      brandname: formData.brandname,
+      type: formData.type,
+      name: formData.name,
+    });
+
+    const exists = catalog.some(
+      (item) =>
+        item.brandname === formData.brandname &&
+        item.type === formData.type &&
+        item.partnerid === formData.partnerid &&
+        item.productid !== formData.productid
+    );
+    console.log("exists: ", exists);
+
+    if (exists) {
+      toast.dismiss(loading);
+      toast.error("Loại hàng đã tồn tại trong hệ thống");
       return;
     }
 
