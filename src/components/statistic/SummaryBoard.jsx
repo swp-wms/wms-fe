@@ -102,7 +102,7 @@ const SummaryBoard = () => {
       setWeightPartners(response);
     };
     getData();
-  });
+  }, []);
 
   const barData = {
     labels: weightPartners.map((item) => item.name),
