@@ -11,9 +11,9 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
       useEffect(() => {
          const fetchExportOrders = async () => {
            try {
-             const response = await orderCalls.fetchExportOrders();
+             const response = await order.getExportOrder();
              setExportOrders(response.filter((order => 
-                                                      order.date.split("T")[0] === new Date().toISOString().split("T")[0]
+                                                      order.createdate.split("T")[0] === new Date().toISOString().split("T")[0]
                                                     && order.status !== "XONG" 
                                                     && order.status !=="HỦY" ))); // filter orders by today's date and not completed
            } catch (error) {
@@ -75,7 +75,7 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
       };
       
       if(field === "numberofbars") {
-        if(updateProduct.catalog?.type === "Thép Thanh") {
+        if(updateProduct.catalog?.type == "Thép Thanh") {
           let w = (updateProduct.catalog?.weightperbundle / updateProduct.catalog?.barsperbundle) * value; // Assuming weight is calculated based on catalog length and number of bars
           updateProduct.weight = w.toFixed(2); // Update weight based on number of bars
         } else if (value === '') {

@@ -4,7 +4,7 @@ import ProductSearch from "./ProductSearchOld";
 import OrderTable from "./OrderTable";
 import product from "../../backendCalls/product";
 import order from "../../backendCalls/order";
-import supplement from "../../backendCalls/supplement";
+import supplementCall from "../../backendCalls/supplement";
 import supplementType from "../../data/supplementType";
 const SupplementForm = ({
   user,
@@ -12,7 +12,7 @@ const SupplementForm = ({
   setOrderDetail,
   activeSupplementForm,
   setActiveSupplementForm,
-  setUser,
+    setUser,
   orderTotalWeight,
   orderTotalBars,
   supplementOrder,
@@ -32,7 +32,7 @@ const SupplementForm = ({
     const fetchProducts = async () => {
       try {
         const response = await product.fetchProducts();
-        setProductList(response);
+        setProductList(response.filter((item) => orderDetail?.orderdetail.find((detail) =>detail.productid === item.id)));
         console.log("Product List:", response);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -63,9 +63,16 @@ const SupplementForm = ({
   }
 
   let checkNumberOfBars = () => {
-    const invalidProducts = selectedProducts.filter(
-      (product) => product.numberofbars <= 0 || product.numberofbars == null
-    );
+    const invalidProducts = selectedProducts.filter((product) => {
+      //if product is Thep Thanh, check numberofbars
+      if (product.type === "Thép Thanh")
+        return !product.numberofbars || product.numberofbars <= 0;
+      else {
+        //if product is Thep Cuon, check weight
+        return !product.weight || product.weight <= 0;
+      }
+    });
+
     if (invalidProducts.length > 0) {
       return false;
     }
@@ -90,11 +97,11 @@ const SupplementForm = ({
       totalBars: totalBars,
     };
     console.log("order weight", orderTotalWeight);
-    if(totalWeight < orderTotalWeight/100*90 && totalWeight > orderTotalWeight/100*110){
+    if(totalWeight < orderTotalWeight/100*90 || totalWeight > orderTotalWeight/100*110){
       toast.error(`Tổng trọng lượng đơn bù: ${totalWeight} kg không được chênh lệch quá 10% tổng trọng lượng đơn hàng ${orderTotalWeight} kg`);
       return;
     }else{
-      const response = await supplement.addSupplementOrder(supplement);
+      const response = await supplementCall.addSupplementOrder(supplement);
       console.log("Response from supplement order:", response);
       if (response.success) {
         toast.success("Tạo đơn bù thành công");

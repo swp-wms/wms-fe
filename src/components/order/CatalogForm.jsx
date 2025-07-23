@@ -171,89 +171,94 @@ export const CatalogForm = ({
     }
   }
 
-  const catalogFieldLeft = [
-    {
-      label: "HÃNG THÉP",
-      type: "text",
-      name: "brandname",
-      options: [], // Will be populated with partnerList
-    },
-    {
-      label: "KÍCH CỠ",
-      type: "text",
-      name: "steeltype",
-      placeholder: "Nhập D + số (VD: D10, D12, D16)",
-      onchange: "",
-      
-    },
-
-    {
-      label: "TIÊU CHUẨN",
-      type: "text",
-      name: "standard",
-      placeholder: "Nhập tiêu chuẩn",
-      onchange: "",
-    },
-
-    {
-      label: "QD CÂY/BÓ",
-      type: "text",
-      name: "barsperbundle",
-      placeholder: "Nhập QD cây/bó",
-      onchange: "",
-    },
-    {
-      label: "DÀI (m)",
-      type: "text",
-      name: "length",
-      placeholder: "Nhập chiều dài (m)",
-      onchange: "",
-    }
-]
-
+    const catalogFieldLeft = [
+      {
+        label: "HÃNG THÉP",
+        type: "text",
+        name: "brandname",
+        options: [],
+      },
+      {
+        label: "KÍCH CỠ",
+        type: "text",
+        name: "steeltype",
+        placeholder: "Nhập D + số (VD: D10, D12, D16)",
+      },
+      {
+        label: "TIÊU CHUẨN",
+        type: "text",
+        name: "standard",
+        placeholder: "Nhập tiêu chuẩn",
+      },
+      {
+        label: "QD CÂY/BÓ",
+        type: "text",
+        name: "barsperbundle",
+        placeholder: "Nhập QD cây/bó",
+        disabledWhen: ["Thép Cuộn"], // ✅ Add disable condition
+      },
+      {
+        label: "DÀI (m)",
+        type: "text",
+        name: "length",
+        placeholder: "Nhập chiều dài (m)",
+        disabledWhen: ["Thép Cuộn"], // ✅ Add disable condition
+      }
+    ];
     const catalogFieldRight = [
-    {
-      label: "KG/M",
-      type: "text",
-      name: "weightpermeter",
-      placeholder: "Nhập KG/M",
-      onchange: "",
-    },
-    {
-      label: "KHỐI LƯỢNG CUỘN (kg)",
-      type: "text",
-      name: "weightperroll",
-    },
-
-    {
-      label: "LOẠI THÉP",
-      type: "select",
-      name: "type",
-      options: [
-        { value: "#", label: "Chọn loại thép" },
-        { value: "Thép Thanh", label: "Thép Thanh" },
-        { value: "Thép Cuộn", label: "Thép Cuộn" },
-      ],
-      onchange: "",
-    },
-    {
-      label: "KHỐI LƯỢNG BÓ (kg)",
-      type: "text",
-      name: "weightperbundle",
-    },
-  ];
+      {
+        label: "KG/M",
+        type: "text",
+        name: "weightpermeter",
+        placeholder: "Nhập KG/M",
+        disabledWhen: ["Thép Cuộn"], // ✅ Add disable condition
+      },
+      {
+        label: "KHỐI LƯỢNG CUỘN (kg)",
+        type: "text",
+        name: "weightperroll",
+        disabledWhen: ["Thép Thanh"], // ✅ Add disable condition
+      },
+      {
+        label: "LOẠI THÉP",
+        type: "select",
+        name: "type",
+        options: [
+          { value: "#", label: "Chọn loại thép" },
+          { value: "Thép Thanh", label: "Thép Thanh" },
+          { value: "Thép Cuộn", label: "Thép Cuộn" },
+        ],
+      },
+      {
+        label: "KHỐI LƯỢNG BÓ (kg)",
+        type: "text",
+        name: "weightperbundle",
+        disabledWhen: ["Thép Cuộn"], // ✅ Add disable condition
+      },
+    ];
 
   const renderField = (field) => {
+    const isDisabled = field.disabledWhen?.includes(formData.type) || false;
+
+
     switch (field.type) {
       case "text":
         return (
+
           <input
             type={field.type}
             name={field.name}
             placeholder={field.placeholder}
             value={formData && formData[field.name] ? formData[field.name] : ""}
             onChange={(e) => handleChange(e)}
-            className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
+        
+            disabled={isDisabled}
+            className={`flex h-8 w-full rounded border border-gray-300 px-2 py-1 text-sm ${
+            isDisabled 
+              ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
+              : 'bg-white'
+          }`} //
+
           />
         );
         
@@ -274,7 +279,6 @@ export const CatalogForm = ({
             ))}
           </select>
         );
-        
     }
   };
 
@@ -283,7 +287,7 @@ export const CatalogForm = ({
     <div className="fixed inset-0 bg-black/50"></div>
      <div className="relative z-50">
       
-      <form className=" max-w-4xl max-h-[90vh] overflow-y-auto bg-white border border-gray-200 shadow-lg rounded-lg w-full mx-4 p-4">
+      <div className=" max-w-4xl max-h-[90vh] overflow-y-auto bg-white border border-gray-200 shadow-lg rounded-lg w-full mx-4 p-4">
          <button className="text-red-600 bg-red-50 hover:text-red-700 hover:bg-red-100 p-1 h-8 w-8 rounded text-center"
               onClick={() => setShowForm(false)}
               >
@@ -303,9 +307,9 @@ export const CatalogForm = ({
                   </div>
 
                   
-
+                  
                   {formErrors && formErrors[field.name] && (
-                  <span className="grow text-red-500 text-xs mt-1 text-right">
+                  <span className="grow w-auto inline-block font-medium text-right text-red-500 text-xs ml-auto mt-1">
                       {formErrors[field.name]}
                     </span>
                   )}
@@ -340,7 +344,7 @@ export const CatalogForm = ({
         </div>
          <div className="mt-5 flex gap-2 justify-end">
               <button
-                type="submit"
+               
                 className="inline-flex items-center px-4 py-2 border border-gray-400 rounded bg-white text-sm text-black hover:bg-gray-50 shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
                 onClick={() => {handleSubmit()}}
                 // disabled={
@@ -357,7 +361,7 @@ export const CatalogForm = ({
               </button>
               
               </div>
-      </form>
+      </div>
       </div>
     </div>
   );
