@@ -50,4 +50,19 @@ export const updateProductCatalog = async (id,data) => {
   }
 }
 
+export const viewProductHistory = async (id) => {
+    try{
+    const response = await axios.get(`${api.VIEW_PRODUCT_HISTORY(id)}`,{
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    });
+    console.log("Sended to backend successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating order:", error);
+    throw error;
+  }
+}
+
 

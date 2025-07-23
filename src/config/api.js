@@ -47,6 +47,7 @@ export const api = {
   GET_PRODUCT_CATALOG: `${baseUrl}/product-catalog`,
   ADD_PRODUCT_CATALOG: `${baseUrl}/product-catalog`,
   UPDATE_PRODUCT_CATALOG: (productid) => `${baseUrl}/product-catalog/${productid}`,
+  VIEW_PRODUCT_HISTORY: (productid) => `${baseUrl}/product-catalog/${productid}`,
 
 
 

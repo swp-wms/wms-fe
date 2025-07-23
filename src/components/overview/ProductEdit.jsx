@@ -12,7 +12,14 @@ import {
   updateProductCatalog,
 } from "../../backendCalls/productCatalog";
 
-const ProductEdit = ({ product, onClose, onUpdate, catalog, user }) => {
+const ProductEdit = ({
+  product,
+  onClose,
+  onUpdate,
+  catalog,
+  user,
+  setProductCatalog,
+}) => {
   const [formData, setFormData] = useState({ ...product });
   const [errors, setErrors] = useState({});
   const [partners, setPartners] = useState([]);
@@ -61,7 +68,7 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog, user }) => {
       const selectedPartner = partners.find((p) => p.name === value);
       console.log(selectedPartner);
       if (selectedPartner) {
-        setFormData((prev) => ({ ...prev, [name]: selectedPartner.id }));
+        setFormData((prev) => ({ ...prev, name: selectedPartner.name }));
       } else {
         toast.error("Loại thép không khả dụng cho hãng hoặc mã thép đã chọn");
       }
@@ -91,18 +98,15 @@ const ProductEdit = ({ product, onClose, onUpdate, catalog, user }) => {
     }
 
     try {
-      let savedProduct;
-
       if (formData.productid) {
         await updateProductCatalog(formData.productid, formData);
-        savedProduct = formData;
       } else {
-        savedProduct = await addProduct(formData);
+        await addProduct({...formData, partner: partners.find((p) => p.name === formData.name).id});
       }
+      console.log("formData: ", formData);
 
+      await onUpdate(formData);
       toast.success("Lưu thành công");
-
-      onUpdate?.(savedProduct);
       onClose();
     } catch (error) {
       toast.error("Lưu thất bại");

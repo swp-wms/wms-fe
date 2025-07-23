@@ -7,15 +7,16 @@ import {
   faSquarePlus,
   faPenToSquare,
   faClockRotateLeft,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   fetchProductCatalog,
   addProduct,
+  viewProductHistory,
 } from "../../backendCalls/productCatalog";
 import ProductEdit from "./ProductEdit";
 import { fetchCatalog } from "../../backendCalls/catalog";
 import toast from "react-hot-toast";
-import partner from "../../backendCalls/partner";
 
 const ProductList = ({ user }) => {
   const [productCatalog, setProductCatalog] = useState([]);
@@ -26,6 +27,9 @@ const ProductList = ({ user }) => {
   const [catalog, setCatalog] = useState([]);
   const [excelProducts, setExcelProducts] = useState([]);
   const [showExcelConfirm, setShowExcelConfirm] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [openHistory, setOpenHistory] = useState(false);
+
   // Fetch product data
   useEffect(() => {
     const getData = async () => {
@@ -72,11 +76,20 @@ const ProductList = ({ user }) => {
   };
 
   // Handle update product
-  const handleUpdateProduct = (updatedProduct) => {
+   const handleUpdateProduct = (updatedProduct) => {
+    console.log("Updated Product:", updatedProduct);
+
     setProductCatalog((prev) => {
-      const index = prev.findIndex((p) => p.id === updatedProduct.id);
+      if (!updatedProduct?.productid) {
+        return [updatedProduct, ...prev];
+      }
+
+      const index = prev.findIndex(
+        (p) => p.productid === updatedProduct.productid
+      );
+
       if (index === -1) {
-        return [...prev, updatedProduct];
+        return [updatedProduct, ...prev];
       }
       const updatedList = [...prev];
       updatedList[index] = updatedProduct;
@@ -86,7 +99,7 @@ const ProductList = ({ user }) => {
 
   // Handle search
   const filteredData = productCatalog.filter((item) => {
-    const name = item.name?.toLowerCase() || "";
+    const name = item.pd?.toLowerCase() || "";
     const namedetail = item.namedetail?.toLowerCase() || "";
     const search = searchTerm.toLowerCase();
     return name.includes(search) || namedetail.includes(search);
@@ -190,17 +203,6 @@ const ProductList = ({ user }) => {
     }
 
     const successList = [];
-    // for (const product of newItems) {
-    //   console.log("Product: ", product);
-    //   try {
-    //     const savedProduct = await addProduct(product);
-    //     console.log("Product added:", savedProduct);
-    //     successList.push(savedProduct);
-    //   } catch (err) {
-    //     console.error("Lỗi khi thêm:", product, err);
-    //     toast.error(`Lỗi khi thêm sản phẩm mã: ${product.pd}`);
-    //   }
-    // }
     for (const product of newItems) {
       try {
         const productInfo = {
@@ -226,9 +228,9 @@ const ProductList = ({ user }) => {
         const savedProduct = await addProduct(productInfo);
         console.log("ProductAfter: ", productInfo);
         console.log("SavedProduct: ", savedProduct);
-        const resultArray = Array.isArray(savedProduct)
-          ? savedProduct
-          : [savedProduct];
+        const resultArray = Array.isArray(productInfo)
+          ? productInfo
+          : [productInfo];
         console.log("ResultArray: ", resultArray);
         successList.push(...resultArray);
         console.log("Product added:", savedProduct);
@@ -239,7 +241,7 @@ const ProductList = ({ user }) => {
     }
 
     if (successList.length > 0) {
-      setProductCatalog((prev) => [...prev, ...successList]);
+      setProductCatalog((prev) => [...successList, ...prev]);
       toast.success(`Đã thêm ${successList.length} mặt hàng vào hệ thống.`);
     }
 
@@ -253,8 +255,19 @@ const ProductList = ({ user }) => {
     setSelectedProduct(null);
   };
 
-  // Handle view history
-  const handleSaveHistory = (item) => {};
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (selectedProduct && selectedProduct.productid) {
+        const pd_history = await viewProductHistory(selectedProduct.productid);
+        console.log("ProductID: ", selectedProduct.productid);
+
+        setHistory(pd_history.data);
+        console.log("History: ", pd_history);
+      }
+    };
+    fetchHistory();
+  }, [selectedProduct]);
+
   return (
     <section>
       <div className="flex justify-between">
@@ -294,22 +307,78 @@ const ProductList = ({ user }) => {
         )}
       </div>
 
-      <div className="flex gap-4 justify-end">
-        <button
-          className="flex items-center gap-4 rounded-sm cursor-pointer mt-4 px-2 text-gray-600 hover:text-gray-800"
-          onClick={handleSaveHistory}
-        >
-          <FontAwesomeIcon icon={faClockRotateLeft} />
-          <span className="font-medium">Lịch sử chỉnh sứa</span>
-        </button>
-      </div>
-
       <TableList
         data={paginatedData}
         onEdit={handleEdit}
         setSelectedProduct={setSelectedProduct}
         option={true}
+        onViewHistory={(product) => {
+          if (!product) return;
+          setSelectedProduct(product);
+          viewProductHistory(product.productid).then(setHistory);
+          setOpenHistory(true);
+        }}
       />
+
+      {openHistory && selectedProduct && Array.isArray(history) && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 ms-[20%]">
+          <div className="bg-white shadow-lg border rounded p-6 mb-6 relative">
+            <button
+              className="px-2 bg-red-800 rounded mb-4 hover:scale-105 transition duration-300 ease-in-out absolute top-2 right-2"
+              onClick={() => {
+                setOpenHistory(false);
+                setHistory([]);
+              }}
+            >
+              <FontAwesomeIcon icon={faXmark} className="text-white font-medium" size="sm" />
+            </button>
+
+            <h2 className="text-lg font-semibold mb-2 text-red-800">
+              Lịch sử thay đổi: {selectedProduct?.namedetail}
+            </h2>
+            <table className="w-full border-collapse text-sm text-center mt-2">
+              <thead>
+                <tr>
+                  <th colSpan={2} className="border border-black px-2">Số lượng</th>
+                  <th colSpan={2} className="border border-black px-2">Khối lượng (kg)</th>
+                  <th rowSpan={2} className="border border-black px-2">Người chỉnh sửa</th>
+                  <th rowSpan={2} className="border border-black px-2">Thời gian chỉnh sửa</th>
+                </tr>
+                <tr>
+                  <th className="border border-black px-2">Trước đây</th>
+                  <th className="border border-black px-2">Hiện tại</th>
+                  <th className="border border-black px-2">Trước đây</th>
+                  <th className="border border-black px-2">Hiện tại</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((entry, idx) => (
+                  <tr key={idx}>
+                    <td className="border border-black px-2">
+                      {entry.old_bars}
+                    </td>
+                    <td className="border border-black px-2">
+                      {entry.new_bars}
+                    </td>
+                    <td className="border border-black px-2">
+                      {entry.old_weight}
+                    </td>
+                    <td className="border border-black px-2">
+                      {entry.new_weight}
+                    </td>
+                    <td className="border border-black px-2">
+                      {entry.warehousekeeperid}
+                    </td>
+                    <td className="border border-black px-2">
+                      {entry.update_time}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       <div className="flex justify-center mt-2 gap-2 mb-8">
         <button
@@ -340,6 +409,7 @@ const ProductList = ({ user }) => {
           onUpdate={handleUpdateProduct}
           catalog={catalog}
           user={user}
+          setProductCatalog={setProductCatalog}
         />
       )}
       {showExcelConfirm && (
@@ -377,7 +447,13 @@ const ProductList = ({ user }) => {
   );
 };
 
-const TableList = ({ data, onEdit, setSelectedProduct, option }) => {
+const TableList = ({
+  data,
+  onEdit,
+  setSelectedProduct,
+  option,
+  onViewHistory,
+}) => {
   return (
     <div className="mt-6">
       <table className="w-full border-collapse text-sm mb-12 text-center">
@@ -439,12 +515,19 @@ const TableList = ({ data, onEdit, setSelectedProduct, option }) => {
                   {(Number(item.totalweight) || 0).toFixed(2)}
                 </td>
                 {option && (
-                  <td className="border border-black text-center py-1">
+                  <td className="border border-black text-center space-y-0.5 py-1">
                     <FontAwesomeIcon
                       icon={faPenToSquare}
-                      className="px-2 cursor-pointer"
+                      className="px-2 cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
                       onClick={() => {
                         onEdit(item), setSelectedProduct(item);
+                      }}
+                    />
+                    <FontAwesomeIcon
+                      icon={faClockRotateLeft}
+                      className="px-2 cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
+                      onClick={() => {
+                        if (onViewHistory) onViewHistory(item);
                       }}
                     />
                   </td>
