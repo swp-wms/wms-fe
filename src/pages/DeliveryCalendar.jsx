@@ -119,9 +119,9 @@ const DeliveryCalendar = ({ user, setUser }) => {
                 messages={messages}
                 eventPropGetter={eventStyleGetter}
                 tooltipAccessor={(event) =>
-                    `Loại: ${event.order.type === 'I' ? "Nhập" : "Xuất"}\n` +
+                    `\nLoại đơn: ${event.order.type === 'I' ? "Nhập" : "Xuất"}\n` +
                     `Trạng thái: ${(deliveryStatus.find(s => s.id === event.deliverystatus)).name}\n` +
-                    `Lái xe: ${event.drivername} - ${event.driverphonenumber || 'Chưa gán'}\n`
+                    `Lái xe: ${event.drivername || 'Chưa gán'} - ${event.driverphonenumber || 'Chưa gán'}\n`
                 }
                 components={{event: CustomEvent}}
                 onSelectEvent={(event) => navigate(`/ke-hoach-van-chuyen/${event.order.type === 'I' ? 'nhap' : 'xuat'}/${event.orderid}/${event.id}`)}
