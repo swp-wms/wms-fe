@@ -148,3 +148,16 @@ export const handleCancelDelivery = async (deliveryid) => {
         return error;
     }
 }
+
+export const getAllDelivery = async () => {
+    try {
+        const response = await axios.get(api.GET_ALL_DELIVERY, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        return response;
+    } catch (error) {
+        return error;
+    }
+}

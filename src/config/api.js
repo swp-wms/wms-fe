@@ -77,6 +77,7 @@ export const api = {
   // DELIVERY API
   GET_IMPORT_DELIVERY: `${baseUrl}/delivery/import`,
   GET_EXPORT_DELIVERY: `${baseUrl}/delivery/export`,
+  GET_ALL_DELIVERY: `${baseUrl}/delivery`,
   GET_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,
   GET_DELIVERY_DETAIL: (deliveryid) => `${baseUrl}/delivery/${deliveryid}`,
   CREATE_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,

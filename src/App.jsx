@@ -26,6 +26,7 @@ import Error403 from "./pages/Error-403";
 
 import Catalog from "./pages/Catalog";
 import InventoryInOutReport from "./pages/InventoryInOutReport";
+import DeliveryCalendar from "./pages/DeliveryCalendar";
 
 function App() {
   const [user, setUser] = useState();
@@ -73,6 +74,10 @@ function App() {
         />
 
         <Route path="/ke-hoach-van-chuyen" element={<Delivery
+          setUser={setUser}
+          user={user}
+        />} />
+        <Route path="/ke-hoach-van-chuyen/lich" element={<DeliveryCalendar
           setUser={setUser}
           user={user}
         />} />

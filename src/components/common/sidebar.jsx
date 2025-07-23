@@ -29,10 +29,9 @@ const Sidebar = ({ user, setUser, setPath }) => {
           {sideElement.map((item) => {
             if (item.allowed.includes(user.roleid)) {
               return (
-                <Link to={item.path}>
+                <Link to={item.path} key={item.id}>
                   <li
                     onClick={() => setPath(item.name)}
-                    key={item.id}
                     className={`text-gray-600 py-2 hover-btn ${
                       location.pathname === item.path ? "selected-btn" : ""
                     }`}
