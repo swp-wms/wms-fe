@@ -266,7 +266,7 @@ export function usePartnerFormLogic({
         if (!/^TD\d{1,4}((CB\d{1,3}V|C\d{2,3}|CD\d{2}|CB\d|CB\d{2,3})|[a-zA-Z])$/.test(value.trim())) return "Vui lòng nhập: TDxCBxxxT hoặc TDxxCBxxxV";
         if (Array.isArray(productList) && productList.some(prod => prod.name.trim().toLowerCase() === value.trim().toLowerCase() &&
                                                                 prod.brandname.trim().toLowerCase() === product.brandname.trim().toLowerCase() &&
-                                                                prod.partnerid.trim().toLowerCase() === product.partnerid.trim().toLowerCase())) {
+                                                                prod.partnerid.trim().toLowerCase() === product.partnerid.trim().toLowerCase()))  {
 
           return "Sản phẩm đã tồn tại";
         }
@@ -503,16 +503,18 @@ export function usePartnerFormLogic({
 
     } else if (activeTab === 'product') {
       if (validateProduct()) {
+
+        const {trueId, ...productWithoutTrueId} = product; // Remove trueId from product}
         if (isCatalogExists.current) {
-          productCalls.addProduct(product);
+          productCalls.addProduct(productWithoutTrueId);
           toast.success("Thêm sản phẩm thành công");
           setShowForm(false);
           if(initialData !== null && selectedPartner !== null && selectedPartner.isfactory) {
-            // If initialData is provided, update the existing product
+            // If initialData is provided, update the existing productWithoutTrueId
             const updatedProducts = selectedProducts.map((p) =>
-              p.name === initialData.product.name ? 
-            { ...product, 
-                trueId: initialData.product.trueId,  // Keep the trueId from initialData
+              p.name === initialData.productWithoutTrueId.name ? 
+            { ...productWithoutTrueId, 
+                trueId: initialData.productWithoutTrueId.trueId,  // Keep the trueId from initialData
                 catalog: catalog,
                 partner: partner
               } : p
@@ -523,7 +525,7 @@ export function usePartnerFormLogic({
             setSelectedProducts((prev) => [
               ...prev,
               {
-                ...product,
+                ...productWithoutTrueId,
                 trueId: selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].trueId + 1,
                 catalog: catalog,
 
@@ -536,16 +538,16 @@ export function usePartnerFormLogic({
           
           catalogCalls.addCatalog(catalog)
             .then(() => {
-              console.log('add product:', product); 
-              productCalls.addProduct(product);
+              console.log('add product:', productWithoutTrueId); 
+              productCalls.addProduct(productWithoutTrueId);
               toast.success("Thêm sản phẩm thành công");
               setShowForm(false);
              if(initialData !== null && selectedPartner.isfactory) {
             // If initialData is provided, update the existing product
             const updatedProducts = selectedProducts.map((p) =>
-              p.name === initialData.product.name ? 
-            { ...product, 
-                trueId: initialData.product.trueId,  // Keep the trueId from initialData
+              p.name === initialData.productWithoutTrueId.name ? 
+            { ...productWithoutTrueId, 
+                trueId: initialData.productWithoutTrueId.trueId,  // Keep the trueId from initialData
                 catalog: catalog,
                 partner:partner } : p
             );
@@ -555,7 +557,7 @@ export function usePartnerFormLogic({
             setSelectedProducts((prev) => [
               ...prev,
               {
-                ...product,
+                ...productWithoutTrueId,
                 trueId: selectedProducts.length === 0 ? 1 : selectedProducts[selectedProducts.length - 1].trueId + 1,
                 catalog: catalog,
                 }

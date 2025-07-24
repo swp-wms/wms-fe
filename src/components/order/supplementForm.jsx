@@ -62,6 +62,21 @@ const SupplementForm = ({
     return sum;
   }
 
+
+  // useEffect(() => {
+  //   if(selectedProducts.length > 0){
+  //     selectedProducts.forEach(product => {
+  //       const foundProduct =  orderDetail.orderdetail.
+  //       find(detail => detail.productid === product.id);
+  //       if (foundProduct ) {
+  //         if(product.numberofbars > foundProduct.numberofbars){
+  //           product.numberofbars = foundProduct.numberofbars;
+  //         }
+  //       }
+  //     })
+  //   }
+  // })
+
   let checkNumberOfBars = () => {
     const invalidProducts = selectedProducts.filter((product) => {
       //if product is Thep Thanh, check numberofbars
@@ -97,7 +112,7 @@ const SupplementForm = ({
       totalBars: totalBars,
     };
     console.log("order weight", orderTotalWeight);
-    if(totalWeight < orderTotalWeight/100*90 || totalWeight > orderTotalWeight/100*110){
+    if(totalWeight > orderTotalWeight/100*110){
       toast.error(`Tổng trọng lượng đơn bù: ${totalWeight} kg không được chênh lệch quá 10% tổng trọng lượng đơn hàng ${orderTotalWeight} kg`);
       return;
     }else{
