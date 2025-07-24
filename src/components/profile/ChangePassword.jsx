@@ -8,6 +8,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import bcrypt from "bcryptjs";
+import { getUser } from "../../backendCalls/user";
 
 const ChangePassword = ({ user, updateUserInfo }) => {
   const validatePassword = (password) => {
@@ -30,6 +32,8 @@ const ChangePassword = ({ user, updateUserInfo }) => {
     new: "",
     confirm: "",
   });
+
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const validatePasswordRealTime = (password) => {
     if (password === "") return "";
@@ -82,20 +86,33 @@ const ChangePassword = ({ user, updateUserInfo }) => {
     }));
   };
 
+  const verifyCurrentPassword = async (currentPassword, hashedPassword) => {
+    try {
+      return await bcrypt.compare(currentPassword, hashedPassword);
+    } catch (error) {
+      console.error("Error comparing passwords:", error);
+      return false;
+    }
+  };
+
   const handleSavePasswordButton = async () => {
     setPasswordErrors({
       current: "",
       new: "",
       confirm: "",
     });
+
+    setIsVerifying(true);
     let hasErrors = false;
 
+    // Kiểm tra validation
     if (
       passwordValidationErrors.current ||
       passwordValidationErrors.new ||
       passwordValidationErrors.confirm
     ) {
       toast.error("Vui lòng sửa các lỗi trước khi lưu");
+      setIsVerifying(false);
       return;
     }
 
@@ -105,9 +122,11 @@ const ChangePassword = ({ user, updateUserInfo }) => {
       !passwordData.confirmPassword
     ) {
       toast.error("Vui lòng điền đầy đủ thông tin");
+      setIsVerifying(false);
       return;
     }
 
+    // Validate mật khẩu mới
     const newPasswordError = validatePassword(passwordData.newPassword);
     if (newPasswordError) {
       setPasswordErrors((prev) => ({
@@ -117,6 +136,7 @@ const ChangePassword = ({ user, updateUserInfo }) => {
       hasErrors = true;
     }
 
+    // Confirm mật khẩu mới
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setPasswordErrors((prev) => ({
         ...prev,
@@ -126,16 +146,48 @@ const ChangePassword = ({ user, updateUserInfo }) => {
     }
 
     if (hasErrors) {
+      setIsVerifying(false);
       return;
     }
 
     try {
+      // getUser (lấy mk hiện tại)
+      const currentUserResponse = await getUser();
+
+      if (!currentUserResponse || !currentUserResponse.data) {
+        toast.error("Không thể lấy thông tin người dùng. Vui lòng thử lại!");
+        setIsVerifying(false);
+        return;
+      }
+
+      const currentHashedPassword = currentUserResponse.data.password;
+
+      // Xác thực mật khẩu hiện tại
+      const isCurrentPasswordValid = await verifyCurrentPassword(
+        passwordData.currentPassword,
+        currentHashedPassword
+      );
+
+      if (!isCurrentPasswordValid) {
+        setPasswordErrors((prev) => ({
+          ...prev,
+          current: "Mật khẩu hiện tại không chính xác, vui lòng thử lại",
+        }));
+        toast.error("Mật khẩu hiện tại không chính xác!");
+        setIsVerifying(false);
+        return;
+      }
+
+      // Update mk mới (đúng mk hiện tại)
       const updatedUser = {
         ...user,
         password: passwordData.newPassword,
       };
+
       await updateUserInfo(updatedUser);
       console.log("Password updated successfully");
+
+      // Reset form
       setEditPassword(false);
       setPasswordData({
         currentPassword: "",
@@ -152,10 +204,13 @@ const ChangePassword = ({ user, updateUserInfo }) => {
         new: "",
         confirm: "",
       });
+
       toast.success("Đổi mật khẩu thành công!");
     } catch (error) {
       console.error("Error updating password:", error);
       toast.error("Không thể đổi mật khẩu. Vui lòng thử lại!");
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -205,11 +260,13 @@ const ChangePassword = ({ user, updateUserInfo }) => {
                       : "border-gray-300"
                   }`}
                   placeholder="Nhập mật khẩu hiện tại"
+                  disabled={isVerifying}
                 />
                 <button
                   type="button"
                   onClick={() => togglePasswordVisibility("current")}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  disabled={isVerifying}
                 >
                   <FontAwesomeIcon
                     icon={showPasswords.current ? faEyeSlash : faEye}
@@ -273,11 +330,13 @@ const ChangePassword = ({ user, updateUserInfo }) => {
                       : "border-gray-300"
                   }`}
                   placeholder="Nhập mật khẩu mới"
+                  disabled={isVerifying}
                 />
                 <button
                   type="button"
                   onClick={() => togglePasswordVisibility("new")}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  disabled={isVerifying}
                 >
                   <FontAwesomeIcon
                     icon={showPasswords.new ? faEyeSlash : faEye}
@@ -334,11 +393,13 @@ const ChangePassword = ({ user, updateUserInfo }) => {
                       : "border-gray-300"
                   }`}
                   placeholder="Nhập lại mật khẩu mới"
+                  disabled={isVerifying}
                 />
                 <button
                   type="button"
                   onClick={() => togglePasswordVisibility("confirm")}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  disabled={isVerifying}
                 >
                   <FontAwesomeIcon
                     icon={showPasswords.confirm ? faEyeSlash : faEye}
@@ -356,14 +417,22 @@ const ChangePassword = ({ user, updateUserInfo }) => {
 
           {/* BTNS */}
           <div className="flex justify-end gap-2 mt-4">
-            <button className="p-2 hover:bg-gray-200 rounded">
+            <button
+              className="p-2 hover:bg-gray-200 rounded"
+              disabled={isVerifying}
+            >
               <FontAwesomeIcon
                 onClick={() => handleEditPasswordButton()}
                 icon={faArrowLeftLong}
                 className="text-lg text-gray-600"
               />
             </button>
-            <button className="p-2 hover:bg-gray-200 rounded">
+            <button
+              className={`p-2 hover:bg-gray-200 rounded ${
+                isVerifying ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={isVerifying}
+            >
               <FontAwesomeIcon
                 onClick={() => handleSavePasswordButton()}
                 icon={faDownload}
@@ -371,6 +440,12 @@ const ChangePassword = ({ user, updateUserInfo }) => {
               />
             </button>
           </div>
+
+          {isVerifying && (
+            <div className="text-center text-sm text-blue-600 mt-2">
+              Đang xác thực mật khẩu...
+            </div>
+          )}
         </div>
       </div>
     </div>
