@@ -2,8 +2,15 @@ import { faArrowLeftLong, faDownload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import ImageUpload from "./ImageUpload";
 
-const EditProfile = ({ user, setUser, updateUserInfo, onCancel }) => {
+const EditProfile = ({
+  user,
+  setUser,
+  updateUserInfo,
+  onCancel,
+  onImageUpload,
+}) => {
   const [errors, setErrors] = useState({
     fullname: "",
     gender: "",
@@ -23,9 +30,9 @@ const EditProfile = ({ user, setUser, updateUserInfo, onCancel }) => {
 
   const validatePhoneNumber = (phone) => {
     if (!phone.trim()) return "Số điện thoại không được để trống";
-    const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+    const phoneRegex = /^(0[3|5|7|8|9])([0-9]{8,9})$/;
     if (!phoneRegex.test(phone)) {
-      return "Số điện thoại không đúng định dạng (VD: 0901234567)";
+      return "Số điện thoại không đúng định dạng";
     }
     return "";
   };
@@ -44,7 +51,6 @@ const EditProfile = ({ user, setUser, updateUserInfo, onCancel }) => {
     const birthDate = new Date(date);
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
-
     if (birthDate > today) {
       return "Ngày sinh không thể là ngày trong tương lai";
     }
@@ -56,7 +62,6 @@ const EditProfile = ({ user, setUser, updateUserInfo, onCancel }) => {
 
   const handleInputChange = (field, value) => {
     setUser({ ...user, [field]: value });
-
     // Xoá tbao lỗi khi ngdung nhập ttin
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -76,6 +81,8 @@ const EditProfile = ({ user, setUser, updateUserInfo, onCancel }) => {
         break;
       case "dateofbirth":
         error = validateDateOfBirth(value);
+        break;
+      default:
         break;
     }
 
@@ -104,8 +111,26 @@ const EditProfile = ({ user, setUser, updateUserInfo, onCancel }) => {
     }
 
     try {
-      await updateUserInfo(user);
-      console.log("User: ", user);
+      // Tạo object mới không có password
+      const userDataToUpdate = {
+        id: user.id,
+        username: user.username,
+        roleid: user.roleid,
+        fullname: user.fullname,
+        image: user.image,
+        phonenumber: user.phonenumber,
+        address: user.address,
+        dateofbirth: user.dateofbirth,
+        gender: user.gender,
+        status: user.status,
+      };
+
+      // Log để debug - đảm bảo không có password
+      console.log("Data being sent for profile update:", userDataToUpdate);
+      console.log("Password field exists:", "password" in userDataToUpdate);
+
+      await updateUserInfo(userDataToUpdate);
+      console.log("User info updated successfully");
       onCancel();
       toast.success("Cập nhật thông tin thành công!");
     } catch (error) {
@@ -138,20 +163,20 @@ const EditProfile = ({ user, setUser, updateUserInfo, onCancel }) => {
       </div>
 
       <div className="flex justify-center mb-6">
-        <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
-          <svg className="w-20 h-20 text-gray-400" viewBox="0 0 24 24">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-          </svg>
-        </div>
+        <ImageUpload
+          currentImage={user.image}
+          onImageUpload={onImageUpload}
+          isEditing={true}
+        />
       </div>
 
       <div className="flex justify-center mb-8">
         <span className="text-white font-bold px-6 py-2 bg-red-700 rounded-full text-sm">
-          {user.roleid == 1
+          {user.roleid === 1
             ? "System Admin"
-            : user.roleid == 3
+            : user.roleid === 3
             ? "Salesman"
-            : user.roleid == 4
+            : user.roleid === 4
             ? "Warehouse Keeper"
             : "Delivery Staff"}
         </span>

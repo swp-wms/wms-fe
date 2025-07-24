@@ -13,6 +13,8 @@ const PartnerSearch = ({
   setActiveTab,
   refresh,
   setRefresh,
+  note,
+  setNote, // Added note state and setter
   TYPE
 
 }) => {
@@ -158,24 +160,15 @@ const PartnerSearch = ({
           </div>
         </div>
         <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <label className="text-sm font-semibold text-black whitespace-nowrap">
-              PHỤ TRÁCH VẬN CHUYỂN:
-            </label>
-            <div className="relative flex-1">
-              <select className="z-30 w-full px-3 py-2 border border-gray-400 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
-                <option>Mã nhân viên vận chuyển</option>
-              </select>
-              <svg className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
+          <br/>
           <div className="flex gap-4">
             <label className="text-sm font-semibold text-black whitespace-nowrap mt-2">GHI CHÚ:</label>
             <textarea
               rows={6}
               className="flex-1 border border-gray-400 rounded px-3 py-2 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Nhập ghi chú..."
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
             />
           </div>
         </div>

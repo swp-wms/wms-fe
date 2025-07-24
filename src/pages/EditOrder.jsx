@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation,useNavigate } from "react-router-dom";
 import PartnerSearch from "../components/order/PartnerSearch";
-import ProductSearch from "../components/order/ProductSearch";
+import ProductSearch from "../components/order/ProductSearchOld";
 import EditTable from "../components/order/EditTable";
 import partner from "../backendCalls/partner";
 import product from "../backendCalls/product";

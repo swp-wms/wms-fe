@@ -193,7 +193,7 @@ useEffect(() => {
 
             {/* Right Column */}
             <div className="col-span-6 space-y-4">
-              <div className="h-full  bg-white border-2 border-gray-800 rounded-lg overflow-hidden">
+              <div className="h-160 bg-white border-2 border-gray-800 rounded-lg overflow-hidden">
                 <div className="w-[50%] h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-600 grid grid-cols-2">
                   <button
                     type="button"
@@ -221,7 +221,7 @@ useEffect(() => {
 
                 
                 {/* Table */}
-                <div className=" m-5 h-full flex flex-col"  >
+                <div className=" m-5 h-[90%] flex flex-col"  >
                   
                   {orderActiveTab === "order" && (
                   <table className="w-full border-collapse">
@@ -260,7 +260,7 @@ useEffect(() => {
                   )}
 
                   {orderActiveTab ==="supplementorder" && (
-                    <SupplementOrderList className=" h-[90%] w-full bg-[#ffffff] border-t-1 border-gray-400 " supplementList={supplementOrder || []} />
+                    <SupplementOrderList className=" h-[99%] w-full bg-[#ffffff] border-t-1 border-gray-400 overflow-x" supplementList={supplementOrder || []} />
                   )}
 
                   {/* Empty table body area */}

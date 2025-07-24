@@ -165,7 +165,7 @@ const InventoryInOutReport = ({ user, setUser }) => {
                             </thead>
                             <tbody className="divide-y divide-gray-200">
                                {reportList?.map((item,index) => (
-                                <tr className="hover:bg-gray-50">
+                                <tr key={index} className="hover:bg-gray-50">
                                     <td className="px-4 py-3 border-r">{item.id}</td>
                                     <td className="px-4 py-3 border-r font-medium text-red-600">{item.name}</td>
                                     <td className="px-4 py-3 border-r">{item.namedetail}</td>

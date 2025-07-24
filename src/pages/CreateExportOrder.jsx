@@ -33,9 +33,8 @@ const CreateOrder = ({ user, setUser }) => {
   const [inputpartner, setInputpartner] = useState("");
   const [inputProduct, setInputProduct] = useState("");
  
-
   const [formInitialData, setFormInitialData] = useState(null);
-
+  const [note, setNote] = useState("");
   //-- ACTIVE TAB
   const [activeTab, setActiveTab] = useState("partner"); // state to manage active tab
   const [showForm, setShowForm] = useState(false);
@@ -131,7 +130,7 @@ const CreateOrder = ({ user, setUser }) => {
       totalweight: totalWeight,
       date: new Date().toISOString(),
       salesmanid: user.id,
-      note: "",
+      note: note,
 
       orderdetail: selectedProducts.map((product) => ({
         productid: product?.id,
@@ -211,6 +210,8 @@ const CreateOrder = ({ user, setUser }) => {
               setpartnerFilteredSuggestions={setpartnerFilteredSuggestions}
               selectedPartner={selectedPartner}
               setSelectedPartner={setSelectedPartner}
+              note={note}
+              setNote={setNote}
               focused={focused}
               setFocused={setFocused}
               setActiveTab={(tab) => {

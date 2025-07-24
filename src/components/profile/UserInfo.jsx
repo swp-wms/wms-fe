@@ -1,17 +1,17 @@
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import getUserInfo from "../../backendCalls/userInfo";
-import { useEffect } from "react";
 import { updateUserInfo } from "../../backendCalls/userInfo";
 import EditProfile from "./EditProfile";
 import ChangePassword from "./ChangePassword";
+import ImageUpload from "./ImageUpload";
 
 const UserInfo = () => {
   const [user, setUser] = useState({
     id: 0,
     username: "",
-    password: "",
+    password: "", // bỏ password khi gửi req
     roleid: 0,
     fullname: "",
     image: "",
@@ -26,12 +26,16 @@ const UserInfo = () => {
 
   useEffect(() => {
     const getData = async () => {
-      const response = await getUserInfo();
-      console.log("check useeffect", response);
-      setUser(response.data);
+      try {
+        const response = await getUserInfo();
+        console.log("User data fetched:", response);
+        setUser(response.data);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
     };
-    getData();
 
+    getData();
     const savedNotes = localStorage.getItem("userNotes");
     if (savedNotes) {
       setNotes(savedNotes);
@@ -42,13 +46,32 @@ const UserInfo = () => {
     localStorage.setItem("userNotes", notes);
   }, [notes]);
 
-  const handleEditInfoButton = async () => {
-    console.log("Edit: ", edit);
+  const handleEditInfoButton = () => {
+    console.log("Edit mode:", !edit);
     setEdit(!edit);
   };
 
+  const handleImageUpload = async (imageUrl) => {
+    try {
+      // Chỉ update iamge
+      const imageUpdateData = {
+        id: user.id,
+        image: imageUrl,
+      };
+
+      console.log("Data being sent for image update:", imageUpdateData);
+
+      await updateUserInfo(imageUpdateData);
+      setUser({ ...user, image: imageUrl });
+      console.log("Profile image updated successfully");
+    } catch (error) {
+      console.error("Error updating profile image:", error);
+      alert("Không thể cập nhật ảnh đại diện. Vui lòng thử lại!");
+    }
+  };
+
   return (
-    <div className="flex gap-6 p-6 max-w-6xl mt-24 ml-80 ">
+    <div className="flex gap-6 p-6 max-w-6xl mt-24 ml-80">
       {/* EDIT */}
       <div className={edit ? "flex" : "hidden"}>
         <EditProfile
@@ -56,6 +79,7 @@ const UserInfo = () => {
           setUser={setUser}
           updateUserInfo={updateUserInfo}
           onCancel={() => setEdit(false)}
+          onImageUpload={handleImageUpload}
         />
       </div>
 
@@ -65,34 +89,33 @@ const UserInfo = () => {
           <div className="flex justify-end">
             <button className="p-2 hover:bg-gray-100 rounded">
               <FontAwesomeIcon
-                onClick={() => handleEditInfoButton()}
+                onClick={handleEditInfoButton}
                 icon={faPenToSquare}
                 className="text-lg text-gray-600"
               />
             </button>
           </div>
+
           <div className="flex justify-center mb-6">
-            <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
-              <svg
-                className="w-20 h-20 text-gray-400"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-              </svg>
-            </div>
+            <ImageUpload
+              currentImage={user.image}
+              onImageUpload={handleImageUpload}
+              isEditing={false}
+            />
           </div>
+
           <div className="flex justify-center mb-8">
             <span className="text-white font-bold px-6 py-2 bg-red-700 rounded-full text-sm">
-              {user.roleid == 1
+              {user.roleid === 1
                 ? "System Admin"
-                : user.roleid == 3
+                : user.roleid === 3
                 ? "Salesman"
-                : user.roleid == 4
+                : user.roleid === 4
                 ? "Warehouse Keeper"
                 : "Delivery Staff"}
             </span>
           </div>
+
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-700 w-32">
@@ -104,6 +127,7 @@ const UserInfo = () => {
                 className="flex-1 ml-2 h-8 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-700 w-32">
                 Tên nhân viên:
@@ -114,6 +138,7 @@ const UserInfo = () => {
                 className="flex-1 ml-2 h-8 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-700 w-32">
                 Giới tính:
@@ -124,6 +149,7 @@ const UserInfo = () => {
                 className="flex-1 ml-2 h-8 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-700 w-32">
                 Ngày sinh:
@@ -134,6 +160,7 @@ const UserInfo = () => {
                 className="flex-1 ml-2 h-8 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-700 w-32">
                 Số điện thoại:
@@ -145,6 +172,7 @@ const UserInfo = () => {
                 className="flex-1 ml-2 h-8 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-700 w-32">
                 Email:
@@ -156,6 +184,7 @@ const UserInfo = () => {
                 className="flex-1 ml-2 h-8 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-700 w-32">
                 Địa chỉ:

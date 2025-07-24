@@ -1,9 +1,8 @@
-import React ,{useState,useEffect} from 'react';
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, Fragment } from 'react';
 import { getUser } from "../backendCalls/user";
 import  catalog from '../backendCalls/catalog';
 import { CatalogForm } from '../components/order/CatalogForm';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 const Catalog = ({user, setUser}) => {
     const [catalogBrands, setCatalogBrands] = useState([]);
@@ -27,11 +26,35 @@ const Catalog = ({user, setUser}) => {
         }
       }, [user, setUser]);
 
+        const groupByBrandname = (catalogBrands) => {
+            return catalogBrands.reduce((acc, item) => {
+            const existingBrand = acc.find(brand => brand.brandname === item.brandname);
+            
+            if (existingBrand) {
+                // If brandname exists, add standard to the standards array
+                if (!existingBrand.standards.includes(item.standard)) {
+                    existingBrand.standards.push(item.standard);
+                }
+                } else {
+                // If brandname doesn't exist, create new entry
+                acc.push({
+                    brandname: item.brandname,
+                    standards: [item.standard]
+                });
+                }
+                
+                return acc;
+            }, []);
+        };
+
     useEffect(() => {
         const fetchBrands = async () =>{
             const response = await catalog.fetchCatalogBrands();
             if(response.status == 200){
-                setCatalogBrands(response.data);
+                // setCatalogBrands(response.data);
+                const groupedBrands = groupByBrandname(response.data);
+                console.log("Grouped Catalog Brands:", groupedBrands);
+                setCatalogBrands(groupedBrands);
             } else {
                 console.error("Failed to fetch catalog brands");
             }
@@ -127,12 +150,14 @@ const Catalog = ({user, setUser}) => {
                    
                 </div>
                 <div className="flex ml-auto gap-2">
+                {!showEditForm && (
                   <button onClick={toggleEdit} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg">
                     <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                     Chỉnh sửa
                   </button>
+                )}
                   {showEditForm && (
                     <button onClick={() => setShowEditForm(false)} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-xs text-black hover:bg-gray-50 shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3 mr-1">
@@ -177,8 +202,8 @@ const Catalog = ({user, setUser}) => {
 
             <div className="grid grid-cols-2 gap-4 shadow-sm border border-gray-200 overflow-hidden">
                 {catalogBrands.length > 0 && (
-                    catalogBrands.map((brand) => (   
-                        <div key={brand.id || brand.brandname}>
+                    catalogBrands.map((brand,id) => (   
+                        <div key={id}>
                             <div className=" bg-gray-300 px-6 py-2 border border-gray-150">
                                 <h2 className="text-lg text-center font-semibold text-gray-700">{brand.brandname}</h2> 
                             </div>
@@ -186,108 +211,100 @@ const Catalog = ({user, setUser}) => {
                                 <table className="w-full text-sm">
                                     <thead className="bg-gray-50">
                                         <tr>
-                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700 " rowSpan={2}>Loại</th>
-                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700" rowSpan={2}>Loại thép</th>
-                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700" rowSpan={2}>QD cây / bó</th>
-                                            <th className="px-4 py-1 text-center border border-gray-400 font-medium text-gray-700" colSpan={4}>{brand.standard}</th>
-                                        </tr>
-                                        <tr>
+                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700 ">Loại</th>
+                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Loại thép</th>
+                                            <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">QD cây / bó</th>
+                                            
+                                        
                                             <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Kg/m</th>
                                             <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Kg / cây </th>
                                             <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Khối lượng bó/ cuộn</th>
-                                            {/* <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700">Dung sai %</th> */}
                                         </tr>
                                     </thead>
-                                   {showEditForm && (
-                                        <tbody className="divide-y border border-gray-400 divide-gray-100">
-                                        {catalogDataEdit
-                                            .filter(item => item.brandname === brand.brandname && item.standard === brand.standard)
-                                            .map((item,id) => (
-                                                <tr key={id} className="hover:bg-gray-50 border border-gray-400">
-                                                    <td className="p-0 border border-gray-400">
-                                                        <input 
-                                                        type="text" 
-                                                        className="w-full h-full px-4 py-3 font-medium text-gray-900 border-0 bg-transparent focus:outline-none focus:ring-0" 
+                                    
+                        {brand.standards.map((standard, index) => (
+                            <tbody key={index}>
+                                <tr className="bg-gray-100">
+                                    <th className="px-4 py-3 text-center border border-gray-400 font-medium text-gray-700" colSpan={9}>{standard}</th>
+                                </tr>
+                                {showEditForm ? (
+                                    catalogDataEdit
+                                        .filter(item => item.brandname === brand.brandname && item.standard === standard)
+                                        .map((item, id) => (
+                                            <tr key={id} className="hover:bg-gray-50 border border-gray-400">
+                                                <td className="p-0 border border-gray-400">
+                                                    <input
+                                                        type="text"
+                                                        className="w-full h-full px-4 py-3 font-medium text-gray-900 border-0 bg-transparent focus:outline-none focus:ring-0"
                                                         value={item.steeltype}
                                                         disabled
-                                                        
-                                                        />
-                                                    </td>
-                                                    <td className="p-0 border border-gray-400">
-                                                        <input 
-                                                        type="text" 
-                                                        className="w-full h-full px-4 py-3 font-medium text-gray-900 border-0 bg-transparent focus:outline-none focus:ring-0" 
+                                                    />
+                                                </td>
+                                                <td className="p-0 border border-gray-400">
+                                                    <input
+                                                        type="text"
+                                                        className="w-full h-full px-4 py-3 font-medium text-gray-900 border-0 bg-transparent focus:outline-none focus:ring-0"
                                                         value={item.type}
                                                         disabled
-                                                        
-                                                        />
-                                                    </td>
-                                                    <td className="p-0 border border-gray-400 hover:bg-gray-300">
-                                                        <input 
-                                                        type="text" 
-                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0 disabled:bg-gray-200" 
-                                                        value={item?.type === "Thép Thanh"? item?.barsperbundle : ""}
-                                                        disabled={ item?.type !== "Thép Thanh"}
-                                                        onChange={(e)=> handleInputChange(e, item.steeltype, item.brandname,'barsperbundle')}
-                                                        />
-                                                    </td>
-                                                    <td className="p-0 border border-gray-400 hover:bg-gray-300">
-                                                        <input 
-                                                        type="text" 
-                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0 disabled:bg-gray-200" 
-                                                        value={item?.type === "Thép Thanh"?(item?.weightperbundle / item?.barsperbundle / item?.length).toFixed(3):""}
-                                                        onChange={(e)=> handleInputChange(e, item.steeltype, item.brandname,'weightpermeter')}
-                                                        disabled={ item?.type !== "Thép Thanh"}
-                                                        />
-                                                    </td>
-                                                    <td className="p-0 border border-gray-400 hover:bg-gray-300">
-                                                        <input 
-                                                        type="text" 
-                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0 " 
-                                                        value={item?.type === "Thép Thanh"?(item?.weightperbundle / item?.barsperbundle).toFixed(2):""}
+                                                    />
+                                                </td>
+                                                <td className="p-0 border border-gray-400 hover:bg-gray-300">
+                                                    <input
+                                                        type="text"
+                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0 disabled:bg-gray-200"
+                                                        value={item?.type === "Thép Thanh" ? item?.barsperbundle : ""}
+                                                        disabled={item?.type !== "Thép Thanh"}
+                                                        onChange={(e) => handleInputChange(e, item.steeltype, item.brandname, 'barsperbundle')}
+                                                    />
+                                                </td>
+                                                <td className="p-0 border border-gray-400 hover:bg-gray-300">
+                                                    <input
+                                                        type="text"
+                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0 disabled:bg-gray-200"
+                                                        value={item?.type === "Thép Thanh" && item?.barsperbundle && item?.length ? (item?.weightperbundle / item?.barsperbundle / item?.length).toFixed(3) : ""}
+                                                        onChange={(e) => handleInputChange(e, item.steeltype, item.brandname, 'weightpermeter')}
+                                                        disabled={item?.type !== "Thép Thanh"}
+                                                    />
+                                                </td>
+                                                <td className="p-0 border border-gray-400 hover:bg-gray-300">
+                                                    <input
+                                                        type="text"
+                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0 "
+                                                        value={item?.type === "Thép Thanh" && item?.barsperbundle ? (item?.weightperbundle / item?.barsperbundle).toFixed(2) : ""}
                                                         disabled
-                                                        />
-                                                    </td>
-                                                    <td className="p-0 border border-gray-400 hover:bg-gray-300">
-                                                        <input type="text" className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0" 
-                                                        value={item?.weightperbundle}
-                                                        onChange={(e)=> handleInputChange(e, item.steeltype, item.brandname,'weightperbundle')}
-                                                        />
-                                                    </td>
-                                                    {/* <td className="p-0 border border-gray-400 hover:bg-gray-300"><input 
-                                                        type="text" 
-                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0" 
-                                                        value="007"
-                                                        onChange={(e)=> handleInputChange(e, item.steeltype, item.brandname,)}  
-                                                        />
-                                                    </td> */}
-                                                    </tr>
-                                            ))}
-                                    </tbody>
-                                    )}
-
-
-                                    {!showEditForm && (
-                                    <tbody className="divide-y border border-gray-400 divide-gray-200">
-                                        {catalogData
-                                            .filter(item => item.brandname === brand.brandname && item.standard === brand.standard)
-                                            .map((item,id) => (
-                                                <tr key={id} className=  "hover:bg-gray-200 border border-gray-400">
-                                                    <td className="px-4 py-3 font-medium text-gray-900">{item.steeltype}</td>
-                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400" >{item.type}</td>
-                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh"? item?.barsperbundle : null}</td>
-                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh"? (item?.weightperbundle / item?.barsperbundle / item?.length).toFixed(3) : null}</td>
-                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh"? (item?.weightperbundle / item?.barsperbundle).toFixed(2) : null}</td>
-                                                    <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh"? item?.weightperbundle : item?.weightperroll}</td>
-                                                    {/* <td className="px-4 py-3 text-gray-700 border border-gray-400">007</td> */}
-                                                </tr>
-                                            ))}
-                                    </tbody>
-                                    )}
-                                </table>
+                                                    />
+                                                </td>
+                                                <td className="p-0 border border-gray-400 hover:bg-gray-300">
+                                                    <input
+                                                        type="text"
+                                                        className="w-full h-full px-4 py-3 text-gray-700 border-0 bg-transparent focus:outline-none focus:ring-0"
+                                                        value={item.type === "Thép Thanh" ? item?.weightperbundle : item?.weightperroll}
+                                                        onChange={(e) => handleInputChange(e, item.steeltype, item.brandname, item.type === "Thép Thanh" ? "weightperbundle" : "weightperroll")}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))
+                                ) : (
+                                    catalogData
+                                        .filter(item => item.brandname === brand.brandname && item.standard === standard)
+                                        .map((item, id) => (
+                                            <tr key={id} className="hover:bg-gray-200 border border-gray-400">
+                                                <td className="px-4 py-3 font-medium text-gray-900">{item.steeltype}</td>
+                                                <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type}</td>
+                                                <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh" ? item?.barsperbundle : null}</td>
+                                                <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh" && item?.barsperbundle && item?.length ? (item?.weightperbundle / item?.barsperbundle / item?.length).toFixed(3) : null}</td>
+                                                <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh" && item?.barsperbundle ? (item?.weightperbundle / item?.barsperbundle).toFixed(2) : null}</td>
+                                                <td className="px-4 py-3 text-gray-700 border border-gray-400">{item.type === "Thép Thanh" ? item?.weightperbundle : item?.weightperroll}</td>
+                                            </tr>
+                                        ))
+                                )}
+                            </tbody>
+                        ))}
+                            </table>    
                             </div>
                         </div>
                     ))
+                    
                 )}
             </div>
             
