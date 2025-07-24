@@ -12,18 +12,15 @@ const ImageUpload = ({ currentImage, onImageUpload, isEditing = false }) => {
     // Cloudinary upload widget configuration
     const widget = window.cloudinary.createUploadWidget(
       {
-        // Thay thế bằng cloud name của bạn (lấy từ Cloudinary Dashboard)
-        cloudName: "dumfnp5uy", // VÍ DỤ: thay bằng cloud name thực của bạn
+        cloudName: "dumfnp5uy",
 
-        // Thay thế bằng upload preset đã tạo (phải là Unsigned mode)
-        uploadPreset: "Dat Viet WHMS User Image", // VÍ DỤ: thay bằng preset name đã tạo
+        uploadPreset: "Dat Viet WHMS User Image",
 
         sources: ["local", "camera"], // Cho phép upload từ máy tính và camera
         multiple: false, // Chỉ cho phép chọn 1 ảnh
-        maxFileSize: 5000000, // 5MB
-        clientAllowedFormats: ["jpg", "jpeg", "png", "gif"], // Các định dạng cho phép
+        maxFileSize: 5000000000,
+        clientAllowedFormats: ["jpg", "jpeg", "png", "gif"],
 
-        // Cấu hình crop
         cropping: true,
         croppingAspectRatio: 1, // Crop hình vuông (1:1)
         croppingDefaultSelectionRatio: 1,
@@ -32,12 +29,10 @@ const ImageUpload = ({ currentImage, onImageUpload, isEditing = false }) => {
         // Tự động resize ảnh
         eager: [{ width: 400, height: 400, crop: "fill" }],
 
-        folder: "Dat Viet WHMS User Image", // Tạo folder để tổ chức ảnh
+        folder: "Dat Viet WHMS User Image",
 
-        // Tùy chọn giao diện
         theme: "minimal",
 
-        // Tự động tag ảnh
         tags: ["profile", "user-avatar"],
 
         // Callback khi upload thành công
