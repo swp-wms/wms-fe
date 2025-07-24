@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { getUser } from "../backendCalls/user";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileExport, faFileImport } from "@fortawesome/free-solid-svg-icons";
+import { faCalendarCheck, faFileExport, faFileImport } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
 
@@ -21,7 +21,7 @@ const Delivery = ({ user, setUser }) => {
   }, []);
 
   return (
-    <div className="Delivery text-lg flex gap-4 font-semibold items-center justify-center fixed bottom-0 right-0 top-[80px] left-[20%]">
+    <div className="Delivery text-lg flex flex-wrap gap-4 font-semibold items-center justify-center fixed bottom-0 right-0 top-[80px] left-[300px]">
       <Link to={'/ke-hoach-van-chuyen/nhap'} className="text-center btn px-[40px] py-[60px] rounded">
         <FontAwesomeIcon className="text-3xl mb-4" icon={faFileImport} />
         <p>Kế hoạch nhập kho</p>
@@ -29,6 +29,10 @@ const Delivery = ({ user, setUser }) => {
       <Link to={'/ke-hoach-van-chuyen/xuat'} className="text-center btn px-[40px] py-[60px] rounded">
         <FontAwesomeIcon className="text-3xl mb-4" icon={faFileExport} />
         <p>Kế hoạch xuất kho</p>
+      </Link>
+      <Link to={'/ke-hoach-van-chuyen/lich'} className="text-center btn px-[40px] py-[60px] rounded">
+        <FontAwesomeIcon className="text-3xl mb-4" icon={faCalendarCheck} />
+        <p>Xem lịch vận chuyển</p>
       </Link>
     </div>
   )

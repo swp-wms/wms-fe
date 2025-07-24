@@ -1,9 +1,8 @@
-import React from "react";
 import { useEffect } from "react";
 import { getUser } from "../backendCalls/user";
-import WarehouseStatus from "../components/overview/WarehouseStatus";
-import ProductList from "../components/overview/ProductList";
-const OverviewPage = ({ user, setUser }) => {
+import ImportHistory from "../components/history/ImportHistory";
+
+const OrderHistory = ({ user, setUser }) => {
   useEffect(() => {
     if (!user) {
       const getData = async () => {
@@ -19,10 +18,9 @@ const OverviewPage = ({ user, setUser }) => {
   }, []);
   return (
     <section className="absolute mt-[80px] ms-[300px] px-12 z-[-1] w-[calc(100%-300px)] ">
-      <WarehouseStatus />
-      <ProductList user={user}/>
+      <ImportHistory />
     </section>
   );
 };
 
-export default OverviewPage;
+export default OrderHistory;

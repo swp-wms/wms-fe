@@ -13,6 +13,8 @@ export const api = {
   GET_ORDERS: `${baseUrl}/orders`,
   GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
   GET_EXPORT_ORDER: `${baseUrl}/orders/export`,
+  GET_IMPORT_WEIGHT: `${baseUrl}/orders/importweight`,
+  GET_EXPORT_WEIGHT: `${baseUrl}/orders/exportweight`,
   GET_ORDER_DETAIL: `${baseUrl}/detail`,
   CREATE_ORDER: `${baseUrl}/orders/`,
   GET_DELIVERY_DETAIL_FOR_UPDATE_ORDER: `${baseUrl}/orders/delivery`,
@@ -43,6 +45,12 @@ export const api = {
 
   UPDATE_PRODUCT: (productid) => `${baseUrl}/products/${productid}`,
 
+  //product catalog API
+  GET_PRODUCT_CATALOG: `${baseUrl}/product-catalog`,
+  ADD_PRODUCT_CATALOG: `${baseUrl}/product-catalog`,
+  UPDATE_PRODUCT_CATALOG: (productid) => `${baseUrl}/product-catalog/${productid}`,
+  VIEW_PRODUCT_HISTORY: (productid) => `${baseUrl}/product-catalog/${productid}`,
+
 
 
   //warehouse API
@@ -62,7 +70,6 @@ export const api = {
   GET_OTP: `${baseUrl}/reset-password/get-otp`,
   VERIFY_OTP: `${baseUrl}/reset-password/verify-otp`,
 
-
   //catalog API
   GET_CATALOGS: `${baseUrl}/catalog`,
   ADD_CATALOG: `${baseUrl}/catalog`,
@@ -72,6 +79,7 @@ export const api = {
   // DELIVERY API
   GET_IMPORT_DELIVERY: `${baseUrl}/delivery/import`,
   GET_EXPORT_DELIVERY: `${baseUrl}/delivery/export`,
+  GET_ALL_DELIVERY: `${baseUrl}/delivery`,
   GET_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,
   GET_DELIVERY_DETAIL: (deliveryid) => `${baseUrl}/delivery/${deliveryid}`,
   CREATE_DELIVERY_FOR_ORDER: (orderid) => `${baseUrl}/delivery/order/${orderid}`,
@@ -87,6 +95,9 @@ export const api = {
   GET_NOTIFS: `${baseUrl}/notification`,
   GET_SEEN_NOTIF: (index) => `${baseUrl}/notification/seen/${index}`,
   SEEN_NOTIF: (notifId) => `${baseUrl}/notification/${notifId}`,
+
+  //report
+  GET_INVENTORY_REPORT: `${baseUrl}/report`,
 }
 
   

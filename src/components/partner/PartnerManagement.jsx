@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import partner from "../../backendCalls/partner";
 import AddPartnerModal from "./AddPartnerModal";
 import PartnerDetailModal from "./PartnerDetailModal";
@@ -23,6 +25,11 @@ const PartnerManagement = () => {
   useEffect(() => {
     filterPartners();
   }, [partners, searchTerm, filterType]);
+
+  // Reset trang khi filter / search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType]);
 
   const loadPartners = async () => {
     try {
@@ -68,18 +75,11 @@ const PartnerManagement = () => {
     });
 
     setFilteredPartners(filtered);
-    setCurrentPage(1);
   };
 
-  const handleAddPartner = async (partnerData) => {
-    try {
-      await partner.addPartner(partnerData);
-      await loadPartners();
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error("Error adding partner:", error);
-      throw error;
-    }
+  const handleAddPartner = async () => {
+    await loadPartners();
+    setIsModalOpen(false);
   };
 
   const handlePartnerClick = (partnerData) => {
@@ -93,16 +93,62 @@ const PartnerManagement = () => {
     setSelectedPartner(null);
   };
 
-  // Pagination
-  const indexOfLastPartner = currentPage * partnersPerPage;
-  const indexOfFirstPartner = indexOfLastPartner - partnersPerPage;
-  const currentPartners = filteredPartners.slice(
-    indexOfFirstPartner,
-    indexOfLastPartner
-  );
+  // Pagination calculations
   const totalPages = Math.ceil(filteredPartners.length / partnersPerPage);
+  const startIndex = (currentPage - 1) * partnersPerPage;
+  const endIndex = startIndex + partnersPerPage;
+  const currentPartners = filteredPartners.slice(startIndex, endIndex);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // Pagination handlers
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push("...");
+        pageNumbers.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pageNumbers.push(1);
+        pageNumbers.push("...");
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        pageNumbers.push(1);
+        pageNumbers.push("...");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push("...");
+        pageNumbers.push(totalPages);
+      }
+    }
+    return pageNumbers;
+  };
 
   return (
     <div className="p-6 max-w-6xl mx-auto mt-20 ml-75">
@@ -140,6 +186,12 @@ const PartnerManagement = () => {
         </button>
       </div>
 
+      {/* Results Info */}
+      <div className="mb-4 text-sm text-gray-600">
+        Hiển thị {startIndex + 1}-{Math.min(endIndex, filteredPartners.length)}{" "}
+        của {filteredPartners.length} kết quả
+      </div>
+
       {/* PARTNER LIST */}
       <div className="space-y-4">
         {currentPartners.length === 0 ? (
@@ -175,19 +227,60 @@ const PartnerManagement = () => {
         )}
       </div>
 
-      {/* PAGING */}
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center mt-6">
-          <div className="flex space-x-2">
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => paginate(i + 1)}
-                className={`w-3 h-3 rounded-full ${
-                  currentPage === i + 1 ? "bg-gray-800" : "bg-gray-300"
-                }`}
-              />
-            ))}
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm text-gray-700">
+            Trang {currentPage} của {totalPages}
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Previous Button */}
+            <button
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                currentPage === 1
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4 mr-1" />
+              Trước
+            </button>
+            {/* Page Numbers */}
+            <div className="flex items-center gap-1">
+              {getPageNumbers().map((pageNum, index) => (
+                <div key={index}>
+                  {pageNum === "..." ? (
+                    <span className="px-3 py-2 text-sm text-gray-500">...</span>
+                  ) : (
+                    <button
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                        currentPage === pageNum
+                          ? "bg-blue-600 text-white"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            {/* Next Button */}
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                currentPage === totalPages
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              Sau
+              <FontAwesomeIcon icon={faChevronRight} className="h-4 w-4 ml-1" />
+            </button>
           </div>
         </div>
       )}
@@ -197,6 +290,7 @@ const PartnerManagement = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleAddPartner}
+        allPartners={partners}
       />
 
       {/* DETAIL MODAL */}

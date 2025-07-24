@@ -34,7 +34,7 @@ const addPartner = async (partnerInfo) => {
 
 const updatePartner = async (partnerInfo) => {
     try{
-        const response = await axios.put(`${api.UPDATE_PARTNER}`, partnerInfo, {
+        const response = await axios.put(`${api.UPDATE_PARTNER(partnerInfo.id)}`, partnerInfo, {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'

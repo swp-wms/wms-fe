@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate,Link } from "react-router-dom";
 import { Bar, Doughnut } from "react-chartjs-2";
+
 import {
   Chart as ChartJS,
   ArcElement,
@@ -28,29 +30,6 @@ ChartJS.register(
   Legend
 );
 
-const Data = [
-  {
-    number: 1000,
-    title: "Tổng số lượng hàng xuất",
-    status: "-16.5%",
-  },
-  {
-    number: 1200,
-    title: "Tổng số lượng hàng nhập",
-    status: "-16.5%",
-  },
-  {
-    number: 10500,
-    title: "Tổng khối lượng hàng xuất",
-    status: "+8.2%",
-  },
-  {
-    number: 15000,
-    title: "Tổng khối lượng hàng nhập",
-    status: "+12.4%",
-  },
-];
-
 const SummaryBoard = () => {
   const [importBars, setImportBars] = useState(0);
   const [importWeight, setImportWeight] = useState(0);
@@ -63,6 +42,7 @@ const SummaryBoard = () => {
   const [weightBrands, setWeightBrands] = useState([]);
   const [weightPartners, setWeightPartners] = useState([]);
   const [weightTypes, setWeightTypes] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getData = async () => {
@@ -105,7 +85,7 @@ const SummaryBoard = () => {
   }, []);
 
   const doughnutDataBrand = {
-    name: "Tổng khối lượng thép phân loại theo nhà cung",
+    name: "Tổng khối lượng thép phân loại theo nhà cung cấp",
     labels: weightBrands.map((item) => item.brandname),
     values: weightBrands.map((item) => item.total_weight),
   };
@@ -122,24 +102,20 @@ const SummaryBoard = () => {
       setWeightPartners(response);
     };
     getData();
-  });
+  }, []);
 
   const barData = {
     labels: weightPartners.map((item) => item.name),
     values: weightPartners.map((item) => item.total_weight),
   };
 
-  const getRandomColors = (num) => {
-    const colors = [];
-    for (let i = 0; i < num; i++) {
-      const color = `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
-      colors.push(color);
-    }
-    return colors;
-  };  
-
   return (
     <>
+       <div className="bg-white p-5 rounded-lg mb-5 shadow-md flex justify-between items-center">
+                <h1 className="text-2xl font-bold text-gray-700">Dashboard Tổng Quan</h1>
+                <Link to="./bao-cao-nhap-xuat-ton" className="stats-button bg-red-500 text-white border-none px-6 py-3 rounded-md  font-semibold cursor-pointer shadow-md hover:shadow-lg"> Xem Thống Kê Xuất Nhập Tồn
+               </Link>
+      </div>
       <div className="grid grid-cols-4 gap-12 mb-10">
         <Board
           number={importBars === null ? 0 : importBars}
@@ -196,6 +172,7 @@ const Board = ({ number, title, status }) => {
 };
 
 const BarChart = ({ chartData }) => {
+  const backgroundColors = generateColorSet(chartData.values.length);
   return (
     <div className="w-full flex justify-center py-8 px-12">
       <Bar
@@ -204,18 +181,7 @@ const BarChart = ({ chartData }) => {
           datasets: [
             {
               label: "Khối lượng thép (kg)",
-              backgroundColor: [
-                "#c45850",
-                "#3195ff",
-                "yellow",
-                "green",
-                "orange",
-                "purple",
-                "pink",
-                "brown",
-                "gray",
-                "black",
-              ],
+              backgroundColor: backgroundColors,
               data: chartData.values,
             },
           ],
@@ -226,7 +192,7 @@ const BarChart = ({ chartData }) => {
             legend: { display: false },
             title: {
               display: true,
-              text: "Biểu đồ thống kê tổng khối lượng nhập kho theo nhà cung cấp",
+              text: "Biểu đồ thống kê tổng khối lượng nhập kho theo đối tác",
               font: {
                 size: 14,
               },
@@ -243,12 +209,13 @@ const BarChart = ({ chartData }) => {
 };
 
 const DoughnutChart = ({ chartData }) => {
+  const backgroundColors = generateColorSet(chartData.values.length);
   const data = {
     labels: chartData.labels,
     datasets: [
       {
         label: "Khối lượng (kg)",
-        backgroundColor: ["#3195ff", "#3cba9f", "pink", "#c45850"],
+        backgroundColor: backgroundColors,
         data: chartData.values,
       },
     ],
@@ -256,12 +223,17 @@ const DoughnutChart = ({ chartData }) => {
 
   return (
     <div className="bg-white shadow-btn px-12 w-full rounded-lg flex justify-center">
-      <Doughnut className="w-full scale-90"
+      <Doughnut
+        className="w-full scale-90"
         data={data}
         options={{
           responsive: true,
           plugins: {
-            legend: { display: true, position: "bottom", labels: { font: { size: 16 }} },
+            legend: {
+              display: true,
+              position: "bottom",
+              labels: { font: { size: 16 } },
+            },
             title: {
               display: true,
               position: "top",
@@ -279,4 +251,39 @@ const DoughnutChart = ({ chartData }) => {
       />
     </div>
   );
+};
+
+const baseColors = [
+  "#3195ff",
+  "#3cba9f",
+  "pink",
+  "#c45850",
+  "#ffcc00",
+  "#9966ff",
+  "#ff6666",
+  "#00cc99",
+  "#ff99cc",
+  "#66ff66",
+  "#0099cc",
+  "#ff9933",
+];
+
+const generateColorSet = (count) => {
+  const colors = [...baseColors];
+  const usedColors = new Set(colors);
+
+  while (colors.length < count) {
+    let color;
+    do {
+      color =
+        "#" +
+        Math.floor(Math.random() * 16777215)
+          .toString(16)
+          .padStart(6, "0");
+    } while (usedColors.has(color));
+    usedColors.add(color);
+    colors.push(color);
+  }
+
+  return colors.slice(0, count);
 };

@@ -7,7 +7,8 @@ import {
   faFile,
   faShapes,
   faHandshake,
-  faBookOpenReader
+  faBookOpenReader,
+  faHistory
 } from "@fortawesome/free-solid-svg-icons";
 
 const sideElement = [
@@ -72,6 +73,13 @@ const sideElement = [
       path: "/danh-muc",
       name: "Danh mục thép",
       allowed: [3]
+    }, 
+    {
+      id: 9,
+      icon: faHistory,
+      path: "/lich-su-xuat-nhap",
+      name: "Lịch sử xuất nhập",
+      allowed: [3, 4]
     }
     
   ];

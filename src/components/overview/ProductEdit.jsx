@@ -6,29 +6,83 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { updateProduct } from "../../backendCalls/product";
 import { fetchPartners } from "../../backendCalls/partner";
+import {
+  addProduct,
+  updateProductCatalog,
+} from "../../backendCalls/productCatalog";
 
-const ProductEdit = ({ product, onClose, onUpdate }) => {
+const ProductEdit = ({
+  product,
+  onClose,
+  onUpdate,
+  catalog,
+  user,
+  setProductCatalog,
+}) => {
   const [formData, setFormData] = useState({ ...product });
   const [errors, setErrors] = useState({});
   const [partners, setPartners] = useState([]);
+  const [validBrands, setValidBrands] = useState([]);
+
+  useEffect(() => {
+    if (!formData.steeltype || !formData.type) return;
+
+    const filteredBrands = catalog
+      .filter(
+        (item) =>
+          item.steeltype === formData.steeltype && item.type === formData.type
+      )
+      .map((item) => item.brandname);
+
+    const uniqueBrands = [...new Set(filteredBrands)];
+    setValidBrands(uniqueBrands);
+  }, [formData.steeltype, formData.type, catalog]);
 
   const notify = () => toast.error("Vui lòng nhập lại thông tin");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    console.log(value);
+
+    if (name === "pd") {
+      const pdValue = value;
+      let namedetail = "";
+      let steeltype = "";
+
+      const match = /^T(D\d{2}CB\d{3}[VT])$/.exec(pdValue);
+      if (match) {
+        namedetail = "Thép " + match[1];
+        steeltype = match[1].match(/D\d{2}/)?.[0] || "";
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        [name]: pdValue,
+        namedetail,
+        steeltype,
+      }));
+    } else if (name === "type") {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    } else if (name === "partner") {
+      const selectedPartner = partners.find((p) => p.name === value);
+      console.log(selectedPartner);
+      if (selectedPartner) {
+        setFormData((prev) => ({ ...prev, name: selectedPartner.name }));
+      } else {
+        toast.error("Loại thép không khả dụng cho hãng hoặc mã thép đã chọn");
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const validate = () => {
     const newErrors = {};
-    if (!/^TD/.test(formData.name || ""))
-      newErrors.name = "Mã hàng hóa phải bắt đầu bằng 'TD'";
-    if (!/^Thép D\d{2}CB\d{3}[VT]$/.test(formData.namedetail || ""))
-      newErrors.namedetail = "Tên hàng hóa không đúng định dạng";
-    if (!/^D\d{2}$/.test(formData.steeltype || ""))
-      newErrors.steeltype = "Mã thép phải theo định dạng Dxx";
+    if (!/^TD\d{2}CB\d{3}[TV]$/.test(formData.pd || "")) {
+      newErrors.pd =
+        "Mã hàng hóa phải có dạng TDxxCBxxxT hoặc TDxxCBxxxV (với x là chữ số), ví dụ TD16CB300T";
+    }
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length) notify();
@@ -36,15 +90,25 @@ const ProductEdit = ({ product, onClose, onUpdate }) => {
   };
 
   const handleSave = async () => {
-    const loading = toast.loading("Đang lưu...");
-    if (!validate()) return toast.dismiss(loading);
+    const loading = toast.loading("Đang lưu thông tin");
+
+    if (!validate()) {
+      toast.dismiss(loading);
+      return;
+    }
 
     try {
-      await updateProduct(formData.id, formData);
+      if (formData.productid) {
+        await updateProductCatalog(formData.productid, formData);
+      } else {
+        await addProduct({...formData, partner: partners.find((p) => p.name === formData.name).id});
+      }
+      console.log("formData: ", formData);
+
+      await onUpdate(formData);
       toast.success("Lưu thành công");
-      onUpdate?.(formData);
       onClose();
-    } catch {
+    } catch (error) {
       toast.error("Lưu thất bại");
     } finally {
       toast.dismiss(loading);
@@ -60,12 +124,28 @@ const ProductEdit = ({ product, onClose, onUpdate }) => {
     getData();
   }, []);
 
-  const length = formData.length || formData.catalog?.length || 0;
-  const weight =
-    formData.weight ||
-    formData.catalog?.weightperbundle / formData.catalog?.barsperbundle ||
-    0;
-  const totalWeight = (formData.totalbar || 0) * weight;
+  useEffect(() => {
+    if (!formData.brandname || !formData.steeltype || !formData.type) return;
+    const matchedProduct = catalog.find(
+      (item) =>
+        item.brandname === formData.brandname &&
+        item.steeltype === formData.steeltype &&
+        item.type === formData.type
+    );
+    console.log("Matched product:", matchedProduct);
+    if (matchedProduct) {
+      setFormData((prev) => ({
+        ...prev,
+        length: matchedProduct.length,
+        weight: matchedProduct.weightperbundle / matchedProduct.barsperbundle,
+        weightperbundle: matchedProduct.weightperbundle,
+        barsperbundle: matchedProduct.barsperbundle,
+      }));
+    }
+  }, [formData.brandname, formData.steeltype, formData.type, catalog]);
+
+  const length = formData.length || 0;
+  const weight = formData.weight || 0;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -78,36 +158,39 @@ const ProductEdit = ({ product, onClose, onUpdate }) => {
 
         <div className="space-y-3 text-sm grid grid-cols-3 gap-x-8">
           {[
-            { label: "Mã hàng hóa", name: "name", error: errors.name },
+            { label: "Mã hàng hóa", name: "pd", error: errors.pd },
             {
               label: "Tên hàng hóa",
               name: "namedetail",
-              error: errors.namedetail,
+              readOnly: true,
             },
-            { label: "Tên nhà cung", name: "brandname" },
-            { label: "Mã thép", name: "steeltype", error: errors.steeltype },
-            { label: "Số lượng", name: "totalbar", type: "number" },
+            {
+              label: "Mã thép",
+              name: "steeltype",
+              readOnly: true,
+            },
             {
               label: "Độ dài (m)",
               name: "length",
               type: "number",
               value: length,
+              readOnly: true,
             },
             {
               label: "Đơn trọng (kg)",
               name: "weight",
               type: "number",
               value: weight.toFixed(2),
+              readOnly: true,
             },
-            { label: "Ghi chú", name: "note" },
           ].map(
             ({
               label,
               name,
               type = "text",
-              readOnly = false,
               error,
               value,
+              readOnly = false,
             }) => (
               <div key={name}>
                 <label className="block mb-1 font-medium">{label}:</label>
@@ -115,10 +198,13 @@ const ProductEdit = ({ product, onClose, onUpdate }) => {
                   type={type}
                   name={name}
                   value={value ?? formData[name] ?? ""}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange(e)}
                   readOnly={readOnly}
+                  disabled={user?.roleid !== 3 ? true : false}
                   className={`w-full border px-2 py-1 rounded ${
-                    readOnly ? "bg-gray-100 cursor-not-allowed" : ""
+                    user?.roleid === 3 && !readOnly
+                      ? ""
+                      : "bg-gray-100 cursor-not-allowed"
                   } ${error ? "border-red-500" : ""}`}
                 />
                 {error && (
@@ -129,25 +215,27 @@ const ProductEdit = ({ product, onClose, onUpdate }) => {
           )}
 
           <div>
-            <label className="block mb-1 font-medium">Tên đối tác:</label>
+            <label className="block mb-1 font-medium">Tên hãng thép:</label>
             <select
-              name="partner"
-              onChange={handleChange}
-              className="w-full border px-2 py-1 rounded"
+              name="brandname"
+              onChange={(e) => handleChange(e)}
+              disabled={user?.roleid !== 3 ? true : false}
+              className={`w-full border px-2 py-1 rounded ${
+                user?.roleid === 3 ? "" : "bg-gray-100 cursor-not-allowed"
+              } `}
             >
-              {product.partner === null ? (
-                <option value="" className="truncate">
-                  {product.partner.name}
+              {product.brandname !== "" ? (
+                <option value="" className="truncate" disabled selected>
+                  {product.brandname}
                 </option>
               ) : (
                 <option value="" disabled selected className="truncate">
-                  Vui lòng chọn đối tác
+                  Vui lòng chọn hãng thép
                 </option>
               )}
-
-              {partners.map((partner) => (
-                <option key={partner.id} value={partner.name}>
-                  {partner.name}
+              {validBrands.map((brand, index) => (
+                <option key={index} value={brand}>
+                  {brand}
                 </option>
               ))}
             </select>
@@ -158,25 +246,75 @@ const ProductEdit = ({ product, onClose, onUpdate }) => {
             <select
               name="type"
               value={formData.type}
-              onChange={handleChange}
-              className="w-full border px-1 py-1 rounded"
+              onChange={(e) => handleChange(e)}
+              disabled={user?.roleid !== 3 ? true : false}
+              className={`w-full border px-2 py-1 rounded ${
+                user?.roleid === 3 ? "" : "bg-gray-100 cursor-not-allowed"
+              } `}
             >
               <option value="Thép Thanh">Thép Thanh</option>
               <option value="Thép Cuộn">Thép Cuộn</option>
             </select>
           </div>
-
+          <div>
+            <label className="block mb-1 font-medium">Số lượng:</label>
+            <input
+              onChange={(e) => handleChange(e)}
+              type="number"
+              name="totalbar"
+              value={formData.totalbar}
+              readOnly={user?.roleid === 4 ? "" : "readOnly"}
+              className={`w-full border px-2 py-1 rounded ${
+                user?.roleid === 4 ? "" : "bg-gray-100 cursor-not-allowed"
+              }`}
+            />
+          </div>
           <div>
             <label className="block mb-1 font-medium">
               Tổng khối lượng (kg):
             </label>
             <input
-              type="text"
+              onChange={(e) => handleChange(e)}
+              type="number"
               name="totalweight"
-              value={totalWeight.toFixed(2)}
-              readOnly
-              className="w-full border px-2 py-1 rounded bg-gray-100 cursor-not-allowed"
+              value={formData.totalweight}
+              readOnly={user?.roleid === 4 ? "" : "readOnly"}
+              className={`w-full border px-2 py-1 rounded ${
+                user?.roleid === 4 ? "" : "bg-gray-100 cursor-not-allowed"
+              }`}
             />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-x-8 text-sm">
+          <div>
+            <label className="block mb-1 font-medium">Tên nhà cung:</label>
+            <select
+              name="partner"
+              onChange={(e) => handleChange(e)}
+              disabled={user?.roleid !== 3 ? true : false}
+              className={`w-full border px-2 py-1 rounded ${
+                user?.roleid === 3 ? "" : "bg-gray-100 cursor-not-allowed"
+              } `}
+            >
+              {product.name !== "" ? (
+                <option value="" className="truncate">
+                  {product.name}
+                </option>
+              ) : (
+                <option value="" disabled selected className="truncate">
+                  Vui lòng chọn đối tác
+                </option>
+              )}
+              {user.roleid === 3 && (
+                <>
+                  {partners.map((p) => (
+                    <option key={p.id} value={p.name}>
+                      {p.name}
+                    </option>
+                  ))}
+                </>
+              )}
+            </select>
           </div>
         </div>
 

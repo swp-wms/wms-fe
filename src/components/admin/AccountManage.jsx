@@ -1,9 +1,11 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMagnifyingGlass,
+  faPenToSquare,
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 import { getAllUserInfo, updateUserInfo } from "../../backendCalls/userInfo";
 import toast from "react-hot-toast";
 import EditUserModal from "./EditUserModal";
@@ -12,14 +14,20 @@ import CreateUserModal from "./CreateUserModal";
 const AccountManage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPosition, setSelectedPosition] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState(""); // New state for status filter
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [users, setUsers] = useState([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showRoleConflictModal, setShowRoleConflictModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [conflictingUser, setConflictingUser] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const getData = async () => {
@@ -40,29 +48,55 @@ const AccountManage = () => {
     getData();
   }, []);
 
+  // Reset trang khi thực hiện filter/ search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedPosition, selectedStatus]);
+
+  // Helper function to get last word of name for sorting
+  const getLastWord = (fullname) => {
+    if (!fullname) return "";
+    const words = fullname.trim().split(/\s+/);
+    return words[words.length - 1].toLowerCase();
+  };
+
+  // Helper function to find active user of specific role
+  const findActiveUserByRole = (roleName) => {
+    return users.find(
+      (user) => user?.role?.rolename === roleName && user?.status === "1"
+    );
+  };
+
   const filteredUsers = users
     .filter((user) => {
+      // Updated search to include fullname and username instead of ID
       const matchesSearch =
-        user?.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase());
-
+        user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user?.username?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesPosition =
         selectedPosition === "" || user?.role?.rolename === selectedPosition;
-
-      // New status filter logic
       const matchesStatus =
         selectedStatus === "" ||
         (selectedStatus === "active" && user?.status === "1") ||
         (selectedStatus === "inactive" && user?.status === "0");
-
       return matchesSearch && matchesPosition && matchesStatus;
     })
-    // Sort by fullname alphabetically
     .sort((a, b) => {
-      const nameA = a?.fullname?.toLowerCase() || "";
-      const nameB = b?.fullname?.toLowerCase() || "";
-      return nameA.localeCompare(nameB);
+      // First sort by status (active first, inactive last)
+      if (a?.status !== b?.status) {
+        return b?.status?.localeCompare(a?.status || "");
+      }
+      // Then sort by last word of name
+      const lastWordA = getLastWord(a?.fullname);
+      const lastWordB = getLastWord(b?.fullname);
+      return lastWordA.localeCompare(lastWordB);
     });
+
+  // PAGING STUFFS
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentUsers = filteredUsers.slice(startIndex, endIndex);
 
   const positions = [
     "Salesman",
@@ -77,6 +111,25 @@ const AccountManage = () => {
   ];
 
   const handleStatusClick = (user) => {
+    // Không cho phép thay đổi trạng thái của System admin
+    if (user?.role?.rolename === "System admin") {
+      return;
+    }
+
+    // Check if user is trying to activate a Warehouse keeper or Delivery staff
+    if (
+      user.status === "0" &&
+      (user?.role?.rolename === "Warehouse keeper" ||
+        user?.role?.rolename === "Delivery staff")
+    ) {
+      const activeUser = findActiveUserByRole(user?.role?.rolename);
+      if (activeUser && activeUser.id !== user.id) {
+        setSelectedUser(user);
+        setConflictingUser(activeUser);
+        setShowRoleConflictModal(true);
+        return;
+      }
+    }
     setSelectedUser(user);
     setShowConfirmModal(true);
   };
@@ -112,9 +165,66 @@ const AccountManage = () => {
     }
   };
 
+  const handleRoleConflictConfirm = async (deactivateOther) => {
+    if (!selectedUser) return;
+    setIsUpdating(true);
+    try {
+      if (deactivateOther && conflictingUser) {
+        // Deactivate the conflicting user first
+        const deactivateResponse = await updateUserInfo({
+          ...conflictingUser,
+          status: "0",
+        });
+        if (deactivateResponse.status !== 200) {
+          toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
+          return;
+        }
+      }
+      // Activate the selected user
+      const activateResponse = await updateUserInfo({
+        ...selectedUser,
+        status: "1",
+      });
+      if (activateResponse.status === 200) {
+        setUsers((prevUsers) =>
+          prevUsers.map((user) => {
+            if (user.id === selectedUser.id) {
+              return { ...user, status: "1" };
+            }
+            if (
+              deactivateOther &&
+              conflictingUser &&
+              user.id === conflictingUser.id
+            ) {
+              return { ...user, status: "0" };
+            }
+            return user;
+          })
+        );
+        toast.success("Cập nhật trạng thái thành công!");
+      } else {
+        toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
+      }
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
+    } finally {
+      setIsUpdating(false);
+      setShowRoleConflictModal(false);
+      setSelectedUser(null);
+      setConflictingUser(null);
+    }
+  };
+
   const handleCancelStatusChange = () => {
     setShowConfirmModal(false);
     setSelectedUser(null);
+  };
+
+  const handleCancelRoleConflict = () => {
+    setShowRoleConflictModal(false);
+    setSelectedUser(null);
+    setConflictingUser(null);
   };
 
   const handleEditClick = (user) => {
@@ -135,7 +245,6 @@ const AccountManage = () => {
   };
 
   const handleCreateSuccess = async () => {
-    // Refresh user list
     try {
       const getUsersResponse = await getAllUserInfo();
       if (getUsersResponse.status === 200) {
@@ -149,12 +258,63 @@ const AccountManage = () => {
     setShowCreateModal(false);
   };
 
+  // PAGING HANDLER
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // TỔNG TRANG
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push("...");
+        pageNumbers.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pageNumbers.push(1);
+        pageNumbers.push("...");
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        pageNumbers.push(1);
+        pageNumbers.push("...");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push("...");
+        pageNumbers.push(totalPages);
+      }
+    }
+    return pageNumbers;
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen mt-20 ml-75">
-      {/* Search + Filter + Add */}
+      {/* SEARCH + FILTER + ADD */}
       <div className="flex items-center justify-between mb-6 gap-4">
-        {/* Search */}
-        <div className="flex-1 max-w-md">
+        {/* SEARCH */}
+        <div className="flex-1 max-w-md relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FontAwesomeIcon
               icon={faMagnifyingGlass}
@@ -163,16 +323,16 @@ const AccountManage = () => {
           </div>
           <input
             type="text"
-            placeholder="Tìm kiếm mã nhân viên, tên nhân viên"
+            placeholder="Tìm kiếm tên nhân viên, tên đăng nhập"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
-        {/* Filters */}
+        {/* FILTER */}
         <div className="flex gap-3">
-          {/* Position Filter */}
+          {/* FILTER VỊ TRÍ */}
           <div className="flex-shrink-0">
             <select
               value={selectedPosition}
@@ -188,7 +348,7 @@ const AccountManage = () => {
             </select>
           </div>
 
-          {/* Status Filter */}
+          {/* FILTER TRẠNG THÁI */}
           <div className="flex-shrink-0">
             <select
               value={selectedStatus}
@@ -205,7 +365,7 @@ const AccountManage = () => {
           </div>
         </div>
 
-        {/* Add */}
+        {/* ADD */}
         <button
           onClick={handleCreateClick}
           className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -215,13 +375,19 @@ const AccountManage = () => {
         </button>
       </div>
 
+      {/* Results Info */}
+      <div className="mb-4 text-sm text-gray-600">
+        Hiển thị {startIndex + 1}-{Math.min(endIndex, filteredUsers.length)} của{" "}
+        {filteredUsers.length} kết quả
+      </div>
+
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                MÃ NHÂN VIÊN
+                ẢNH ĐẠI DIỆN
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 TÊN NHÂN VIÊN
@@ -241,17 +407,40 @@ const AccountManage = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredUsers.length === 0 ? (
+            {currentUsers.length === 0 ? (
               <tr>
                 <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                   Không tìm thấy nhân viên nào
                 </td>
               </tr>
             ) : (
-              filteredUsers.map((user, index) => (
+              currentUsers.map((user, index) => (
                 <tr key={user?.id || index} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {user?.id || "N/A"}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
+                      {user?.image ? (
+                        <img
+                          src={user.image || "/placeholder.svg"}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback to default avatar if image fails to load
+                            e.target.style.display = "none";
+                            e.target.parentNode.querySelector(
+                              ".default-avatar"
+                            ).style.display = "block";
+                          }}
+                        />
+                      ) : null}
+                      <svg
+                        className="w-10 h-10 text-gray-400 default-avatar"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                        style={{ display: user?.image ? "none" : "block" }}
+                      >
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                      </svg>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {user?.fullname || "N/A"}
@@ -263,28 +452,44 @@ const AccountManage = () => {
                     {user?.username || "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => handleStatusClick(user)}
-                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium transition-colors hover:opacity-80 ${
-                        user?.status === "1"
-                          ? "bg-green-100 text-green-800 hover:bg-green-200"
-                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                      }`}
-                    >
-                      {user?.status === "1" ? "Active" : "Inactive"}
-                    </button>
+                    {/* System admin thì không cho click */}
+                    {user?.role?.rolename === "System admin" ? (
+                      <span
+                        className={`inline-flex px-3 py-1 rounded-full text-xs font-medium cursor-not-allowed opacity-60 ${
+                          user?.status === "1"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {user?.status === "1" ? "Active" : "Inactive"}
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleStatusClick(user)}
+                        className={`inline-flex px-3 py-1 rounded-full text-xs font-medium transition-colors hover:opacity-80 ${
+                          user?.status === "1"
+                            ? "bg-green-100 text-green-800 hover:bg-green-200"
+                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        }`}
+                      >
+                        {user?.status === "1" ? "Active" : "Inactive"}
+                      </button>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                     <div className="flex items-center justify-center gap-2">
-                      <button
-                        onClick={() => handleEditClick(user)}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
-                      >
-                        <FontAwesomeIcon
-                          icon={faPenToSquare}
-                          className="h-4 w-4"
-                        />
-                      </button>
+                      {/* Only show edit button if not System admin */}
+                      {user?.role?.rolename !== "System admin" && (
+                        <button
+                          onClick={() => handleEditClick(user)}
+                          className="text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          <FontAwesomeIcon
+                            icon={faPenToSquare}
+                            className="h-4 w-4"
+                          />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -294,10 +499,70 @@ const AccountManage = () => {
         </table>
       </div>
 
-      {/* Status Confirmation Modal */}
+      {/* PAGINATION */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm text-gray-700">
+            Trang {currentPage} của {totalPages}
+          </div>
+          <div className="flex items-center gap-2">
+            {/* PREV BTN */}
+            <button
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                currentPage === 1
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4 mr-1" />
+              Trước
+            </button>
+
+            {/* Page Numbers */}
+            <div className="flex items-center gap-1">
+              {getPageNumbers().map((pageNum, index) => (
+                <div key={index}>
+                  {pageNum === "..." ? (
+                    <span className="px-3 py-2 text-sm text-gray-500">...</span>
+                  ) : (
+                    <button
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                        currentPage === pageNum
+                          ? "bg-blue-600 text-white"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* NEXT BTN */}
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                currentPage === totalPages
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              Sau
+              <FontAwesomeIcon icon={faChevronRight} className="h-4 w-4 ml-1" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal confirm trạng thái */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-300 rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Xác nhận thay đổi trạng thái
             </h3>
@@ -348,6 +613,48 @@ const AccountManage = () => {
         </div>
       )}
 
+      {/* Modal conflict vị trí */}
+      {showRoleConflictModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Xác nhận thay đổi trạng thái
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Hệ thống hiện đang có{" "}
+              <span className="font-medium text-gray-900">
+                {conflictingUser?.fullname}
+              </span>{" "}
+              với vị trí{" "}
+              <span className="font-medium text-gray-900">
+                {selectedUser?.role?.rolename}
+              </span>{" "}
+              ở trạng thái Active. Bạn có muốn deactive họ và active{" "}
+              <span className="font-medium text-gray-900">
+                {selectedUser?.fullname}
+              </span>{" "}
+              không?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={handleCancelRoleConflict}
+                disabled={isUpdating}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50"
+              >
+                Không
+              </button>
+              <button
+                onClick={() => handleRoleConflictConfirm(true)}
+                disabled={isUpdating}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+              >
+                {isUpdating ? "Đang cập nhật..." : "Có"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Edit User Modal */}
       {showEditModal && (
         <EditUserModal
@@ -363,6 +670,7 @@ const AccountManage = () => {
       {/* Create User Modal */}
       {showCreateModal && (
         <CreateUserModal
+          users={users}
           onSuccess={handleCreateSuccess}
           onCancel={() => setShowCreateModal(false)}
         />

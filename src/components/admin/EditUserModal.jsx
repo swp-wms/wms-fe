@@ -11,12 +11,10 @@ import toast from "react-hot-toast";
 
 const EditUserModal = ({ user, onSuccess, onCancel }) => {
   const [editFormData, setEditFormData] = useState({
-    username: user?.username || "",
     password: "",
     role: user?.role?.rolename || "",
   });
   const [isEditUpdating, setIsEditUpdating] = useState(false);
-  const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -42,15 +40,9 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
     }
   };
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const validatePassword = (password) => {
     // Check khi nhập mk
     if (password === "") return "";
-
     if (password.length < 8 || password.length > 30) {
       return "Mật khẩu tối thiểu 8 ký tự. Tối đa 30 ký tự.";
     } else if (!/^(?=.*\d)(?=.*[a-zA-Z]).*$/.test(password)) {
@@ -64,15 +56,6 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
       ...prev,
       [field]: value,
     }));
-
-    if (field === "username") {
-      if (value && !validateEmail(value)) {
-        setEmailError("Tên đăng nhập phải có định dạng email hợp lệ");
-      } else {
-        setEmailError("");
-      }
-    }
-
     if (field === "password") {
       const error = validatePassword(value);
       setPasswordError(error);
@@ -81,23 +64,19 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
 
   const handleSaveEdit = async () => {
     if (!user) return;
-
-    if (!editFormData.username || !editFormData.role) {
+    if (!editFormData.role) {
       toast.error("Vui lòng điền đầy đủ thông tin!");
       return;
     }
-
-    // if (emailError || passwordError) {
-    //   toast.error("HHHHHHHHHHHHHHHH")
-    //   return
-    // }
+    if (passwordError) {
+      toast.error("Vui lòng kiểm tra lại thông tin!");
+      return;
+    }
 
     setIsEditUpdating(true);
-
     try {
       const updatedUserData = {
         ...user,
-        username: editFormData.username,
         ...(editFormData.password && { password: editFormData.password }),
         role: getRoleIdFromName(editFormData.role),
       };
@@ -111,7 +90,7 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
         onSuccess(updatedUser);
         toast.success("Cập nhật thông tin thành công!");
       } else if (response.status === 400) {
-        toast.error("TÊN ĐĂNG NHẬP đã tồn tại!");
+        toast.error("Có lỗi xảy ra khi cập nhật thông tin!");
       } else {
         toast.error("Có lỗi xảy ra khi cập nhật thông tin!");
       }
@@ -141,7 +120,7 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
                 />
               </svg>
             </div>
-            {/* Role */}
+            {/* ROLE */}
             <div className="w-40">
               <select
                 value={editFormData.role}
@@ -157,7 +136,7 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
               </select>
             </div>
           </div>
-          {/* Data */}
+          {/* DATA */}
           <div className="flex-1 space-y-4">
             <div className="flex items-center gap-4">
               <label className="w-32 text-sm font-medium text-gray-700">
@@ -185,22 +164,12 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
               <label className="w-32 text-sm font-medium text-gray-700">
                 TÊN ĐĂNG NHẬP:
               </label>
-              <div className="flex-1">
-                <input
-                  placeholder="example@email.com"
-                  type="email"
-                  value={editFormData.username}
-                  onChange={(e) =>
-                    handleEditFormChange("username", e.target.value)
-                  }
-                  className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    emailError ? "border-red-500" : "border-gray-300"
-                  }`}
-                />
-                {emailError && (
-                  <p className="text-red-500 text-xs mt-1">{emailError}</p>
-                )}
-              </div>
+              <input
+                type="email"
+                value={user?.username || ""}
+                disabled
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
+              />
             </div>
             <div className="flex items-center gap-4">
               <label className="w-32 text-sm font-medium text-gray-700">
@@ -236,11 +205,11 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
               </div>
             </div>
           </div>
-          {/* Buttons */}
+          {/* BTNS */}
           <div className="flex flex-col gap-3">
             <button
               onClick={handleSaveEdit}
-              disabled={isEditUpdating || emailError || passwordError}
+              disabled={isEditUpdating || passwordError}
               className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 min-w-[100px]"
             >
               <FontAwesomeIcon icon={faSave} />

@@ -6,7 +6,22 @@ import '../../index.css';
 
 const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, productList, totalBars, totalWeight, setActiveTab,TYPE }) => {
   // Handler for changing product fields (e.g. quantity)
-  
+     const [exportOrders, setExportOrders] = useState(null); // store export order details
+
+      useEffect(() => {
+         const fetchExportOrders = async () => {
+           try {
+             const response = await order.getExportOrder();
+             setExportOrders(response.filter((order => 
+                                                      order.createdate.split("T")[0] === new Date().toISOString().split("T")[0]
+                                                    && order.status !== "XONG" 
+                                                    && order.status !=="HỦY" ))); // filter orders by today's date and not completed
+           } catch (error) {
+             console.error("Error fetching export orders:", error);
+           }
+         };
+         fetchExportOrders();
+       }, []);
   useEffect(() => {
 
     // const filtered = new Map();
@@ -60,14 +75,51 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
       };
       
       if(field === "numberofbars") {
-        if(updateProduct.catalog?.type === "Thép Thanh") {
+        if(updateProduct.catalog?.type == "Thép Thanh") {
           let w = (updateProduct.catalog?.weightperbundle / updateProduct.catalog?.barsperbundle) * value; // Assuming weight is calculated based on catalog length and number of bars
           updateProduct.weight = w.toFixed(2); // Update weight based on number of bars
         } else if (value === '') {
           // ✅ Clear weight when number of bars is cleared
           updateProduct.weight = '';
+
         }
-        
+
+        //if creating an Export Order, we need to check if the product quantity is available for export or not
+        if(TYPE === "E"){
+          const selectedProduct = productList.find(product => product.trueId === id);
+          let totalBarAvailable = selectedProduct?.totalbar || 0 // the total bars available in the inventory
+          let totalWeightAvailable = selectedProduct?.totalweight || 0 // the total weight available in the inventory
+          
+          // gathering unfinished export orders in the same day
+          // to get the total number of bars and weight that gonna be exported
+          if(exportOrders){
+            const similarProducts = exportOrders.map(order =>{
+              const similarProductInAnotherOrder = order.orderdetail.find(detail => detail.productid === id);
+              
+              return similarProductInAnotherOrder;
+            })
+            .filter(product => product !== undefined);
+            console.log("similarProducts: ", similarProducts);
+            
+            
+            const totalExportBars = similarProducts.reduce((sum, product) => (sum += product.numberofbars || sum),0)
+            const totalExportWeight = similarProducts.reduce((sum, product) => (sum += product.weight || sum),0)
+            totalBarAvailable -= totalExportBars  ;
+            totalWeightAvailable -= totalExportWeight;
+          }
+          totalBarAvailable < 0? 0: totalBarAvailable;
+          totalWeightAvailable < 0? 0: totalWeightAvailable;
+          if(value > totalBarAvailable){
+            toast.error(`Số lượng hàng hóa không đủ để xuất, chỉ còn ${totalBarAvailable} cây`);
+            updateProduct.numberofbars = totalBarAvailable;
+            updateProduct.weight = (totalWeightAvailable / totalBarAvailable * totalBarAvailable).toFixed(2);
+          } 
+          
+          else if(value * updateProduct.catalog?.weightperbundle / updateProduct.catalog?.barsperbundle > totalWeightAvailable){
+            toast.error(`Khối lượng hàng hóa không đủ để xuất, chỉ còn ${totalWeightAvailable} KG`);
+            updateProduct.weight = totalWeightAvailable;
+          }
+        }
       }
     
       if(field === "name"){
@@ -146,24 +198,114 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
     setSelectedProducts(products.sort((a,b) => a.trueId - b.trueId));
   }
  
-  const handleBrandNameSelect = (e,product) =>{
-    const selectedid= e.target.value;
-    const selected = product.matchingProduct.find(p => p.id == selectedid);
-    console.log("selected: ", selected);
+  // const handleBrandNameSelect = (e,product) =>{
+  //   const selectedid= e.target.value;
+  //   const selected = product.matchingProduct.find(p => p.id == selectedid);
+  //   console.log("selected: ", selected);
     
+  //   if(selected) {
+  //     const fieldsToUpdate = [
+  //     { field: 'id', value: selected.id },
+  //     { field: 'name', value: selected.name },
+  //     { field: 'namedetail', value: selected.namedetail },
+  //     { field: 'brandname', value: selected.brandname },
+  //     { field: 'steeltype', value: selected.steeltype },
+  //     { field: 'partnerid', value: selected.catalog.partnerid },
+  //     { field: 'type', value: selected.type },
+  //     { field: 'catalog', value: selected.catalog },
+  //     { field: 'partner', value: selected.partner },
+  //     { field: 'totalbar', value: selected.totalbar },
+  //     { field: 'totalweight', value: selected.totalweight }
+  //   ];
+    
+  //   // Update each field individually
+  //   fieldsToUpdate.forEach(({ field, value }) => {
+  //     handleProductFieldChange(product.trueId, field, value);
+  //   });
   
-  // Update the product's brandname using your existing function
-  console.log("Selected brand name: ", selected.catalog.brandname);
-  handleProductFieldChange(product.trueId, "brandname", selected.catalog.brandname);
+  //   }
+
+
+  // // // Update the product's brandname using your existing function
+  // // console.log("Selected brand name: ", selected.catalog.brandname);
+  // // handleProductFieldChange(product.trueId, "brandname", selected.catalog.brandname);
   
 
-  console.log("Selected partner: ", selected.partner);
-  handleProductFieldChange(product.trueId, "partner", selected.partner);
-  
-  console.log("Selected catalog: ", selected.catalog);
-  handleProductFieldChange(product.trueId, "catalog", selected.catalog);
+  // // console.log("Selected partner: ", selected.partner);
+  // // handleProductFieldChange(product.trueId, "partner", selected.partner);
 
+  // // handleProductFieldChange(product.partnerid, "partnerid", selected.partnerid);
+  
+  // // console.log("Selected catalog: ", selected.catalog);
+  // // handleProductFieldChange(product.trueId, "catalog", selected.catalog);
+
+  // }
+
+
+  const handleBrandNameSelect = (e, product) => {
+  const selectedid = e.target.value;
+  const selected = product.matchingProduct.find(p => p.id == selectedid);
+  
+  if (!selected) {
+    console.log("No product selected");
+    return;
   }
+  
+  console.log("Selected product:", selected);
+  
+  // ✅ Create the updated product with all necessary fields
+  const updatedProduct = {
+    // Base product data from selected
+    id: selected.id,
+    name: selected.name,
+    namedetail: selected.namedetail,
+    brandname: selected.brandname,
+    steeltype: selected.steeltype,
+    partnerid: selected.partnerid,
+    type: selected.type,
+    totalbar: selected.totalbar,
+    totalweight: selected.totalweight,
+    
+    // Keep original table-specific fields
+    trueId: product.trueId,
+    numberofbars: product.numberofbars || '',
+    weight: product.weight || '',
+    note: product.note || '',
+    
+    // Object references
+    catalog: selected.catalog ? { ...selected.catalog } : null,
+    partner: selected.partner ? { ...selected.partner } : null,
+    matchingProduct: product.matchingProduct, // Keep for future selections
+    
+    // Preserve order detail ID if editing
+    ...(product.orderdetailid && { orderdetailid: product.orderdetailid })
+  };
+  
+  // ✅ Update the products array
+  setSelectedProducts(prevProducts => {
+    const newProducts = prevProducts.map(p => 
+      p.trueId === product.trueId ? updatedProduct : p
+    );
+    
+    console.log("Updated selectedProducts:", newProducts);
+    return newProducts.sort((a, b) => a.trueId - b.trueId);
+  });
+  
+  // ✅ Optional: Recalculate weight if it's a "Thép Thanh" and has quantity
+  // if (selected.catalog?.type === "Thép Thanh" && product.numberofbars) {
+  //   const calculatedWeight = (
+  //     (selected.catalog.weightperbundle / selected.catalog.barsperbundle) * 
+  //     product.numberofbars
+  //   ).toFixed(2);
+    
+  //   // Update weight after state has been set
+  //   setTimeout(() => {
+  //     handleProductFieldChange(product.trueId, "weight", calculatedWeight);
+  //   }, 0);
+  // }
+  
+  toast.success(`Đã chọn ${selected.brandname} - ${selected.namedetail}`);
+};
 
   const popupTableRow = (product, index) =>{
     const extractSteelType = (productName) => {
@@ -218,13 +360,13 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
                    {TYPE == "I" ? (
                       <>
-                        {/* Show brandname for factory partners */}
-                        {selectedPartner && selectedPartner.isfactory && (
+                
+                        {selectedPartner && product.brandname && (
                           <span>{product.brandname}</span>
                         )}
                         
-                        {/* Show select for non-factory partners or when no partner selected */}
-                        {(!selectedPartner || !selectedPartner.isfactory) && (
+                        
+                        {!selectedPartner || !product.brandname &&  (
                           <select onChange={(e) => handleBrandNameSelect(e, product)}>
                             <option value="">Chọn hãng</option>
                             {product.matchingProduct?.map((p, index) => (
@@ -360,13 +502,13 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
                 <td className="border border-gray-800 px-2 py-2 text-xs text-black w-20">
                     {TYPE == "I" ? (
                       <>
-                        {/* Show brandname for factory partners */}
-                        {selectedPartner && selectedPartner.isfactory && (
+                
+                        {selectedPartner && product.brandname && (
                           <span>{product.brandname}</span>
                         )}
                         
-                        {/* Show select for non-factory partners or when no partner selected */}
-                        {(!selectedPartner || !selectedPartner.isfactory) && (
+                        
+                        {!selectedPartner || !product.brandname &&  (
                           <select onChange={(e) => handleBrandNameSelect(e, product)}>
                             <option value="">Chọn hãng</option>
                             {product.matchingProduct?.map((p, index) => (
@@ -492,12 +634,12 @@ const OrderTable = ({ selectedProducts, setSelectedProducts, selectedPartner, pr
               <td className="border border-gray-800 px-2 py-2 pl-15 text-xs font-bold text-black w-12" colSpan={5}>Tổng cộng</td>
               <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{totalBars}</td>
               <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{Number(totalWeight).toFixed(2)}</td>
-              <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12"></td>
+              <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12" colSpan={2}></td>
             </tr>
             <tr>
               <td 
                 className="py-2 border border-gray-800 p-0 text-xs font-bold text-black w-12"
-                colSpan={8}
+                colSpan={9}
                 style={{ textAlign: "center", verticalAlign: "middle" }}
               >
                 {/* <div className="flex items-center justify-center h-full w-full">
