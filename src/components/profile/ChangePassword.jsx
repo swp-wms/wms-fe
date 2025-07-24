@@ -101,8 +101,8 @@ const ChangePassword = ({ user, updateUserInfo }) => {
       new: "",
       confirm: "",
     });
-
     setIsVerifying(true);
+
     let hasErrors = false;
 
     // Kiểm tra validation
@@ -153,7 +153,6 @@ const ChangePassword = ({ user, updateUserInfo }) => {
     try {
       // getUser (lấy mk hiện tại)
       const currentUserResponse = await getUser();
-
       if (!currentUserResponse || !currentUserResponse.data) {
         toast.error("Không thể lấy thông tin người dùng. Vui lòng thử lại!");
         setIsVerifying(false);
@@ -178,13 +177,13 @@ const ChangePassword = ({ user, updateUserInfo }) => {
         return;
       }
 
-      // Update mk mới (đúng mk hiện tại)
-      const updatedUser = {
-        ...user,
-        password: passwordData.newPassword,
+      // Tạo object chỉ chứa thông tin cần thiết để đổi mật khẩu
+      const passwordUpdateData = {
+        id: user.id,
+        password: passwordData.newPassword, // Gửi mật khẩu mới (chưa hash)
       };
 
-      await updateUserInfo(updatedUser);
+      await updateUserInfo(passwordUpdateData);
       console.log("Password updated successfully");
 
       // Reset form
@@ -306,6 +305,7 @@ const ChangePassword = ({ user, updateUserInfo }) => {
                       ...prev,
                       new: validationError,
                     }));
+
                     if (
                       passwordData.confirmPassword &&
                       value !== passwordData.confirmPassword
@@ -371,6 +371,7 @@ const ChangePassword = ({ user, updateUserInfo }) => {
                     if (passwordErrors.confirm) {
                       setPasswordErrors((prev) => ({ ...prev, confirm: "" }));
                     }
+
                     if (
                       value &&
                       passwordData.newPassword &&

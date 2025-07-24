@@ -69,9 +69,10 @@ const AccountManage = () => {
 
   const filteredUsers = users
     .filter((user) => {
+      // Updated search to include fullname and username instead of ID
       const matchesSearch =
-        user?.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase());
+        user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user?.username?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesPosition =
         selectedPosition === "" || user?.role?.rolename === selectedPosition;
       const matchesStatus =
@@ -129,14 +130,12 @@ const AccountManage = () => {
         return;
       }
     }
-
     setSelectedUser(user);
     setShowConfirmModal(true);
   };
 
   const handleConfirmStatusChange = async () => {
     if (!selectedUser) return;
-
     console.log("Selected User:", selectedUser);
     setIsUpdating(true);
     try {
@@ -168,7 +167,6 @@ const AccountManage = () => {
 
   const handleRoleConflictConfirm = async (deactivateOther) => {
     if (!selectedUser) return;
-
     setIsUpdating(true);
     try {
       if (deactivateOther && conflictingUser) {
@@ -177,19 +175,16 @@ const AccountManage = () => {
           ...conflictingUser,
           status: "0",
         });
-
         if (deactivateResponse.status !== 200) {
           toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
           return;
         }
       }
-
       // Activate the selected user
       const activateResponse = await updateUserInfo({
         ...selectedUser,
         status: "1",
       });
-
       if (activateResponse.status === 200) {
         setUsers((prevUsers) =>
           prevUsers.map((user) => {
@@ -328,12 +323,13 @@ const AccountManage = () => {
           </div>
           <input
             type="text"
-            placeholder="Tìm kiếm mã nhân viên, tên nhân viên"
+            placeholder="Tìm kiếm tên nhân viên, tên đăng nhập"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
+
         {/* FILTER */}
         <div className="flex gap-3">
           {/* FILTER VỊ TRÍ */}
@@ -351,6 +347,7 @@ const AccountManage = () => {
               ))}
             </select>
           </div>
+
           {/* FILTER TRẠNG THÁI */}
           <div className="flex-shrink-0">
             <select
@@ -367,6 +364,7 @@ const AccountManage = () => {
             </select>
           </div>
         </div>
+
         {/* ADD */}
         <button
           onClick={handleCreateClick}
@@ -389,7 +387,7 @@ const AccountManage = () => {
           <thead className="bg-gray-50 border-b">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                MÃ NHÂN VIÊN
+                ẢNH ĐẠI DIỆN
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 TÊN NHÂN VIÊN
@@ -418,8 +416,31 @@ const AccountManage = () => {
             ) : (
               currentUsers.map((user, index) => (
                 <tr key={user?.id || index} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {user?.id || "N/A"}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
+                      {user?.image ? (
+                        <img
+                          src={user.image || "/placeholder.svg"}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback to default avatar if image fails to load
+                            e.target.style.display = "none";
+                            e.target.parentNode.querySelector(
+                              ".default-avatar"
+                            ).style.display = "block";
+                          }}
+                        />
+                      ) : null}
+                      <svg
+                        className="w-10 h-10 text-gray-400 default-avatar"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                        style={{ display: user?.image ? "none" : "block" }}
+                      >
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                      </svg>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {user?.fullname || "N/A"}
@@ -498,6 +519,7 @@ const AccountManage = () => {
               <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4 mr-1" />
               Trước
             </button>
+
             {/* Page Numbers */}
             <div className="flex items-center gap-1">
               {getPageNumbers().map((pageNum, index) => (
@@ -519,6 +541,7 @@ const AccountManage = () => {
                 </div>
               ))}
             </div>
+
             {/* NEXT BTN */}
             <button
               onClick={handleNextPage}
