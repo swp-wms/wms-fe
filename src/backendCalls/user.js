@@ -40,3 +40,16 @@ export const getUser = async () => {
         return error;
     }
 }
+
+export const getAllUsers = async () => {
+    try {
+        const response = await axios.get(api.GET_ALL_USER_INFO, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        return response;
+    } catch (error) {
+        return error;
+    }
+}
