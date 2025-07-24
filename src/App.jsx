@@ -34,7 +34,7 @@ function App() {
 
   return (
     <div>
-      {user && <Header user={user} setUser={setUser} />}
+      {user && localStorage.getItem('token') !== null && <Header user={user} setUser={setUser} />}
       <Routes>
         <Route path="/" element={<Home setUser={setUser} user={user} />} />
         <Route path="/dang-nhap" element={<Login />} />
