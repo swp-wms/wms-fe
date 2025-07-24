@@ -9,6 +9,8 @@ import moment from "moment/moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBoxOpen,
+  faNewspaper,
+  faPaperPlane,
   faSquareXmark,
   faTruck,
 } from "@fortawesome/free-solid-svg-icons";
@@ -29,13 +31,16 @@ const ImportHistory = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedPartner, setSelectedPartner] = useState("");
   const [partners, setPartners] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPageImport, setCurrentPageImport] = useState(1);
+  const [currentPageExport, setCurrentPageExport] = useState(1);
+  const itemsPerPage = 4;
 
   useEffect(() => {
     const getData = async () => {
       const response = await getImportOrder();
       setImportHistory(response);
       if (response.length > 0) {
-        const firstDate = moment(response[0].createdate).format("DD-MM-YYYY");
         setSelectedDate("Tất cả");
       }
     };
@@ -71,7 +76,7 @@ const ImportHistory = () => {
   const getDeliveryByOrder = async (orderId) => {
     const response = await getDeliveriesForOrder(orderId);
     console.log(response.data);
-    setDeliveryByOrder(response.data);
+    setDeliveryByOrder(Array.isArray(response.data) ? response.data : []);
   };
 
   useEffect(() => {
@@ -123,23 +128,59 @@ const ImportHistory = () => {
       selectedPartner ? item.partner?.name === selectedPartner : true
     );
 
+  const totalPagesImport = Math.ceil(
+    filteredImportOrders.length / itemsPerPage
+  );
+  const totalPagesExport = Math.ceil(
+    filteredExportOrders.length / itemsPerPage
+  );
+
+  const paginatedImportOrders = filteredImportOrders.slice(
+    (currentPageImport - 1) * itemsPerPage,
+    currentPageImport * itemsPerPage
+  );
+
+  const paginatedExportOrders = filteredExportOrders.slice(
+    (currentPageExport - 1) * itemsPerPage,
+    currentPageExport * itemsPerPage
+  );
+
+  useEffect(() => {
+    setCurrentPageImport(1);
+    setCurrentPageExport(1);
+  }, [selectedDate, searchKeyword, selectedPartner]);
+
+  const totalPages = Math.ceil(deliveryByOrder.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentDeliveries = deliveryByOrder.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  useEffect(() => {
+    if (selectedOrder) {
+      setCurrentPage(1);
+      getDeliveryByOrder(selectedOrder.id || selectedOrder);
+    }
+  }, [selectedOrder]);
+
   return (
-    <div className="pt-4 absolute w-[90%] left-1/2 -translate-x-1/2">
+    <div className="pt-4 absolute w-full left-1/2 -translate-x-1/2 px-16">
       <div className="flex justify-between gap-6 py-4 px-2 text-gray-500 font-medium">
         <div className="flex gap-4 items-center">
           <input
             type="text"
-            placeholder="Tìm theo mã đơn..."
+            placeholder="Tìm kiếm theo mã đơn"
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
-            className="border px-3 py-2 rounded w-1/3 text-sm"
+            className="border px-3 py-2 rounded text-sm"
           />
           <select
             value={selectedPartner}
             onChange={(e) => setSelectedPartner(e.target.value)}
             className="border px-3 py-2 rounded text-sm"
           >
-            <option value="">-- Tất cả đối tác --</option>
+            <option value="">Danh sách tên nhà cung cấp</option>
             {partners.map((partner) => (
               <option key={partner} value={partner}>
                 {partner}
@@ -159,7 +200,7 @@ const ImportHistory = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-5 gap-6">
         <div className="flex flex-col gap-2 max-h-screen overflow-y-auto text-center overflow-hidden">
           {uniqueDates.map((date, index) => (
             <div
@@ -171,17 +212,25 @@ const ImportHistory = () => {
           ? "bg-white shadow text-black font-semibold"
           : "bg-gray-100 text-gray-400 hover:text-black"
       }
-      ${date !== "Tất cả" ? getOpacityClass(index) : ""}
+      ${date !== "Tất cả" ? getOpacityClass(index) : "border"}
     `}
             >
+              {date === "Tất cả" ? (
+                <FontAwesomeIcon
+                  icon={faNewspaper}
+                  size="lg -translate-x-1 mr-1"
+                />
+              ) : (
+                ""
+              )}
               {date}
             </div>
           ))}
         </div>
 
         <div className="flex flex-col gap-4 col-span-2">
-          {filteredImportOrders.length > 0 ? (
-            filteredImportOrders.map((item) => (
+          {paginatedImportOrders.length > 0 ? (
+            paginatedImportOrders.map((item) => (
               <div
                 key={"import-" + item.id}
                 onClick={() => {
@@ -192,8 +241,6 @@ const ImportHistory = () => {
                 onMouseEnter={(e) => {
                   setHoveredOrder({
                     ...item,
-                    x: e.clientX - 400,
-                    y: e.clientY - 100,
                   });
                   setHoverType("import");
                 }}
@@ -232,12 +279,38 @@ const ImportHistory = () => {
               <span>Không có đơn nhập hàng trong ngày được chọn</span>
             </p>
           )}
+          {totalPagesImport > 1 && (
+            <div className="flex justify-center gap-4 pt-4">
+              <button
+                onClick={() =>
+                  setCurrentPageImport((prev) => Math.max(prev - 1, 1))
+                }
+                disabled={currentPageImport === 1}
+                className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+              >
+                Trang trước
+              </button>
+              <span className="text-sm py-1">
+                Trang {currentPageImport} / {totalPagesImport}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPageImport((prev) =>
+                    Math.min(prev + 1, totalPagesImport)
+                  )
+                }
+                disabled={currentPageImport === totalPagesImport}
+                className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+              >
+                Trang sau
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Export Orders */}
         <div className="flex flex-col gap-4 col-span-2">
-          {filteredExportOrders.length > 0 ? (
-            filteredExportOrders.map((item) => (
+          {paginatedExportOrders.length > 0 ? (
+            paginatedExportOrders.map((item) => (
               <div
                 key={"export-" + item.id}
                 onClick={() => {
@@ -248,8 +321,6 @@ const ImportHistory = () => {
                 onMouseEnter={(e) => {
                   setHoveredOrder({
                     ...item,
-                    x: e.clientX - 400,
-                    y: e.clientY - 100,
                   });
                   setHoverType("export");
                 }}
@@ -288,12 +359,39 @@ const ImportHistory = () => {
               <span>Không có đơn xuất hàng trong ngày được chọn</span>
             </p>
           )}
+          {totalPagesExport > 1 && (
+            <div className="flex justify-center gap-4 pt-4">
+              <button
+                onClick={() =>
+                  setCurrentPageImport((prev) => Math.max(prev - 1, 1))
+                }
+                disabled={currentPageImport === 1}
+                className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+              >
+                Trang trước
+              </button>
+              <span className="text-sm py-1">
+                Trang {currentPageImport} / {totalPagesImport}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPageImport((prev) =>
+                    Math.min(prev + 1, totalPagesImport)
+                  )
+                }
+                disabled={currentPageImport === totalPagesImport}
+                className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+              >
+                Trang sau
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {hoveredOrder && (
-        <div className="fixed z-[100] pointer-events-none ms-[10%]">
-          <div className="bg-white rounded-lg p-4 shadow-xl border pointer-events-auto w-[500px] translate-x-1/2 translate-y-16">
+        <div className="absolute -top-4 left-[30%] z-[120] h-screen flex items-center justify-center pointer-events-none">
+          <div className="bg-white rounded-lg p-4 shadow-xl border w-[500px] pointer-events-auto">
             <h2
               className={`text-lg font-bold mb-2 text-center ${
                 hoverType === "import" ? "text-green-600" : "text-red-600"
@@ -338,8 +436,8 @@ const ImportHistory = () => {
       )}
 
       {selectedOrder && (
-        <div className="fixed inset-0 flex items-center justify-center z-[120] translate-y-1/2 w-full">
-          <div className="bg-white rounded-lg p-6 w-96 shadow-xl relative border">
+        <div className="fixed top-0 left-0 bottom-0 flex items-center justify-center z-[150] w-full h-screen bg-[#00000017] transition-all duration-300">
+          <div className="bg-white rounded-lg p-6 w-96 shadow-xl relative border -translate-y-16">
             <FontAwesomeIcon
               onClick={() => setSelectedOrder(null)}
               icon={faSquareXmark}
@@ -353,10 +451,10 @@ const ImportHistory = () => {
               Mã đơn hàng: {selectedOrder.id}
             </h2>
 
-            {deliveryByOrder.length > 0 ? (
+            {currentDeliveries.length > 0 ? (
               <div className="mt-4">
                 <ul className="space-y-2 text-sm text-gray-600">
-                  {deliveryByOrder.map((delivery) => (
+                  {currentDeliveries.map((delivery) => (
                     <li key={delivery.id} className="border rounded p-2">
                       <p>
                         <span className="font-semibold">
@@ -409,6 +507,31 @@ const ImportHistory = () => {
                 <FontAwesomeIcon icon={faTruck} size="2xl" />
                 <span>Chưa có thông tin giao hàng </span>
               </p>
+            )}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-4">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+                >
+                  Trang trước
+                </button>
+                <span className="text-sm py-1">
+                  Trang {currentPage} / {totalPages}
+                </span>
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+                >
+                  Trang sau
+                </button>
+              </div>
             )}
           </div>
         </div>

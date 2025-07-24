@@ -17,7 +17,7 @@ const OrderHistory = ({ user, setUser }) => {
     }
   }, []);
   return (
-    <section className="absolute mt-[80px] ms-[300px] px-12 z-[-1] w-[calc(100%-300px)] ">
+    <section className="relative mt-[80px] ms-[300px] px-12 z-[-1] w-[calc(100%-300px)] h-[100%]">
       <ImportHistory />
     </section>
   );
