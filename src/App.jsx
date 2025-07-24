@@ -27,6 +27,7 @@ import Error403 from "./pages/Error-403";
 import Catalog from "./pages/Catalog";
 import InventoryInOutReport from "./pages/InventoryInOutReport";
 import DeliveryCalendar from "./pages/DeliveryCalendar";
+import OrderHistory from "./pages/OrderHistory";
 
 function App() {
   const [user, setUser] = useState();
@@ -57,12 +58,24 @@ function App() {
           element={<CreateExportOrder setUser={setUser} user={user} />}
         />
         {/* View Order */}
-        <Route path="/nhap-hang/:id" element={<ViewOrder user={user} setUser={setUser} />} />
-        <Route path='/xuat-hang/:id' element={<ViewOrder user={user} setUser={setUser} />} />
+        <Route
+          path="/nhap-hang/:id"
+          element={<ViewOrder user={user} setUser={setUser} />}
+        />
+        <Route
+          path="/xuat-hang/:id"
+          element={<ViewOrder user={user} setUser={setUser} />}
+        />
 
         {/* Edit Order */}
-        <Route path="/nhap-hang/:id/cap-nhat" element={<EditOrder user={user} setUser={setUser} />} />
-        <Route path='/xuat-hang/:id/cap-nhat' element={<EditOrder user={user} setUser={setUser} />} />
+        <Route
+          path="/nhap-hang/:id/cap-nhat"
+          element={<EditOrder user={user} setUser={setUser} />}
+        />
+        <Route
+          path="/xuat-hang/:id/cap-nhat"
+          element={<EditOrder user={user} setUser={setUser} />}
+        />
 
         <Route
           path="/tong-quan-kho"
@@ -73,22 +86,22 @@ function App() {
           element={<Statistic user={user} setUser={setUser} />}
         />
 
-        <Route path="/ke-hoach-van-chuyen" element={<Delivery
-          setUser={setUser}
-          user={user}
-        />} />
-        <Route path="/ke-hoach-van-chuyen/lich" element={<DeliveryCalendar
-          setUser={setUser}
-          user={user}
-        />} />
-        <Route path="/ke-hoach-van-chuyen/:act/:orderId/:deliveryId" element={<DeliverySchedule
-          setUser={setUser}
-          user={user}
-        />} />
-        <Route path="/ke-hoach-van-chuyen/:act/*" element={<DeliverySchedule
-          setUser={setUser}
-          user={user}
-        />} />
+        <Route
+          path="/ke-hoach-van-chuyen"
+          element={<Delivery setUser={setUser} user={user} />}
+        />
+        <Route
+          path="/ke-hoach-van-chuyen/lich"
+          element={<DeliveryCalendar setUser={setUser} user={user} />}
+        />
+        <Route
+          path="/ke-hoach-van-chuyen/:act/:orderId/:deliveryId"
+          element={<DeliverySchedule setUser={setUser} user={user} />}
+        />
+        <Route
+          path="/ke-hoach-van-chuyen/:act/*"
+          element={<DeliverySchedule setUser={setUser} user={user} />}
+        />
 
         <Route
           path="/thong-tin-ca-nhan"
@@ -104,13 +117,28 @@ function App() {
           path="/thong-tin-doi-tac"
           element={<Partner user={user} setUser={setUser} />}
         />
-        <Route path="/danh-muc" element={<Catalog user={user} setUser={setUser} />} />
+        <Route
+          path="/danh-muc"
+          element={<Catalog user={user} setUser={setUser} />}
+        />
 
-        <Route path="/error403" element={<Error403 user={user} setUser={setUser} />} />
-        <Route path="/error404" element={<Error404 user={user} setUser={setUser} />} />
+        <Route
+          path="/error403"
+          element={<Error403 user={user} setUser={setUser} />}
+        />
+        <Route
+          path="/error404"
+          element={<Error404 user={user} setUser={setUser} />}
+        />
 
-        <Route path="/thong-ke-kho/bao-cao-nhap-xuat-ton" element={<InventoryInOutReport user={user} setUser={setUser} />} />
-
+        <Route
+          path="/thong-ke-kho/bao-cao-nhap-xuat-ton"
+          element={<InventoryInOutReport user={user} setUser={setUser} />}
+        />
+        <Route
+          path="/lich-su-xuat-nhap"
+          element={<OrderHistory user={user} setUser={setUser} />}
+        ></Route>
       </Routes>
     </div>
   );

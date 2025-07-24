@@ -13,6 +13,8 @@ export const api = {
   GET_ORDERS: `${baseUrl}/orders`,
   GET_IMPORT_ORDER: `${baseUrl}/orders/import`,
   GET_EXPORT_ORDER: `${baseUrl}/orders/export`,
+  GET_IMPORT_WEIGHT: `${baseUrl}/orders/importweight`,
+  GET_EXPORT_WEIGHT: `${baseUrl}/orders/exportweight`,
   GET_ORDER_DETAIL: `${baseUrl}/detail`,
   CREATE_ORDER: `${baseUrl}/orders/`,
   GET_DELIVERY_DETAIL_FOR_UPDATE_ORDER: `${baseUrl}/orders/delivery`,
@@ -67,7 +69,6 @@ export const api = {
   //otp api
   GET_OTP: `${baseUrl}/reset-password/get-otp`,
   VERIFY_OTP: `${baseUrl}/reset-password/verify-otp`,
-
 
   //catalog API
   GET_CATALOGS: `${baseUrl}/catalog`,
