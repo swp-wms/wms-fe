@@ -12,11 +12,16 @@ import bcrypt from "bcryptjs";
 import { getUser } from "../../backendCalls/user";
 
 const ChangePassword = ({ user, updateUserInfo }) => {
+  // 8-30 ký tự, gồm cả chữ và số, không có ký tự đặc biệt
   const validatePassword = (password) => {
     if (password.length < 8 || password.length > 30) {
-      return "Mật khẩu tối thiểu 8 ký tự. Tối đa 30 ký tự.";
-    } else if (!/^(?=.*\d)(?=.*[a-zA-Z]).*$/.test(password)) {
-      return "Mật khẩu phải chứa cả chữ và số.";
+      return "Mật khẩu phải từ 8 đến 30 ký tự.";
+    } else if (!/^[a-zA-Z0-9]+$/.test(password)) {
+      return "Mật khẩu chỉ được chứa chữ cái và số, không có ký tự đặc biệt.";
+    } else if (!/(?=.*[a-zA-Z])/.test(password)) {
+      return "Mật khẩu phải chứa ít nhất một chữ cái.";
+    } else if (!/(?=.*[0-9])/.test(password)) {
+      return "Mật khẩu phải chứa ít nhất một chữ số.";
     }
     return "";
   };
@@ -38,9 +43,13 @@ const ChangePassword = ({ user, updateUserInfo }) => {
   const validatePasswordRealTime = (password) => {
     if (password === "") return "";
     if (password.length < 8 || password.length > 30) {
-      return "Mật khẩu tối thiểu 8 ký tự. Tối đa 30 ký tự.";
-    } else if (!/^(?=.*\d)(?=.*[a-zA-Z]).*$/.test(password)) {
-      return "Mật khẩu phải chứa cả chữ và số.";
+      return "Mật khẩu phải từ 8 đến 30 ký tự.";
+    } else if (!/^[a-zA-Z0-9]+$/.test(password)) {
+      return "Mật khẩu chỉ được chứa chữ cái và số, không có ký tự đặc biệt.";
+    } else if (!/(?=.*[a-zA-Z])/.test(password)) {
+      return "Mật khẩu phải chứa ít nhất một chữ cái.";
+    } else if (!/(?=.*[0-9])/.test(password)) {
+      return "Mật khẩu phải chứa ít nhất một chữ số.";
     }
     return "";
   };
@@ -76,6 +85,11 @@ const ChangePassword = ({ user, updateUserInfo }) => {
         new: "",
         confirm: "",
       });
+      setShowPasswords({
+        current: false,
+        new: false,
+        confirm: false,
+      });
     }
   };
 
@@ -96,6 +110,7 @@ const ChangePassword = ({ user, updateUserInfo }) => {
   };
 
   const handleSavePasswordButton = async () => {
+    // Reset errors
     setPasswordErrors({
       current: "",
       new: "",
@@ -105,7 +120,7 @@ const ChangePassword = ({ user, updateUserInfo }) => {
 
     let hasErrors = false;
 
-    // Kiểm tra validation
+    // Validate
     if (
       passwordValidationErrors.current ||
       passwordValidationErrors.new ||
@@ -177,11 +192,18 @@ const ChangePassword = ({ user, updateUserInfo }) => {
         return;
       }
 
-      // Tạo object chỉ chứa thông tin cần thiết để đổi mật khẩu
+      // chỉ đổi mật khẩu
       const passwordUpdateData = {
         id: user.id,
-        password: passwordData.newPassword, // Gửi mật khẩu mới (chưa hash)
+        password: passwordData.newPassword, // Chỉ gửi mật khẩu mới
       };
+
+      // Debug
+      console.log("Data being sent for password update:", passwordUpdateData);
+      console.log(
+        "Fields in password update:",
+        Object.keys(passwordUpdateData)
+      );
 
       await updateUserInfo(passwordUpdateData);
       console.log("Password updated successfully");
@@ -202,6 +224,11 @@ const ChangePassword = ({ user, updateUserInfo }) => {
         current: "",
         new: "",
         confirm: "",
+      });
+      setShowPasswords({
+        current: false,
+        new: false,
+        confirm: false,
       });
 
       toast.success("Đổi mật khẩu thành công!");
@@ -329,7 +356,7 @@ const ChangePassword = ({ user, updateUserInfo }) => {
                       ? "border-red-500"
                       : "border-gray-300"
                   }`}
-                  placeholder="Nhập mật khẩu mới"
+                  placeholder="Nhập mật khẩu mới (8-30 ký tự, chỉ chữ và số)"
                   disabled={isVerifying}
                 />
                 <button
