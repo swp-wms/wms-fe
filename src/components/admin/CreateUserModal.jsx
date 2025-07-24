@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -17,7 +15,7 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
     username: "",
     password: "",
     role: "",
-    status: 0, // Mặc định là inactive (integer)
+    status: 0, // mặc định acc mới inactive
   });
   const [isCreating, setIsCreating] = useState(false);
   const [emailError, setEmailError] = useState("");
@@ -102,7 +100,7 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
       return;
     }
 
-    // Check for role conflicts
+    // Check role conflict
     if (
       createFormData.role === "Warehouse keeper" ||
       createFormData.role === "Delivery staff"
@@ -115,7 +113,7 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
       }
     }
 
-    await createUserWithStatus(1); // Default active status (integer)
+    await createUserWithStatus(1); // Default status
   };
 
   const createUserWithStatus = async (status) => {
@@ -126,7 +124,7 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
         username: createFormData.username,
         password: createFormData.password,
         roleid: getRoleIdFromName(createFormData.role),
-        status: status, // Sử dụng integer status (1 hoặc 0)
+        status: status,
       };
 
       const response = await createNewUser(newUserData);
@@ -149,13 +147,13 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
     }
   };
 
-  const handleRoleConflictConfirm = async (deactivateOther) => {
-    if (deactivateOther && conflictingUser) {
+  const handleRoleConflictConfirm = async () => {
+    if (conflictingUser) {
       try {
-        // Deactivate the conflicting user first
+        // Deactivate acc confict
         const deactivateResponse = await updateUserInfo({
           ...conflictingUser,
-          status: "0", // Giữ nguyên string cho updateUserInfo vì có thể API này đang expect string
+          status: "0", // Deactive user cũ
         });
 
         if (deactivateResponse.status !== 200) {
@@ -176,9 +174,8 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
     setShowRoleConflictModal(false);
     setConflictingUser(null);
 
-    //Có (deactivateOther = true) tạo user status 1
-    //Không (deactivateOther = false) tạo user status 0
-    await createUserWithStatus(deactivateOther ? 1 : 0);
+    // Tạo user mới với trạng thái active
+    await createUserWithStatus(1);
   };
 
   const handleCancelRoleConflict = () => {
@@ -188,7 +185,7 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-gray-200 rounded-lg p-6 max-w-4xl w-full mx-4 relative">
           <div className="flex items-start gap-8">
             <div className="flex flex-col items-center gap-4">
@@ -316,10 +313,10 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
         </div>
       </div>
 
-      {/* Modal thông báo role conflict */}
+      {/* MODAL conflict vị trí */}
       {showRoleConflictModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-[60]">
+          <div className="bg-gray-300 rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Xác nhận tạo tài khoản
             </h3>
@@ -332,22 +329,23 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
               <span className="font-medium text-gray-900">
                 {createFormData.role}
               </span>{" "}
-              ở trạng thái Active. Bạn có muốn deactive họ không?
+              ở trạng thái Active. Khi tạo tài khoản mới, hệ thống sẽ tự động
+              deactive tài khoản cũ và active tài khoản mới.
             </p>
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => handleRoleConflictConfirm(false)}
+                onClick={handleCancelRoleConflict}
                 disabled={isCreating}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50"
               >
-                Không
+                Hủy
               </button>
               <button
-                onClick={() => handleRoleConflictConfirm(true)}
+                onClick={handleRoleConflictConfirm}
                 disabled={isCreating}
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
               >
-                {isCreating ? "Đang tạo..." : "Có"}
+                {isCreating ? "Đang tạo..." : "Xác nhận"}
               </button>
             </div>
           </div>

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
-import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMagnifyingGlass,
+  faPenToSquare,
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 import { getAllUserInfo, updateUserInfo } from "../../backendCalls/userInfo";
 import toast from "react-hot-toast";
 import EditUserModal from "./EditUserModal";
@@ -46,7 +48,7 @@ const AccountManage = () => {
     getData();
   }, []);
 
-  // Reset trang 1 khi thực hiện filter/ search
+  // Reset trang khi thực hiện filter/ search
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedPosition, selectedStatus]);
@@ -108,6 +110,11 @@ const AccountManage = () => {
   ];
 
   const handleStatusClick = (user) => {
+    // Không cho phép thay đổi trạng thái của System admin
+    if (user?.role?.rolename === "System admin") {
+      return;
+    }
+
     // Check if user is trying to activate a Warehouse keeper or Delivery staff
     if (
       user.status === "0" &&
@@ -424,16 +431,29 @@ const AccountManage = () => {
                     {user?.username || "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => handleStatusClick(user)}
-                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium transition-colors hover:opacity-80 ${
-                        user?.status === "1"
-                          ? "bg-green-100 text-green-800 hover:bg-green-200"
-                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                      }`}
-                    >
-                      {user?.status === "1" ? "Active" : "Inactive"}
-                    </button>
+                    {/* System admin thì không cho click */}
+                    {user?.role?.rolename === "System admin" ? (
+                      <span
+                        className={`inline-flex px-3 py-1 rounded-full text-xs font-medium cursor-not-allowed opacity-60 ${
+                          user?.status === "1"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {user?.status === "1" ? "Active" : "Inactive"}
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleStatusClick(user)}
+                        className={`inline-flex px-3 py-1 rounded-full text-xs font-medium transition-colors hover:opacity-80 ${
+                          user?.status === "1"
+                            ? "bg-green-100 text-green-800 hover:bg-green-200"
+                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        }`}
+                      >
+                        {user?.status === "1" ? "Active" : "Inactive"}
+                      </button>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                     <div className="flex items-center justify-center gap-2">
@@ -516,10 +536,10 @@ const AccountManage = () => {
         </div>
       )}
 
-      {/* Confirm trạng thái */}
+      {/* Modal confirm trạng thái */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-200 rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Xác nhận thay đổi trạng thái
             </h3>
@@ -570,10 +590,10 @@ const AccountManage = () => {
         </div>
       )}
 
-      {/* Role Conflict Modal */}
+      {/* Modal conflict vị trí */}
       {showRoleConflictModal && (
-        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-200 rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Xác nhận thay đổi trạng thái
             </h3>
@@ -586,10 +606,7 @@ const AccountManage = () => {
               <span className="font-medium text-gray-900">
                 {selectedUser?.role?.rolename}
               </span>{" "}
-              ở trạng thái Active. Bạn có muốn deactive {" "}
-              <span className="font-medium text-gray-900">
-                {conflictingUser?.fullname}
-              </span>{" "}và active{" "}
+              ở trạng thái Active. Bạn có muốn deactive họ và active{" "}
               <span className="font-medium text-gray-900">
                 {selectedUser?.fullname}
               </span>{" "}
