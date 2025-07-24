@@ -26,7 +26,7 @@ const PartnerManagement = () => {
     filterPartners();
   }, [partners, searchTerm, filterType]);
 
-  // Reset to first page when search or filters change
+  // Reset trang khi filter / search
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterType]);
@@ -42,6 +42,7 @@ const PartnerManagement = () => {
 
   const filterPartners = () => {
     let filtered = partners;
+
     // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(
@@ -53,6 +54,7 @@ const PartnerManagement = () => {
           partner.name?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
+
     // Filter by type
     if (filterType !== "all") {
       filtered = filtered.filter((partner) => {
@@ -64,24 +66,20 @@ const PartnerManagement = () => {
         return true;
       });
     }
+
     // Sort by ID (ascending order)
     filtered = filtered.sort((a, b) => {
       const idA = a.id || "";
       const idB = b.id || "";
       return idA.toString().localeCompare(idB.toString());
     });
+
     setFilteredPartners(filtered);
   };
 
-  const handleAddPartner = async (partnerData) => {
-    try {
-      await partner.addPartner(partnerData);
-      await loadPartners();
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error("Error adding partner:", error);
-      throw error;
-    }
+  const handleAddPartner = async () => {
+    await loadPartners();
+    setIsModalOpen(false);
   };
 
   const handlePartnerClick = (partnerData) => {
@@ -122,7 +120,6 @@ const PartnerManagement = () => {
   const getPageNumbers = () => {
     const pageNumbers = [];
     const maxVisiblePages = 5;
-
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
@@ -150,7 +147,6 @@ const PartnerManagement = () => {
         pageNumbers.push(totalPages);
       }
     }
-
     return pageNumbers;
   };
 
@@ -251,7 +247,6 @@ const PartnerManagement = () => {
               <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4 mr-1" />
               Trước
             </button>
-
             {/* Page Numbers */}
             <div className="flex items-center gap-1">
               {getPageNumbers().map((pageNum, index) => (
@@ -273,7 +268,6 @@ const PartnerManagement = () => {
                 </div>
               ))}
             </div>
-
             {/* Next Button */}
             <button
               onClick={handleNextPage}
@@ -296,6 +290,7 @@ const PartnerManagement = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleAddPartner}
+        allPartners={partners}
       />
 
       {/* DETAIL MODAL */}

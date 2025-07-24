@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { getUser } from "../backendCalls/user";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileExport, faFileImport } from "@fortawesome/free-solid-svg-icons";
+import { faCalendarCheck, faFileExport, faFileImport } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
 
@@ -31,7 +31,7 @@ const Delivery = ({ user, setUser }) => {
         <p>Kế hoạch xuất kho</p>
       </Link>
       <Link to={'/ke-hoach-van-chuyen/lich'} className="text-center btn px-[40px] py-[60px] rounded">
-        <FontAwesomeIcon className="text-3xl mb-4" icon={faFileExport} />
+        <FontAwesomeIcon className="text-3xl mb-4" icon={faCalendarCheck} />
         <p>Xem lịch vận chuyển</p>
       </Link>
     </div>

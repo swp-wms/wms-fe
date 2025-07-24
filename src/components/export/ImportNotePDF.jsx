@@ -12,6 +12,8 @@ Font.register({
   src: RobotoRegular,
 });
 
+const today = new Date();
+
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
@@ -164,7 +166,7 @@ const ImportNotePDF = ({ currentDelivery, currentDeliveryDetail, currentOrder })
       {/* Form Title */}
       <Text style={styles.formTitle}>PHIẾU NHẬP KHO</Text>
       <View style={styles.dateInfo}>
-        <Text>Ngày {(new Date).getDay()} tháng {(new Date).getMonth()} năm {(new Date).getFullYear()}</Text>
+        <Text>Ngày {today.getDate()} tháng {today.getMonth() + 1} năm {today.getFullYear()}</Text>
       </View>
 
       {/* Recipient/Delivery Info */}
