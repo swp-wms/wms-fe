@@ -30,9 +30,9 @@ const EditProfile = ({
 
   const validatePhoneNumber = (phone) => {
     if (!phone.trim()) return "Số điện thoại không được để trống";
-    const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+    const phoneRegex = /^(0[3|5|7|8|9])([0-9]{8,9})$/;
     if (!phoneRegex.test(phone)) {
-      return "Số điện thoại không đúng định dạng (VD: 0901234567)";
+      return "Số điện thoại không đúng định dạng";
     }
     return "";
   };
@@ -111,7 +111,7 @@ const EditProfile = ({
     }
 
     try {
-      // Tạo object mới không chứa password để tránh hash lại mật khẩu
+      // Tạo object mới không có password
       const userDataToUpdate = {
         id: user.id,
         username: user.username,
@@ -123,11 +123,14 @@ const EditProfile = ({
         dateofbirth: user.dateofbirth,
         gender: user.gender,
         status: user.status,
-        // Không gửi password khi chỉ update thông tin cá nhân
       };
 
+      // Log để debug - đảm bảo không có password
+      console.log("Data being sent for profile update:", userDataToUpdate);
+      console.log("Password field exists:", "password" in userDataToUpdate);
+
       await updateUserInfo(userDataToUpdate);
-      console.log("User info updated successfully:", userDataToUpdate);
+      console.log("User info updated successfully");
       onCancel();
       toast.success("Cập nhật thông tin thành công!");
     } catch (error) {

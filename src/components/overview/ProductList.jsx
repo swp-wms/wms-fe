@@ -17,6 +17,8 @@ import {
 import ProductEdit from "./ProductEdit";
 import { fetchCatalog } from "../../backendCalls/catalog";
 import toast from "react-hot-toast";
+import moment from "moment";
+import { getAllUsers } from "../../backendCalls/user";
 
 const ProductList = ({ user }) => {
   const [productCatalog, setProductCatalog] = useState([]);
@@ -29,13 +31,26 @@ const ProductList = ({ user }) => {
   const [showExcelConfirm, setShowExcelConfirm] = useState(false);
   const [history, setHistory] = useState([]);
   const [openHistory, setOpenHistory] = useState(false);
+  const [userInfo, setUserInfo] = useState([]);
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await getAllUsers();
+      setUserInfo(response.data);
+      console.log(response.data);
+    };
+    getData();
+  })
 
   // Fetch product data
   useEffect(() => {
     const getData = async () => {
       const response = await fetchProductCatalog();
+      const userResponse = await getAllUsers();
       setProductCatalog(response);
+      setUserInfo(userResponse.data);
       console.log(response);
+      console.log(userResponse.data);
     };
     getData();
   }, []);
@@ -367,10 +382,10 @@ const ProductList = ({ user }) => {
                       {entry.new_weight}
                     </td>
                     <td className="border border-black px-2">
-                      {entry.warehousekeeperid}
+                      {userInfo.map((user) => user.id === entry.warehousekeeperid && user.username)}
                     </td>
                     <td className="border border-black px-2">
-                      {entry.update_time}
+                      {moment(entry.update_time).format(" HH:mm:ss - DD/MM/YYYY")}
                     </td>
                   </tr>
                 ))}
@@ -467,8 +482,8 @@ const TableList = ({
             <th className="border border-black">Loại thép</th>
             <th className="border border-black">Mã thép</th>
             <th className="border border-black">Số lượng </th>
-            <th className="border border-black">Khối lượng bó</th>
-            <th className="border border-black">Số thanh/bó</th>
+            {/* <th className="border border-black">Khối lượng bó</th>
+            <th className="border border-black">Số thanh/bó</th> */}
             <th className="border border-black">
               Độ dài <br />
               (m)
@@ -501,12 +516,12 @@ const TableList = ({
                 <td className="border border-black px-2">{item.type}</td>
                 <td className="border border-black px-2">{item.steeltype}</td>
                 <td className="border border-black px-2">{item.totalbar}</td>
-                <td className="border border-black px-2">
+                {/* <td className="border border-black px-2">
                   {item.weightperbundle}
                 </td>
                 <td className="border border-black px-2">
                   {item.barsperbundle}
-                </td>
+                </td> */}
                 <td className="border border-black px-2">{length}</td>
                 <td className="border border-black px-2">
                   {(Number(weight) || 0).toFixed(2)}

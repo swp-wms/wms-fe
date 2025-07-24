@@ -11,7 +11,7 @@ const UserInfo = () => {
   const [user, setUser] = useState({
     id: 0,
     username: "",
-    password: "",
+    password: "", // bỏ password khi gửi req
     roleid: 0,
     fullname: "",
     image: "",
@@ -20,6 +20,7 @@ const UserInfo = () => {
     dateofbirth: "",
     gender: "",
   });
+
   const [notes, setNotes] = useState("");
   const [edit, setEdit] = useState(false);
 
@@ -27,14 +28,14 @@ const UserInfo = () => {
     const getData = async () => {
       try {
         const response = await getUserInfo();
-        console.log("check useeffect", response);
+        console.log("User data fetched:", response);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching user info:", error);
       }
     };
-    getData();
 
+    getData();
     const savedNotes = localStorage.getItem("userNotes");
     if (savedNotes) {
       setNotes(savedNotes);
@@ -46,15 +47,22 @@ const UserInfo = () => {
   }, [notes]);
 
   const handleEditInfoButton = () => {
-    console.log("Edit: ", edit);
+    console.log("Edit mode:", !edit);
     setEdit(!edit);
   };
 
   const handleImageUpload = async (imageUrl) => {
     try {
-      const updatedUser = { ...user, image: imageUrl };
-      await updateUserInfo(updatedUser);
-      setUser(updatedUser);
+      // Chỉ update iamge
+      const imageUpdateData = {
+        id: user.id,
+        image: imageUrl,
+      };
+
+      console.log("Data being sent for image update:", imageUpdateData);
+
+      await updateUserInfo(imageUpdateData);
+      setUser({ ...user, image: imageUrl });
       console.log("Profile image updated successfully");
     } catch (error) {
       console.error("Error updating profile image:", error);
