@@ -4,7 +4,7 @@ import {
   faSave,
   faSquareXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { fetchPartners } from "../../backendCalls/partner";
 import {
@@ -18,7 +18,6 @@ const ProductEdit = ({
   onUpdate,
   catalog,
   user,
-  setProductCatalog,
 }) => {
   const [formData, setFormData] = useState({ ...product });
   const [errors, setErrors] = useState({});
@@ -101,7 +100,10 @@ const ProductEdit = ({
       if (formData.productid) {
         await updateProductCatalog(formData.productid, formData);
       } else {
-        await addProduct({...formData, partner: partners.find((p) => p.name === formData.name).id});
+        await addProduct({
+          ...formData,
+          partner: partners.find((p) => p.name === formData.name).id,
+        });
       }
       console.log("formData: ", formData);
 

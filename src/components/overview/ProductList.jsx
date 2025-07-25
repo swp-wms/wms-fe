@@ -1,5 +1,6 @@
-import React, { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
+import Spreadsheet from "react-spreadsheet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowUpFromBracket,
@@ -8,6 +9,15 @@ import {
   faPenToSquare,
   faClockRotateLeft,
   faXmark,
+  faScroll,
+  faScrollTorah,
+  faMouse,
+  faMousePointer,
+  faComputerMouse,
+  faArrowsLeftRightToLine,
+  faArrowsLeftRight,
+  faArrowLeft,
+  faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   fetchProductCatalog,
@@ -32,6 +42,7 @@ const ProductList = ({ user }) => {
   const [history, setHistory] = useState([]);
   const [openHistory, setOpenHistory] = useState(false);
   const [userInfo, setUserInfo] = useState([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     const getData = async () => {
@@ -40,7 +51,7 @@ const ProductList = ({ user }) => {
       console.log(response.data);
     };
     getData();
-  })
+  }, []);
 
   // Fetch product data
   useEffect(() => {
@@ -91,7 +102,7 @@ const ProductList = ({ user }) => {
   };
 
   // Handle update product
-   const handleUpdateProduct = (updatedProduct) => {
+  const handleUpdateProduct = (updatedProduct) => {
     console.log("Updated Product:", updatedProduct);
 
     setProductCatalog((prev) => {
@@ -156,69 +167,134 @@ const ProductList = ({ user }) => {
         partner: row["Mã đối tác"] || "",
       }));
 
-      console.log("Map: ", mappedData);
+      const mapToSpreadsheetData = (products) => {
+        return products.map((item) => {
+          const pd = item.pd || "";
+          const isValidPD = /^TD\d{2}CB\d{3}[TV]$/.test(pd);
+          const steeltype = isValidPD ? `D${pd.slice(2, 4)}` : "";
+          const namedetail = isValidPD ? `Thép ${pd.slice(1)}` : "";
 
-      if (mappedData.weightperbundle && mappedData.barsperbundle) {
-        mappedData.weight =
-          mappedData.weightperbundle / mappedData.barsperbundle;
-      }
+          return [
+            { value: pd, readOnly: false },
+            { value: namedetail, readOnly: true, className: "bg-gray-100" },
+            { value: item.name || "" },
+            { value: item.brandname || "" },
+            { value: item.type || "" },
+            { value: steeltype, readOnly: true, className: "bg-gray-100" },
+            {
+              value: item.totalbar?.toString() || "0",
+              readOnly: true,
+              className: "bg-gray-100",
+            },
+            {
+              value: item.length?.toString() || "0",
+              readOnly: true,
+              className: "bg-gray-100",
+            },
+            {
+              value: item.weightperbundle?.toString() || "0",
+              readOnly: true,
+              className: "bg-gray-100",
+            },
+            {
+              value: item.barsperbundle?.toString() || "0",
+              readOnly: true,
+              className: "bg-gray-100",
+            },
+            { value: item.partner, readOnly: false },
+            { value: item.totalweight, readOnly: false },
+          ];
+        });
+      };
 
-      console.log(mappedData);
+      const spreadsheetData = mapToSpreadsheetData(mappedData);
 
-      setExcelProducts(mappedData);
+      setData(spreadsheetData);
       setShowExcelConfirm(true);
     };
 
     reader.readAsArrayBuffer(file);
+    e.target.value = null;
+  };
+
+  const convertSpreadsheetToProducts = (sheetData) => {
+    return sheetData.map((row) => {
+      const pd = row[0]?.value?.trim() || "";
+      const isValidPD = /^TD\d{2}CB\d{3}[TV]$/.test(pd);
+      const namedetail = isValidPD ? `Thép ${pd.slice(1)}` : "";
+      const steeltype = isValidPD ? `D${pd.slice(2, 4)}` : "";
+
+      return {
+        pd,
+        namedetail,
+        name: row[2]?.value?.trim() || "",
+        brandname: row[3]?.value?.trim() || "",
+        type: row[4]?.value?.trim() || "",
+        steeltype,
+        totalbar: Number(row[6]?.value) || 0,
+        length: Number(row[7]?.value) || 0,
+        weightperbundle: Number(row[8]?.value) || 0,
+        barsperbundle: Number(row[9]?.value) || 0,
+        partner: row[10]?.value?.trim() || "",
+      };
+    });
+  };
+
+  const validateSpreadsheetBeforeSubmit = (sheetData) => {
+    const errors = [];
+
+    sheetData.forEach((row, i) => {
+      const pd = row[0]?.value || "";
+      const name = row[2]?.value || "";
+      const brandname = row[3]?.value || "";
+      const type = row[4]?.value || "";
+
+      if (!/^TD\d{2}CB\d{3}[TV]$/.test(pd)) {
+        errors.push(`Dòng ${i + 1}: Mã hàng hóa không đúng định dạng`);
+      }
+      if (!name) errors.push(`Dòng ${i + 1}: Thiếu tên đối tác`);
+      if (!brandname) errors.push(`Dòng ${i + 1}: Thiếu tên hãng thép`);
+      if (!type) errors.push(`Dòng ${i + 1}: Thiếu loại thép`);
+    });
+
+    return errors;
   };
 
   const handleConfirmImport = async () => {
-    const generateKey = (item) => item;
-    const existingKeySet = productCatalog.map(generateKey);
-    console.log(existingKeySet);
-
-    const newItems = [];
-    const duplicates = [];
-
-    console.log("Excel products:", excelProducts);
-    for (const item of excelProducts) {
-      const key = generateKey(item);
-      console.log("Key: ", key);
-
-      if (
-        existingKeySet.some(
-          (existingKey) =>
-            existingKey.pd?.trim().toLowerCase() ===
-              key.pd?.trim().toLowerCase() &&
-            existingKey.name?.trim().toLowerCase() ===
-              key.name?.trim().toLowerCase() &&
-            existingKey.brandname?.trim().toLowerCase() ===
-              key.brandname?.trim().toLowerCase() &&
-            existingKey.type?.trim().toLowerCase() ===
-              key.type?.trim().toLowerCase()
-        )
-      ) {
-        duplicates.push(item);
-        console.log("Sản phẩm trùng mã:", item);
-      } else {
-        newItems.push(item);
-        existingKeySet.push(key);
-        console.log("Sản phẩm gửi lên:", item);
-      }
+    const errors = validateSpreadsheetBeforeSubmit(data);
+    if (errors.length > 0) {
+      errors.forEach((err) => toast.error(err));
+      return;
     }
+
+    const editedProducts = convertSpreadsheetToProducts(data);
+
+    const existingKeySet = productCatalog.map((item) => ({
+      pd: item.pd?.toLowerCase(),
+      name: item.name?.toLowerCase(),
+      brandname: item.brandname?.toLowerCase(),
+      type: item.type?.toLowerCase(),
+    }));
+
+    const duplicates = editedProducts.filter((item) =>
+      existingKeySet.some(
+        (exist) =>
+          exist.pd === item.pd?.toLowerCase() &&
+          exist.name === item.name?.toLowerCase() &&
+          exist.brandname === item.brandname?.toLowerCase() &&
+          exist.type === item.type?.toLowerCase()
+      )
+    );
 
     if (duplicates.length > 0) {
-      toast.error(`${duplicates.length} mặt hàng đã tồn tại trong hệ thống`);
-    }
-
-    if (newItems.length === 0) {
-      setShowExcelConfirm(false);
-      setExcelProducts([]);
+      toast.error(
+        `Có ${duplicates.length} sản phẩm trùng. Vui lòng sửa lại trong bảng trước khi xác nhận.`
+      );
       return;
     }
 
     const successList = [];
-    for (const product of newItems) {
+    for (const product of editedProducts) {
       try {
         const productInfo = {
           pd: product.pd?.trim() || "",
@@ -345,7 +421,11 @@ const ProductList = ({ user }) => {
                 setHistory([]);
               }}
             >
-              <FontAwesomeIcon icon={faXmark} className="text-white font-medium" size="sm" />
+              <FontAwesomeIcon
+                icon={faXmark}
+                className="text-white font-medium"
+                size="sm"
+              />
             </button>
 
             <h2 className="text-lg font-semibold mb-2 text-red-800">
@@ -354,10 +434,18 @@ const ProductList = ({ user }) => {
             <table className="w-full border-collapse text-sm text-center mt-2">
               <thead>
                 <tr>
-                  <th colSpan={2} className="border border-black px-2">Số lượng</th>
-                  <th colSpan={2} className="border border-black px-2">Khối lượng (kg)</th>
-                  <th rowSpan={2} className="border border-black px-2">Người chỉnh sửa</th>
-                  <th rowSpan={2} className="border border-black px-2">Thời gian chỉnh sửa</th>
+                  <th colSpan={2} className="border border-black px-2">
+                    Số lượng
+                  </th>
+                  <th colSpan={2} className="border border-black px-2">
+                    Khối lượng (kg)
+                  </th>
+                  <th rowSpan={2} className="border border-black px-2">
+                    Người chỉnh sửa
+                  </th>
+                  <th rowSpan={2} className="border border-black px-2">
+                    Thời gian chỉnh sửa
+                  </th>
                 </tr>
                 <tr>
                   <th className="border border-black px-2">Trước đây</th>
@@ -382,10 +470,15 @@ const ProductList = ({ user }) => {
                       {entry.new_weight}
                     </td>
                     <td className="border border-black px-2">
-                      {userInfo.map((user) => user.id === entry.warehousekeeperid && user.username)}
+                      {userInfo.map(
+                        (user) =>
+                          user.id === entry.warehousekeeperid && user.username
+                      )}
                     </td>
                     <td className="border border-black px-2">
-                      {moment(entry.update_time).format(" HH:mm:ss - DD/MM/YYYY")}
+                      {moment(entry.update_time).format(
+                        " HH:mm:ss - DD/MM/YYYY"
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -427,23 +520,26 @@ const ProductList = ({ user }) => {
           setProductCatalog={setProductCatalog}
         />
       )}
+
       {showExcelConfirm && (
         <div className="fixed inset-0 flex items-center justify-center z-50 ms-[20%] ">
-          <div className="bg-white p-6 rounded-lg shadow-lg border border-black mx-16">
-            <h2 className="text-lg font-semibold mb-4">
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-black mx-16 w-[80%] text-sm">
+            <h2 className="text-lg font-semibold mb-6">
               Xác nhận thêm hàng hóa
             </h2>
-            <TableList data={excelProducts} option={false} />
-            <p>
-              Bạn có chắc chắn muốn thêm <strong>{excelProducts.length}</strong>{" "}
-              mặt hàng từ file Excel không?
+
+            <div className="max-h-[400px] overflow-auto scrollbar-hide">
+              <Spreadsheet data={data} onChange={setData} className="w-full" />
+            </div>
+            <p className="py-6">
+              Bạn có chắc chắn muốn thêm <strong>{data.length}</strong> mặt hàng
+              từ file Excel không?
             </p>
-            <div className="mt-4 flex justify-end gap-4 font-medium">
+            <div className="flex justify-end gap-4 font-medium">
               <button
                 className="px-4 py-2 bg-gray-300 rounded hover:scale-105 transition duration-300 ease-in-out cursor-pointer"
                 onClick={() => {
                   setShowExcelConfirm(false);
-                  setExcelProducts([]);
                 }}
               >
                 Hủy
@@ -557,3 +653,16 @@ const TableList = ({
 };
 
 export default ProductList;
+
+const spreadsheetHeaders = [
+  "Mã HH",
+  "Tên HH",
+  "Tên đối tác",
+  "Hãng thép",
+  "Loại",
+  "Mã thép",
+  "Số lượng",
+  "Độ dài",
+  "KL bó",
+  "Số thanh/bó",
+];
