@@ -22,7 +22,7 @@ const Login = () => {
   }
 
   return (
-    <div className="Login min-h-screen min-w-screen font-medium"
+    <div className="Login fixed top-0 bottom-0 left-0 right-0 font-medium"
       style={{ backgroundImage: 'linear-gradient(to bottom, #b5070e, black)' }} >
       <div className="min-h-screen min-w-screen bg-[url('./image-removebg-preview.png')] bg-cover bg-no-repeat bg-center opacity-40"></div>
 
