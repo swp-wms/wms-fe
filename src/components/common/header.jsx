@@ -105,7 +105,7 @@ const NavBar = ({ user, data }) => {
           </div>}
         <FontAwesomeIcon icon={faGear} size="lg" />
         <Link to={"/thong-tin-ca-nhan"} className="flex flex-row rounded-full bg-white shadow-btn p-1.5 w-fit justify-between items-center gap-2">
-          <div className="size-8 rounded-full bg-gray-200"></div>
+          <div style={{backgroundImage: `url(${user.image})`}} className="bg-center bg-cover size-8 rounded-full bg-gray-200"></div>
           <span className="px-3 font-medium">{user.username}</span>
         </Link>
       </div>
