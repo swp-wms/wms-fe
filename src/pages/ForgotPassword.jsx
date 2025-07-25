@@ -28,13 +28,17 @@ const ForgotPassword = () => {
     const handleCheckEmail = async (e) => {
         e.preventDefault();
         if (document.querySelector('.email-field').checkValidity()) {
-
+            let toastid;
             try {
+                toastid = toast.loading('Đang gửi OTP...');
                 await axios.post(api.GET_OTP, {
                     email: email
                 });
+                toast.dismiss(toastid);
+                toast.success('Đã gửi OTP! Vui lòng kiểm tra hòm thư!');
                 setStep(2);
             } catch (error) {
+                toast.dismiss(toastid);
                 toast.error(error.response.data.message);
             }
         } else {
@@ -51,15 +55,18 @@ const ForgotPassword = () => {
             toast.error('OTP không chính xác.');
             return;
         }
-
+        let toastid;
         try {
+            toastid = toast.loading('Đang kiểm tra OTP...');
             await axios.post(api.VERIFY_OTP, {
                 otp: otpString,
                 email: email
             });
             setStep(3);
+            toast.dismiss(toastid);
             toast.success('OTP chính xác')
         } catch (error) {
+            toast.dismiss(toastid);
             toast.error(error.response.data.message);
         }
     }
@@ -68,17 +75,25 @@ const ForgotPassword = () => {
         e.preventDefault();
         if (password.length < 8 || password.length > 30) {
             toast.error('Mật khẩu tối thiểu 8 ký tự. Tối đa 30 ký tự.')
-        } else if (!/^[a-zA-Z0-9]{8,30}$/.test(password)) {
+        } else if (!/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z0-9]{8,30}$/.test(password)) {
             toast.error('Mật khẩu chứa chữ và số.')
         } else if (password !== retype) {
             toast.error('Nhập lại mật khẩu chưa chính xác.')
         } else {
-            await axios.post(api.RESET_PASSWORD, {
-                password: password,
-                email: email
-            });
-            toast.success('Đổi mật khẩu thành công.');
-            window.location.href = '/dang-nhap';
+            let toastid;
+            try {
+                toastid = toast.loading('Đang đổi mật khẩu...');
+                await axios.post(api.RESET_PASSWORD, {
+                    password: password,
+                    email: email
+                });
+                toast.dismiss(toastid);
+                toast.success('Đổi mật khẩu thành công.');
+                window.location.href = '/dang-nhap';
+            } catch (error) {
+                toast.dismiss(toastid);
+                toast.error(error.response.data.message);
+            }
         }
     }
 
@@ -178,7 +193,7 @@ const ForgotPassword = () => {
                 </form>
 
                 <Link to="/dang-nhap" className="mt-4 absolute top-0 left-[20px]">
-                    <FontAwesomeIcon icon={faArrowLeft}/>
+                    <FontAwesomeIcon icon={faArrowLeft} />
                     <span className="ml-4">Đăng nhập</span>
                 </Link>
             </div>

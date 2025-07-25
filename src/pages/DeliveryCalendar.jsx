@@ -101,7 +101,7 @@ const DeliveryCalendar = ({ user, setUser }) => {
     }, []);
 
     return (
-        <div className="fixed bottom-0 right-0 top-[90px] left-[300px] p-8 z-50 bg-white overflow-scroll">
+        <div className="fixed bottom-0 right-0 top-[90px] left-[300px] p-8 pb-0 z-50 bg-white overflow-scroll">
             <Calendar
                 events={deliverySchedule}
                 localizer={localizer}
@@ -111,7 +111,7 @@ const DeliveryCalendar = ({ user, setUser }) => {
                 onView={(view) => setCurrentView(view)}
                 startAccessor="start"
                 endAccessor="end"
-                style={{ height: 550 }}
+                style={{ height: '75vh' }}
                 timeslots={4}
                 selectable
                 step={15}
@@ -126,6 +126,10 @@ const DeliveryCalendar = ({ user, setUser }) => {
                 components={{event: CustomEvent}}
                 onSelectEvent={(event) => navigate(`/ke-hoach-van-chuyen/${event.order.type === 'I' ? 'nhap' : 'xuat'}/${event.orderid}/${event.id}`)}
             />
+            <div className="flex items-center mt-3">
+                <div className="w-[20px] h-[20px] mr-2 bg-[#27a844]"></div> <span>Nhập hàng</span>
+                <div className="w-[20px] h-[20px] ml-5 mr-2 bg-[#fec107]"></div> <span>Xuất hàng</span>
+            </div>
         </div>
     );
 }

@@ -1,34 +1,34 @@
 import { useState } from "react"
 import { handleLogin } from "../backendCalls/user";
+import toast from "react-hot-toast";
 
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
-  const [error, setError] = useState('');
 
   const login = async (e) => {
     e.preventDefault();
+    const id = toast.loading('Đang đăng nhập... Vui lòng chỉ bấm 1 lần!');
     const response = await handleLogin(username, password);
     if (response.status !== 200) {
-      setError(response.response.data.message);
+      toast.dismiss(id);
+      toast.error(response.response.data.message);
     } else {
-      setError('');
+      toast.dismiss(id);
       window.location.href = '/';
     }
   }
 
   return (
-    <div className="Login min-h-screen min-w-screen font-medium"
+    <div className="Login fixed top-0 bottom-0 left-0 right-0 font-medium"
       style={{ backgroundImage: 'linear-gradient(to bottom, #b5070e, black)' }} >
       <div className="min-h-screen min-w-screen bg-[url('./image-removebg-preview.png')] bg-cover bg-no-repeat bg-center opacity-40"></div>
 
       <div className="fixed top-0 bottom-0 left-0 right-0 flex items-center justify-center">
         <form className="bg-white p-8 rounded-md w-[360px] flex flex-col items-center">
           <img className="mb-4" src="/logo.png" width={'160px'} alt="logo" />
-
-          {error && <p style={{ color: 'red', fontWeight: 'normal' }}>{error}</p>}
 
           <input className="login-input bg-[#fae5e2] placeholder:text-[#e18479]"
             type="text"
