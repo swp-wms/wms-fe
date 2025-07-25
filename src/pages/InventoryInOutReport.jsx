@@ -195,20 +195,7 @@ const InventoryInOutReport = ({ user, setUser }) => {
 
                     {/* Pagination */}
                     <div className="px-4 py-3 border-t flex items-center justify-between">
-                        <div className="text-sm text-gray-500">
-                            Hiển thị 1-5 trong tổng số 25 bản ghi
-                        </div>
-                        <div className="flex space-x-1">
-                            <button className="px-3 py-1 border rounded text-sm hover:bg-gray-50 disabled:opacity-50" disabled>
-                                <i className="fas fa-chevron-left"></i>
-                            </button>
-                            <button className="px-3 py-1 border rounded text-sm bg-red-600 text-white">1</button>
-                            <button className="px-3 py-1 border rounded text-sm hover:bg-gray-50">2</button>
-                            <button className="px-3 py-1 border rounded text-sm hover:bg-gray-50">3</button>
-                            <button className="px-3 py-1 border rounded text-sm hover:bg-gray-50">
-                                <i className="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
+                        
                     </div>
                 </div>
             </div>

@@ -144,7 +144,15 @@ const ImportOrder = ({ user, setUser }) => {
                                 )}
                                 {order.status !== cancelledStatus && order.status !== finishedStatus && (
                                 <div className="flex h-4 ml-[10%] w-[90%] bg-gray-200 rounded-full overflow-hidden dark:bg-neutral-700" role="progressbar" aria-valuenow="{order.status.match(/(\d+(\.\d+)?)(?=%)/)[0]}" aria-valuemin="0" aria-valuemax="100">
-                                    <div className="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap transition duration-500" style={{ width: parseFloat(order.status).toFixed(0)  <=18 ? "18%" : `${parseFloat(order.status).toFixed(0)}%` }}>{parseFloat(order.status).toFixed(1)}%</div>
+                                    <div className="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap transition duration-500" 
+                                        style={{ 
+                                                width: order.status == null || order.status === '' ? "15%" : 
+                                                    parseFloat(order.status) <= 18 ? "18%" : 
+                                                    `${Math.min(parseFloat(order.status) || 0, 100).toFixed(0)}%`
+                                            }}
+                                        >{order.status == null || order.status === '' ? "0%" : 
+                                        `${(parseFloat(order.status) || 0).toFixed(1)}%`}
+                                    </div>
                                 </div>
                                 )}
                         </div>
