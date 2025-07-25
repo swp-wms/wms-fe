@@ -483,16 +483,6 @@ return (
               </button>
 
               <button
-                type="button"
-                className="inline-flex items-center justify-center text-gray-700 bg-white border border-gray-200 hover:bg-gray-300 px-4 py-1 text-sm rounded-md"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-                </svg>
-                Chỉnh sửa
-              </button>
-
-              <button
                 type="submit"
                 onClick={handleSubmit}
                 className="inline-flex items-center justify-center text-gray-700 bg-white border border-gray-200 hover:border-gray-300 px-4 py-1 text-sm rounded-md"
