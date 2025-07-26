@@ -183,7 +183,7 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
                 <div className="relative">
                   <input
                     autoComplete="off"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? "text" : "text"}
                     value={editFormData.password}
                     onChange={(e) =>
                       handleEditFormChange("password", e.target.value)
