@@ -137,8 +137,8 @@ const InventoryInOutReport = ({ user, setUser }) => {
                     </div>
                 </div>
 
-                {/* Inventory Report Table */}
-                <div className="bg-white rounded-lg shadow-sm border">
+          
+                <div className="bg-white rounded-lg shadow-sm border mr-2">
                     <div className="p-4 border-b">
                         <h2 className="font-semibold text-gray-800">Báo cáo xuất nhập tồn kho</h2>
                     </div>
@@ -147,19 +147,23 @@ const InventoryInOutReport = ({ user, setUser }) => {
                         <table className="w-full text-sm">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-4 py-3 text-left font-medium text-gray-700 border-r">STT</th>
-                                    <th className="px-4 py-3 text-left font-medium text-gray-700 border-r">Mã hàng hóa</th>
-                                    <th className="px-4 py-3 text-left font-medium text-gray-700 border-r">Tên hàng hóa</th>
-                                    <th className="px-4 py-3 text-center font-medium text-gray-700 border-r">ĐVT</th>
-                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">Tồn đầu</th>
-                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">SL Nhập</th>
-                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">SL Xuất</th>
-                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">Tồn cuối</th>
-                                    <th className="px-4 py-3 text-center font-medium text-gray-700 border-r">ĐVT</th>
-                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">Tồn đầu</th>
-                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">SL Nhập</th>
-                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r">SL Xuất</th>
-                                    <th className="px-4 py-3 text-right font-medium text-gray-700">Tồn cuối</th>
+                                    <th className="px-4 py-3 text-left font-medium text-gray-700 border-r border-b-3" rowSpan={2}>STT</th>
+                                    <th className="px-4 py-3 text-left font-medium text-gray-700 border-r border-b-3" rowSpan={2}>Mã hàng hóa</th>
+                                    <th className="px-4 py-3 text-left font-medium text-gray-700 border-r-3 border-b-3" rowSpan={2}>Tên hàng hóa</th>
+                                    <th className="px-4 py-3 text-center font-medium text-gray-700 border-r-3 border-b" colSpan={5}>Theo số lượng cây</th>
+                                    <th className="px-4 py-3 text-center font-medium text-gray-700 border-r border-b" colSpan={5}>Theo khối lượng</th>
+                                </tr>
+                                <tr>
+                                    <th className="px-4 py-3 text-center font-medium text-gray-700 border-r border-b-3">ĐVT</th>
+                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r border-b-3">Tồn đầu</th>
+                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r border-b-3">SL Nhập</th>
+                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r border-b-3">SL Xuất</th>
+                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r-3 border-b-3">Tồn cuối</th>
+                                    <th className="px-4 py-3 text-center font-medium text-gray-700 border-r border-b-3">ĐVT</th>
+                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r border-b-3">Tồn đầu</th>
+                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r border-b-3">KL Nhập</th>
+                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-r border-b-3">KL Xuất</th>
+                                    <th className="px-4 py-3 text-right font-medium text-gray-700 border-b-3 border-r">Tồn cuối</th>
 
                                 </tr>
                             </thead>
@@ -168,14 +172,14 @@ const InventoryInOutReport = ({ user, setUser }) => {
                                 <tr key={index} className="hover:bg-gray-50">
                                     <td className="px-4 py-3 border-r">{item.id}</td>
                                     <td className="px-4 py-3 border-r font-medium text-red-600">{item.name}</td>
-                                    <td className="px-4 py-3 border-r">{item.namedetail}</td>
+                                    <td className="px-4 py-3 border-r-3">{item.namedetail}</td>
                                     <td className="px-4 py-3 text-center border-r">{item.unit1}</td>
                                     <td className="px-4 py-3 text-right border-r">{item.OpStockUnit1}</td>
 
                                     <td className="px-4 py-3 text-right border-r">{item.QantityInUnit1}</td>
                                     <td className="px-4 py-3 text-right border-r">{item.QantityOutUnit1}</td>
 
-                                    <td className="px-4 py-3 text-right border-r">{item.EdStockUnit1}</td>
+                                    <td className="px-4 py-3 text-right border-r-3 ">{item.EdStockUnit1}</td>
 
                                     <td className="px-4 py-3 text-center border-r">{item.unit2}</td>
                                     <td className="px-4 py-3 text-right border-r">{item.OpStockUnit2.toFixed(1)}</td>
