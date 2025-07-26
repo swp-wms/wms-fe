@@ -12,7 +12,6 @@ Font.register({
   src: RobotoRegular,
 });
 
-const today = new Date();
 
 const styles = StyleSheet.create({
   page: {
@@ -166,7 +165,7 @@ const ImportNotePDF = ({ currentDelivery, currentDeliveryDetail, currentOrder })
       {/* Form Title */}
       <Text style={styles.formTitle}>PHIẾU NHẬP KHO</Text>
       <View style={styles.dateInfo}>
-        <Text>Ngày {today.getDate()} tháng {today.getMonth() + 1} năm {today.getFullYear()}</Text>
+        <Text>Ngày {(new Date(currentDelivery.completedate)).getDate()} tháng {(new Date(currentDelivery.completedate)).getMonth() + 1} năm {(new Date(currentDelivery.completedate)).getFullYear()}</Text>
       </View>
 
       {/* Recipient/Delivery Info */}

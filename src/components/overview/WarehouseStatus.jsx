@@ -5,7 +5,6 @@ import {
   fetchWarehouses,
   fetchWarehousesByDate,
 } from "../../backendCalls/warehouse";
-import ImportExcel from "./ImportExcel";
 
 const getColorByPercentage = (percentage) => {
   if (percentage < 40) return "#e8f5e9";

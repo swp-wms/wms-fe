@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 
 const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, user, deliverySchedule, setDeliverySchedule }) => {
     const [driver, setDriver] = useState({});
-    const [error, setError] = useState();
     const [edit, setEdit] = useState(false); //set edit for delivery staff
 
     const addTruck = async (e) => {
@@ -21,24 +20,28 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
 
         try {
             if (!driver.drivername || !driver.drivercode || !driver.licenseplate || !driver.driverphonenumber) {
-                setError('Bạn cần điền đầy đủ thông tin tài xế.');
+                toast.error('Bạn cần điền đầy đủ thông tin tài xế.');
             } else if (driver.drivername.trim().length <= 0 || driver.drivercode.trim().length <= 0 || driver.driverphonenumber.trim().length <= 0 || driver.licenseplate.trim().length <= 0) {
-                setError('Bạn cần điền đầy đủ thông tin tài xế.');
+                toast.error('Bạn cần điền đầy đủ thông tin tài xế.');
+            } else if (!/^[\p{L} ]+$/u.test(driver.drivername)) {
+                toast.error('Tên tài xế không được chứa số hay kí tự đặc biệt.');
             } else if (driver.drivercode.length !== 12 || !(/^\d+$/.test(driver.drivercode))) {
-                setError('CCCD/GPLX bao gồm 12 chữ số.');
+                toast.error('CCCD/GPLX bao gồm 12 chữ số.');
             } else if (!(/^0\d{9,10}$/.test(driver.driverphonenumber))) {
-                setError('Số điện thoại gồm 10 hoặc 11 chữ số, bắt đầu bằng số 0.');
+                toast.error('Số điện thoại gồm 10 hoặc 11 chữ số, bắt đầu bằng số 0.');
+            } else if (!(/^(?:\d{2}[A-Z]-\d{3}\.?\d{2}|\d{2}-\d{4})$/.test(driver.licenseplate))) {
+                toast.error('Biển số xe không hợp lệ.');
             } else if (!currentDelivery.deliverytime || !currentDelivery.gettime) {
-                setError('Thời gian bốc hàng và giao hàng cần được điền.');
+                toast.error('Thời gian bốc hàng và giao hàng cần được điền.');
             }
             // --- START OF FIX ---
             else if (gett.getTime() >= deliveryt.getTime()) { // This checks if pickup is *after* delivery
-                setError('Thời gian giao hàng không thể sớm hơn thời gian bốc hàng.');
+                toast.error('Thời gian giao hàng không thể sớm hơn thời gian bốc hàng.');
             }
             // --- END OF FIX ---
             else {
-                await handleAddTruck(currentDelivery.id, { ...driver, deliverytime: currentDelivery.deliverytime, gettime: currentDelivery.gettime });
-                setError(); // Clear any previous errors
+                // await handleAddTruck(currentDelivery.id, { ...driver, deliverytime: currentDelivery.deliverytime, gettime: currentDelivery.gettime });
+
                 setCurrentDelivery({
                     ...currentDelivery,
                     drivername: driver.drivername,
@@ -55,7 +58,7 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
             }
         } catch (error) {
             console.error("Error in addTruck:", error); // Use console.error for errors
-            setError('Có lỗi xảy ra khi thêm tài xế.'); // Generic error message for the user
+            toast.error('Có lỗi xảy ra khi thêm tài xế.'); // Generic error message for the user
         }
     }
 
@@ -63,14 +66,14 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
         e.preventDefault();
         try {
             await handleConfirmNotEnoughTruck(currentDelivery.id);
-            setError();
+            toast.error();
             // window.location.reload();
             setDeliverySchedule(deliverySchedule.map((delivery) => delivery.id === currentDelivery.id ? { ...delivery, deliverystatus: '-1' } : delivery));
 
             toast.success('Cập nhật trạng thái thành công.');
             setIsChangePercent(prev => !prev);
         } catch (error) {
-            setError(error);
+            toast.error(error);
         }
     }
 
@@ -136,7 +139,6 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
                     </div>
                 </div>
             </div>
-            <p className="text-red-700">{error}</p>
             <div className="flex gap-3 justify-end  mt-4">
                 {((currentDelivery.deliverystatus === '1') || (Math.abs(Number(currentDelivery?.deliverystatus)) === 2 && edit)) && user.roleid === 5 && <button className='btn px-4 py-2 '
                     onClick={(e) => addTruck(e)}
