@@ -40,7 +40,7 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
             }
             // --- END OF FIX ---
             else {
-                // await handleAddTruck(currentDelivery.id, { ...driver, deliverytime: currentDelivery.deliverytime, gettime: currentDelivery.gettime });
+                await handleAddTruck(currentDelivery.id, { ...driver, deliverytime: currentDelivery.deliverytime, gettime: currentDelivery.gettime });
 
                 setCurrentDelivery({
                     ...currentDelivery,
