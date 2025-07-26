@@ -108,31 +108,50 @@ const ImportOrder = ({user, setUser}) => {
                                     <p className="text-xs text-gray-800 font-medium pl-6">{total(order.orderdetail,"numberofbars")} cây - {Number(total(order.orderdetail,"weight")).toFixed(1)} kg</p>
                                 </div>
 
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-1">
-                                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 text-gray-500">
-                                        <path fillRule="evenodd" d="M11.99 2.243a4.49 4.49 0 0 0-3.398 1.55 4.49 4.49 0 0 0-3.497 1.306 4.491 4.491 0 0 0-1.307 3.498 4.491 4.491 0 0 0-1.548 3.397c0 1.357.6 2.573 1.548 3.397a4.491 4.491 0 0 0 1.307 3.498 4.49 4.49 0 0 0 3.498 1.307 4.49 4.49 0 0 0 3.397 1.549 4.49 4.49 0 0 0 3.397-1.549 4.49 4.49 0 0 0 3.497-1.307 4.491 4.491 0 0 0 1.306-3.497 4.491 4.491 0 0 0 1.55-3.398c0-1.357-.601-2.573-1.549-3.397a4.491 4.491 0 0 0-1.307-3.498 4.49 4.49 0 0 0-3.498-1.307 4.49 4.49 0 0 0-3.396-1.549Zm3.53 7.28a.75.75 0 0 0-1.06-1.06l-6 6a.75.75 0 1 0 1.06 1.06l6-6Zm-5.78-.905a1.125 1.125 0 1 0 0 2.25 1.125 1.125 0 0 0 0-2.25Zm4.5 4.5a1.125 1.125 0 1 0 0 2.25 1.125 1.125 0 0 0 0-2.25Z" clipRule="evenodd" />
-                                        </svg>
+                        <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-1">
+                                {/* If cancelled, show cancelled icon */}
+                                {order.status === cancelledStatus &&(
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-red-500">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
 
+                                )}
+                                {order.status !== cancelledStatus && (
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 text-gray-500">
+                                    <path fillRule="evenodd" d="M2.25 13.5a8.25 8.25 0 0 1 8.25-8.25.75.75 0 0 1 .75.75v6.75H18a.75.75 0 0 1 .75.75 8.25 8.25 0 0 1-16.5 0Z" clipRule="evenodd" />
+                                    <path fillRule="evenodd" d="M12.75 3a.75.75 0 0 1 .75-.75 8.25 8.25 0 0 1 8.25 8.25.75.75 0 0 1-.75.75h-7.5a.75.75 0 0 1-.75-.75V3Z" clipRule="evenodd" />
+                                </svg>
+                                )}
 
-                                        <span className="text-[12px] font-medium text-gray-500">Trạng thái</span>
-                                    </div>
+                                {/* Order Status */}
+                                <span className="text-[12px] font-medium text-gray-500">Trạng thái</span>
+                            </div>
+
                                 {order.status === cancelledStatus && (
-                                 <div className="bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-3 py-1 rounded-full text-sm font-medium inline-block">
+                                 <div className="bg-red-100 text-red-600  px-3 py-1 rounded-full text-sm font-bold inline-block">
                                     Đơn hàng đã bị hủy
                                 </div>
                                 )}
                                 {order.status == finishedStatus && (
-                                 <div className="bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-3 py-1 rounded-full text-sm font-medium inline-block">
-                                    Đơn hàng đã hoàn thành
+                                 <div className="text-center font-bold bg-green-300 text-green-600  px-3 py-1 rounded-full text-sm  inline-block">
+                                   Hoàn thành
                                 </div>
                                 )}
                                 {order.status !== cancelledStatus && order.status !== finishedStatus && (
                                 <div className="flex h-4 ml-[10%] w-[90%] bg-gray-200 rounded-full overflow-hidden dark:bg-neutral-700" role="progressbar" aria-valuenow="{order.status.match(/(\d+(\.\d+)?)(?=%)/)[0]}" aria-valuemin="0" aria-valuemax="100">
-                                    <div className="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap transition duration-500" style={{ width: parseFloat(order.status).toFixed(0)  <=18 ? "18%" : `${parseFloat(order.status).toFixed(0)}%` }}>{parseFloat(order.status).toFixed(1)}%</div>
+                                    <div className="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap transition duration-500" 
+                                        style={{ 
+                                                width: order.status == null || order.status === '' ? "15%" : 
+                                                    parseFloat(order.status) <= 18 ? "18%" : 
+                                                    `${Math.min(parseFloat(order.status) || 0, 100).toFixed(0)}%`
+                                            }}
+                                        >{order.status == null || order.status === '' ? "0%" : 
+                                        `${(parseFloat(order.status) || 0).toFixed(1)}%`}
+                                    </div>
                                 </div>
                                 )}
-                                </div>
+                        </div>
                         <Link to={`./${order.id}`} className="w-[80%] h-12 bg-white border-2 border-gray-100 rounded-md flex gap-2 self-center justify-self-center  place-content-center justify-evenly content-around shadow-lg">
                             <FontAwesomeIcon className="h-full place-self-center text-[#1e1e1e]" icon={faArrowUpRightFromSquare} />
                             <p className="place-self-center ">Xem chi tiết</p>

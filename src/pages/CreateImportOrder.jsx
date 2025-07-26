@@ -118,7 +118,7 @@ const CreateOrder = ({ user, setUser }) => {
     ) {
       alert("Please select a partner and at least one product.");
       return;
-    }x
+    }
     // Here you would typically send the order data to your backend
     const orderData = {
       type: "I",
