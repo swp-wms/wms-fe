@@ -103,7 +103,7 @@ const WarehouseStatus = () => {
       <div className="text-center text-lg font-semibold text-gray-700">
         <span className="font-bold flex flex-col">
           <span className="text-nowrap">Sức chứa tối đa</span>
-          <span>15.000.000 kg</span>
+          <span>15000000 kg</span>
         </span>
         <div className="mt-2">
           <FontAwesomeIcon
