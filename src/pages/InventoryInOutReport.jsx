@@ -178,12 +178,12 @@ const InventoryInOutReport = ({ user, setUser }) => {
                                     <td className="px-4 py-3 text-right border-r">{item.EdStockUnit1}</td>
 
                                     <td className="px-4 py-3 text-center border-r">{item.unit2}</td>
-                                    <td className="px-4 py-3 text-right border-r">{item.OpStockUnit2}</td>
+                                    <td className="px-4 py-3 text-right border-r">{item.OpStockUnit2.toFixed(1)}</td>
 
-                                    <td className="px-4 py-3 text-right border-r">{item.QantityInUnit2}</td>
-                                    <td className="px-4 py-3 text-right border-r">{item.QantityOutUnit2}</td>
+                                    <td className="px-4 py-3 text-right border-r">{item.QantityInUnit2.toFixed(1)}</td>
+                                    <td className="px-4 py-3 text-right border-r">{item.QantityOutUnit2.toFixed(1)}</td>
 
-                                    <td className="px-4 py-3 text-right border-r">{item.EdStockUnit2}</td>
+                                    <td className="px-4 py-3 text-right border-r">{item.EdStockUnit2.toFixed(1)}</td>
 
                                 </tr>
                                ))}
