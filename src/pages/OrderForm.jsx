@@ -16,6 +16,7 @@ const OrderForm = ({ user, setUser }) => {
   const [supplementOrder, setSupplementOrder] = useState([]);
   const navigate = useNavigate();
   const [orderActiveTab, setOrderActiveTab] = useState('order');
+  const [deliveryDetail, setDeliveryDetail] = useState({});
 
   //control supplementForm
   const [activeSupplementForm, setActiveSupplementForm] = useState(false);
@@ -51,7 +52,78 @@ const OrderForm = ({ user, setUser }) => {
     fetchOrderDetails();
   }, [id, user]);
 
-useEffect(() => {
+    useEffect(() => {
+      const fetchDeliveryDetails = async () => {
+        try {
+          const response = await order.fetchDeliveryDetails(id);
+          console.log("Delivery details response:", response);
+          
+          if (orderDetail?.orderdetail && response?.length > 0) {
+           
+            const allDeliveryDetails = response.flatMap(delivery => delivery.deliverydetail);
+            
+            console.log("Flattened delivery details:", allDeliveryDetails);
+            
+          
+            const mergedData = orderDetail.orderdetail.map(item => {
+              // Find all delivery details for this orderdetail item
+              const matchingDeliveries = allDeliveryDetails.filter(
+                deliveryData => deliveryData.orderdetailid === item.id
+              );
+              
+              if (matchingDeliveries.length > 0) {
+                // ✅ Sum all delivery quantities for this item
+                const totalDeliveredBars = matchingDeliveries.reduce(
+                  (sum, delivery) => sum + (delivery.realnumberofbars || 0), 0
+                );
+                const totalDeliveredWeight = matchingDeliveries.reduce(
+                  (sum, delivery) => sum + (delivery.realtotalweight || 0), 0
+                );
+                
+                // ✅ Check if realnumberofbars already exists
+                if (item.realnumberofbars !== undefined && item.realnumberofbars !== null) {
+                  // ✅ Append to existing values
+                  return {
+                    ...item,
+                    realnumberofbars: item.realnumberofbars + totalDeliveredBars,
+                    realtotalweight: (item.realtotalweight || 0) + totalDeliveredWeight,
+                  };
+                } else {
+                  // ✅ Create new values from delivery data
+                  return {
+                    ...item,
+                    realnumberofbars: totalDeliveredBars,
+                    realtotalweight: totalDeliveredWeight,
+                  };
+                }
+              }
+              
+             
+              return item;
+            });
+
+            console.log("Merged data:", mergedData);
+            
+           
+            setOrderDetail(prev => ({
+              ...prev,
+              orderdetail: mergedData
+            }));
+            
+            setDeliveryDetail(response); 
+          }
+        } catch (error) {
+          console.error("Error fetching delivery details:", error);
+        }
+      };
+      
+      
+      if (orderDetail?.orderdetail?.length > 0) {
+        fetchDeliveryDetails();
+      }
+    }, [id, orderDetail?.id]);
+
+  useEffect(() => {
   if(user){
     const checkSalesmanId = () => {
       if(orderDetail && user){
@@ -126,7 +198,7 @@ useEffect(() => {
       {/* <Header /> */}
       <div className="min-h-screen bg-[#fafafa] pt-25 pl-77 pr-5">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {activeSupplementForm && (
             <SupplementForm
               user={user}
@@ -192,7 +264,7 @@ useEffect(() => {
             </div>
 
             {/* Right Column */}
-            <div className="col-span-6 space-y-4">
+            <div className="col-span-8 space-y-4">
               <div className="h-160 bg-white border-2 border-gray-800 rounded-lg overflow-hidden">
                 <div className="w-[50%] h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-600 grid grid-cols-2">
                   <button
@@ -221,18 +293,21 @@ useEffect(() => {
 
                 
                 {/* Table */}
-                <div className=" m-5 h-[90%] flex flex-col"  >
-                  
+                <div className=" m-5 h-[90%] flex flex-col overflow-auto"  >
+
                   {orderActiveTab === "order" && (
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="bg-gray-100">
                         <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">STT</th>
                         <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Mã hàng</th>
+                        <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black">Hãng thép</th>
                         <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black">Tên hàng hóa</th>
                         <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-16">Dài</th>
                         <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Số lượng</th>
+                        <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Số lượng thực tế</th>
                         <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Khối lượng</th>
+                        <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Khối lượng thực tế</th>
                         <th className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-20">Ghi chú</th>
                       </tr>
                     </thead>
@@ -241,17 +316,22 @@ useEffect(() => {
                         <tr className="hover:bg-gray-50" key={index}>
                           <td className="border border-gray-800 px-2 py-2 text-xs text-black">{index + 1}</td>
                           <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.product.name}</td>
+                          <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.product.brandname}</td>
                           <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.product.namedetail}</td>
                           <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.product.catalog.length}</td>
                           <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.numberofbars}</td>
+                          <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.realnumberofbars}</td>
                           <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.weight}</td>
+                          <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.realtotalweight}</td>
                           <td className="border border-gray-800 px-2 py-2 text-xs text-black">{item.note}</td>
                         </tr>
                       ))}
                       <tr>
-                        <td className="border border-gray-800 px-2 py-2 pl-15 text-xs font-bold text-black w-12" colSpan={4}>Tổng cộng</td>
+                        <td className="border border-gray-800 px-2 py-2 pl-15 text-xs font-bold text-black w-12" colSpan={5}>Tổng cộng</td>
                         <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{total(orderDetail?.orderdetail || [], 'numberofbars')}</td>
+                        <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{total(orderDetail?.orderdetail || [], 'realnumberofbars')}</td>
                         <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{Number(total(orderDetail?.orderdetail || [], 'weight')).toFixed(2)}</td>
+                        <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12">{Number(total(orderDetail?.orderdetail || [], 'realtotalweight')).toFixed(2)}</td>
                         <td className="border border-gray-800 px-2 py-2 text-xs font-bold text-black w-12"></td>
 
                       </tr>
