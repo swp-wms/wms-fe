@@ -15,6 +15,7 @@ const initialPartner = {
   bankaccount: "",
   bankname: "",
   note: "",
+  isfactory: false, // Default to false
 };
 
 //INITIAL ERROR VALUES
@@ -231,9 +232,11 @@ export function usePartnerFormLogic({
       case "taxcode":
         if (!value.trim()) return "Bắt buộc";
         if (isNaN(value)) return "Chỉ nhập số";
+        if (value.length !== 10 && value.length !== 13) return "Mã số thuế phải có 10 hoặc 13 chữ số";
         break;
       case "phonenumber":
         if (value && isNaN(value)) return "Chỉ nhập số";
+        if (value && (value.length < 10 || value.length > 12)) return "Số điện thoại phải có 10 hoặc 12 chữ số";
         break;
       case "account":
         if (value && isNaN(value)) return "Chỉ nhập số";
@@ -405,6 +408,8 @@ export function usePartnerFormLogic({
   //----------HANDLERS FOR INPUT CHANGES-----------------
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    setPartner((prev) => ({ ...prev, id: generateNextPartnerId() }));
     setPartner((prev) => ({ ...prev, [name]: value }));
     const errorMsg = validateField(name, value);
     if (errorMsg) {
@@ -416,6 +421,16 @@ export function usePartnerFormLogic({
     setPartnerErrors((prev) => ({ ...prev, [name]: "" }));
 
   }
+
+  const handleIsFactoryChange = (e) => {
+  const { name, value, type, checked } = e.target;
+  const newValue = type === 'checkbox' ? checked : value;
+  
+  setPartner(prev => ({
+    ...prev,
+    [name]: newValue
+  }));
+};
 
   const handleProductChange = (e) => {
     const { name, value } = e.target;
@@ -445,7 +460,7 @@ export function usePartnerFormLogic({
           catalog.steeltype.trim().toLowerCase() === steeltype.trim().toLowerCase() &&
           catalog.type.trim().toLowerCase() === updatedProduct.type.trim().toLowerCase()
       );
-
+      
       if (foundCatalog) {
         console.log("Found catalog:", foundCatalog);
         setCatalog(foundCatalog);
@@ -458,7 +473,7 @@ export function usePartnerFormLogic({
       isCatalogExists.current = false;
       setCatalog(updatedCatalog);
     }
-
+    console.log("isCatalogExists:", isCatalogExists.current);
     console.log("Catalog: ", updatedCatalog);
     setProduct(updatedProduct);
 
@@ -489,6 +504,27 @@ export function usePartnerFormLogic({
     console.log("Catalog: ", catalog);
   };
 
+  const generateNextPartnerId = () => {
+    if (!partnerList || partnerList.length === 0) {
+      return "KH001";
+    }
+
+    // Find the highest ID number
+    let maxNumber = 0;
+    partnerList.forEach((p) => {
+      if (p.id && p.id.startsWith("KH")) {
+        const numberPart = Number.parseInt(p.id.substring(2));
+        if (!isNaN(numberPart) && numberPart > maxNumber) {
+          maxNumber = numberPart;
+        }
+      }
+    });
+
+    // Generate next ID
+    const nextNumber = maxNumber + 1;
+    return `KH${nextNumber.toString().padStart(3, "0")}`;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (activeTab === 'partner') {
@@ -506,15 +542,16 @@ export function usePartnerFormLogic({
 
         const {trueId, ...productWithoutTrueId} = product; // Remove trueId from product}
         if (isCatalogExists.current) {
+          console.log('Catalog already exists:', catalog);
           productCalls.addProduct(productWithoutTrueId);
           toast.success("Thêm sản phẩm thành công");
           setShowForm(false);
           if(initialData !== null && selectedPartner !== null && selectedPartner.isfactory) {
             // If initialData is provided, update the existing productWithoutTrueId
             const updatedProducts = selectedProducts.map((p) =>
-              p.name === initialData.productWithoutTrueId.name ? 
+              p.name === initialData.product.name ? 
             { ...productWithoutTrueId, 
-                trueId: initialData.productWithoutTrueId.trueId,  // Keep the trueId from initialData
+                trueId: initialData.product.trueId,  // Keep the trueId from initialData
                 catalog: catalog,
                 partner: partner
               } : p
@@ -537,17 +574,18 @@ export function usePartnerFormLogic({
         else {
           
           catalogCalls.addCatalog(catalog)
+          
             .then(() => {
-              console.log('add product:', productWithoutTrueId); 
+              console.log('Catalog added successfully:', catalog);
               productCalls.addProduct(productWithoutTrueId);
               toast.success("Thêm sản phẩm thành công");
               setShowForm(false);
              if(initialData !== null && selectedPartner.isfactory) {
             // If initialData is provided, update the existing product
             const updatedProducts = selectedProducts.map((p) =>
-              p.name === initialData.productWithoutTrueId.name ? 
+              p.name === initialData.product.name ? 
             { ...productWithoutTrueId, 
-                trueId: initialData.productWithoutTrueId.trueId,  // Keep the trueId from initialData
+                trueId: initialData.product.trueId,  // Keep the trueId from initialData
                 catalog: catalog,
                 partner:partner } : p
             );
@@ -581,6 +619,6 @@ export function usePartnerFormLogic({
     catalogList, setCatalogList,
     handleChange, handleProductChange, handleCatalogChange, handleSubmit,
     activeTab, setActiveTab, setShowForm, partnerList, setPartnerList, selectedProducts, selectedPartner, setSelectedProducts, setSelectedPartner,
-    initialData
+    initialData, handleIsFactoryChange, generateNextPartnerId
   };
 }

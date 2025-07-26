@@ -107,13 +107,18 @@ const ProductSearch = ({
             {productFilteredSuggestions.map((product, index) => (
               <li key={index}>
                 <button
-                  className="w-full text-left px-3 py-2 hover:bg-gray-100 focus:bg-gray-200"
+                  className="w-full text-left px-3 py-2 hover:bg-gray-100 focus:bg-gray-200 flex"
                   onClick={() => {handleProductSelect(product)
                     setShowSuggestions(false);
                   }}
                   onMouseDown={e => e.preventDefault()} // Prevent input blur before click
                 >
+                  <div className="grow">
                   {product.brandname} - {product.namedetail}
+                  </div>
+                  <div className="display-end justify-self-end-safe">
+                    {product.totalbar} cây - {product.totalweight !== null?product.totalweight.toFixed(1) : 0} kg
+                  </div>
                 </button>
               </li>
             ))}

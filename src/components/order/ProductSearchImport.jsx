@@ -48,43 +48,49 @@ const ProductSearch = ({
 
 useEffect(() => {
   if (!selectedPartner) return;
-  
-  setSelectedProducts(prevProducts => {
-    if(selectedPartner.isfactory === true) {
-      return prevProducts?.map(product => {
-        const matchingProduct = productList.find(item => 
+  if (selectedPartner.isfactory === true) {
+    setSelectedProducts(prevProducts => {
+      const updatedProducts = prevProducts.map(product => {
+        const matchingProduct = productList.find(item =>
           item.name === product.name && item.partnerid === selectedPartner?.id
         );
         //if found, then join product with the matching product founded
-        if(matchingProduct){
-          console.log("matching product, factory")
+        if (matchingProduct) {
+          console.log("matching product, factory:", matchingProduct)
           return {
             ...matchingProduct,
-            trueId: product.trueId !== undefined ? product.trueId : 
-              (prevProducts.length == 0 ? 1 : prevProducts[prevProducts.length - 1].trueId + 1),
+            trueId: product.trueId,
             numberofbars: product.numberofbars,
             note: product.note,
-            orderdetailid: product.orderdetailid,
+            orderdetailid: product.orderdetailid
           };
-        }else{
+        } else {
           const generalProduct = generalProductList.find(item => item.name === product.name);
-          console.log("general product factory");
-          return{
-            trueId: product.trueId !== undefined ? product.trueId : 
-              (prevProducts.length == 0 ? 1 : prevProducts[prevProducts.length - 1].trueId + 1),
+          console.log("general product factory:", generalProduct);
+          return {
+            trueId: product.trueId,
             ...generalProduct,
+            partnerid: null,
             numberofbars: product.numberofbars,
             note: product.note,
-            orderdetailid: product.orderdetailid,
-            
+            orderdetailid: product.orderdetailid
           }
         }
-      }
-    
-    );
-    }
-    return prevProducts;
-  });
+      });
+
+      const hasChanges = updatedProducts.some((updatedProduct, index) => {
+        const originalProduct = prevProducts[index];
+        return (
+          updatedProduct.id !== originalProduct.id ||
+          updatedProduct.partnerid !== originalProduct.partnerid ||
+          updatedProduct.brandname !== originalProduct.brandname ||
+          updatedProduct.catalog?.length !== originalProduct.catalog?.length
+        );
+      });
+
+      return hasChanges ? updatedProducts : prevProducts;
+    });
+  }
 }, [selectedPartner, productList]);
 
 // Handle selectedProducts changes for non-factory
@@ -94,28 +100,43 @@ useEffect(() => {
 
   setSelectedProducts(prevProducts => {
     const updatedProducts = prevProducts?.map(product => {
-      const matchingProduct = productList.find(item => item.name === product.name && item.partnerid === selectedPartner?.id && item.brandname === product.brandname);
+      const matchingProduct = productList.find(item => item.name === product.name && item.partnerid === selectedPartner?.id && item.brandname == product.brandname);
       if(matchingProduct){
-        console.log("matching product, not factory")
+        console.log("matching product, not factory: ",matchingProduct);
+        // If a matching product is found, return the product with the matching product details
         return {
           trueId: product.trueId,
-           ...matchingProduct
+           ...matchingProduct,
+           
+
         };
       }
       else{
-        console.log("product not found in productList, using generalProductList");
+        const general = generalProductList.find(item => item.name === product.name)
+
+        console.log("product not found in productList, using generalProductList: ", general);
+
          return {
           trueId: product.trueId,
-          ...generalProductList.find(item => item.name === product.name)
+          ...general,
+          partnerid: null, // Set partnerid to null if not found
          }
       }
     });
-    
-  
+
+   
+
+
     // Only update if there are actual changes
-    const hasChanges = updatedProducts.some((product, index) => 
-      JSON.stringify(product.matchingProduct) !== JSON.stringify(prevProducts[index]?.matchingProduct)
-    );
+    const hasChanges = updatedProducts.some((product, index) => {
+     const originalProduct = prevProducts[index];
+      return (
+        product.id !== originalProduct.id ||
+        product.partnerid !== originalProduct.partnerid ||
+        product.brandname !== originalProduct.brandname ||
+        product.catalog?.length !== originalProduct.catalog?.length
+      );
+    });
     
     return hasChanges ? updatedProducts : prevProducts;
     // //return to prev if no changes

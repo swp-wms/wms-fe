@@ -5,7 +5,7 @@ const CompleteForm = (props) => {
     partner, partnerErrors, product, productErrors, catalog, catalogErrors, catalogList,
     handleChange, handleProductChange, handleCatalogChange, handleSubmit,
     activeTab, setActiveTab, setShowForm, partnerList, setPartnerList,productList, selectedProducts, selectedPartner, setSelectedPartner, setSelectedProducts,
-    initialData
+    initialData,handleIsFactoryChange,generateNextPartnerId
   } = usePartnerFormLogic(props);
 
 return (
@@ -79,6 +79,7 @@ return (
                           value={partner.id}
                           onChange={handleChange}
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
+                          disabled
                         />
                         </div>
 
@@ -178,7 +179,20 @@ return (
                           className="flex h-8 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                         />
                         
-                      </div>
+                        <div className="flex items-center gap-2 mt-3">
+                          <input 
+                            type="checkbox"
+                            id="isfactory"
+                            name="isfactory"
+                            checked={partner.isfactory}  
+                            onChange={handleIsFactoryChange}               // ✅ Handle change
+                            className="h-4 w-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500"
+                          />
+                          <label htmlFor="isfactory" className="text-sm font-medium text-gray-700 cursor-pointer">
+                            Đối tác là nhà máy sản xuất
+                          </label>
+                        </div>
+                                            </div>
                     </div>
                   </div>
 
