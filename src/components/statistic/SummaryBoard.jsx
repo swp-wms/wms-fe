@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate,Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Bar, Doughnut } from "react-chartjs-2";
 
 import {
@@ -111,10 +111,17 @@ const SummaryBoard = () => {
 
   return (
     <>
-       <div className="bg-white p-5 rounded-lg mb-5 shadow-md flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-700">Dashboard Tổng Quan</h1>
-                <Link to="./bao-cao-nhap-xuat-ton" className="stats-button bg-red-500 text-white border-none px-6 py-3 rounded-md  font-semibold cursor-pointer shadow-md hover:shadow-lg"> Xem Thống Kê Xuất Nhập Tồn
-               </Link>
+      <div className="bg-white p-3 rounded-lg mb-5 shadow-md flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-700">
+          Dashboard Tổng Quan
+        </h1>
+        <Link
+          to="./bao-cao-nhap-xuat-ton"
+          className="stats-button bg-red-500 text-white border-none px-6 py-3 rounded-md  font-semibold cursor-pointer shadow-md hover:shadow-lg"
+        >
+          {" "}
+          Xem Thống Kê Xuất Nhập Tồn
+        </Link>
       </div>
       <div className="grid grid-cols-4 gap-12 mb-10">
         <Board
@@ -138,9 +145,13 @@ const SummaryBoard = () => {
           status={exportWeightPercent}
         />
       </div>
-      <div className="flex justify-between mb-10 w-full gap-12 ">
-        <DoughnutChart chartData={doughnutDataBrand} />
-        <DoughnutChart chartData={doughnutDataType} />
+      <div className="grid grid-cols-3 justify-between mb-2 w-full gap-12">
+        <div className="col-span-1">
+          <DoughnutChart chartData={doughnutDataType} position="bottom" size="80%" />
+        </div>
+        <div className="col-span-2">
+          <DoughnutChart chartData={doughnutDataBrand} position="right" size="75%"/>
+        </div>
       </div>
 
       <div className="bg-white shadow-btn rounded-lg w-[100%] flex justify-center mb-10">
@@ -154,7 +165,7 @@ export default SummaryBoard;
 
 const Board = ({ number, title, status }) => {
   return (
-    <div className="bg-white shadow p-4 flex flex-col gap-2 rounded-lg items-center font-semibold">
+    <div className="bg-white shadow p-4 mt-4 flex flex-col gap-2 rounded-lg items-center font-semibold">
       <div>{title}</div>
       <div className="text-3xl font-bold">{number}</div>
       <div className="flex justify-between items-center text-sm w-full">
@@ -208,7 +219,7 @@ const BarChart = ({ chartData }) => {
   );
 };
 
-const DoughnutChart = ({ chartData }) => {
+const DoughnutChart = ({ chartData, position, size }) => {
   const backgroundColors = generateColorSet(chartData.values.length);
   const data = {
     labels: chartData.labels,
@@ -222,16 +233,18 @@ const DoughnutChart = ({ chartData }) => {
   };
 
   return (
-    <div className="bg-white shadow-btn px-12 w-full rounded-lg flex justify-center">
+    <div className="bg-white w-full flex justify-center mb-10 py-4 shadow-btn rounded-lg h-[400px]">
       <Doughnut
-        className="w-full scale-90"
+        className="w-full h-full translate-y-2"
         data={data}
         options={{
-          responsive: true,
+          cutout: "50%", 
+          radius: size,
+          maintainAspectRatio: false,
           plugins: {
             legend: {
               display: true,
-              position: "bottom",
+              position: position,
               labels: { font: { size: 16 } },
             },
             title: {
@@ -243,7 +256,7 @@ const DoughnutChart = ({ chartData }) => {
               },
               padding: {
                 top: 5,
-                bottom: 30,
+                bottom: -10,
               },
             },
           },
