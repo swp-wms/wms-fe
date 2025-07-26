@@ -21,7 +21,7 @@ const DeliveryForm = ({
 
     const [newDeliveryList, setNewDeliveryList] = useState([]);  //product list of delivery
     const [error, setError] = useState();
-    
+
     const handleEmptyForm = (e) => {
         e.preventDefault();
         setNewDelivery({
@@ -65,12 +65,24 @@ const DeliveryForm = ({
         e.preventDefault();
         if (document.querySelector('.DeliveryForm').checkValidity()) {
             setError();
-            
-            if((new Date()) > new Date(newDelivery.getdate)) {
+
+            const currentDate = new Date();
+            const deliveryDate = new Date(newDelivery.deliverydate);
+            const getDate = new Date(newDelivery.getdate);
+
+            // Normalize current date to the beginning of the day (00:00:00)
+            currentDate.setHours(0, 0, 0, 0);
+
+            // Normalize delivery date to the beginning of the day (00:00:00)
+            deliveryDate.setHours(0, 0, 0, 0);
+            getDate.setHours(0, 0, 0, 0);
+
+
+            if (currentDate > getDate) {
                 setError('Ngày vận chuyển không thể sớm hơn thời gian hiện tại.');
                 return;
             }
-            if (newDelivery.getdate > newDelivery.deliverydate) {
+            if (getDate > deliveryDate) {
                 setError('Ngày vận chuyển không thể sớm hơn ngày bốc hàng.');
                 return;
             }
@@ -154,7 +166,7 @@ const DeliveryForm = ({
                 <button type='button' className='btn px-4 py-2 '>
                     <FontAwesomeIcon icon={faCancel} className='mr-2'
                         onClick={(e) => handleEmptyForm(e)} />
-                    Hủy
+                    Làm mới
                 </button>
             </div>}
             {currentDelivery && currentDelivery.deliverystatus === '2' && user && user.roleid === 3 && <div className="flex justify-end gap-3">
