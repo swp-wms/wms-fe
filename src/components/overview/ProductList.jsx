@@ -9,15 +9,8 @@ import {
   faPenToSquare,
   faClockRotateLeft,
   faXmark,
-  faScroll,
-  faScrollTorah,
-  faMouse,
-  faMousePointer,
-  faComputerMouse,
-  faArrowsLeftRightToLine,
-  faArrowsLeftRight,
-  faArrowLeft,
-  faArrowRight,
+  faPlus,
+  faMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   fetchProductCatalog,
@@ -29,8 +22,25 @@ import { fetchCatalog } from "../../backendCalls/catalog";
 import toast from "react-hot-toast";
 import moment from "moment";
 import { getAllUsers } from "../../backendCalls/user";
+import { fetchPartners } from "../../backendCalls/partner";
+
+const headers = [
+  "Mã hàng hóa",
+  "Tên hàng",
+  "Tên đối tác",
+  "Tên hãng",
+  "Loại thép",
+  "Mã thép",
+  "Số lượng",
+  "Độ dài",
+  "Khối lượng bó",
+  "Số thanh/bó",
+  "Tổng khối lượng",
+  "Mã đối tác",
+];
 
 const ProductList = ({ user }) => {
+  const [partners, setPartners] = useState([]);
   const [productCatalog, setProductCatalog] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,8 +52,25 @@ const ProductList = ({ user }) => {
   const [history, setHistory] = useState([]);
   const [openHistory, setOpenHistory] = useState(false);
   const [userInfo, setUserInfo] = useState([]);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([
+    headers.map((h) => ({
+      value: h,
+      readOnly: true,
+      className: "bg-gray-300 font-bold",
+    })),
+  ]);
 
+  // Fetch partner data
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetchPartners();
+      setPartners(response);
+      console.log(response);
+    };
+    getData();
+  }, []);
+
+  // Fetch user data
   useEffect(() => {
     const getData = async () => {
       const response = await getAllUsers();
@@ -177,7 +204,11 @@ const ProductList = ({ user }) => {
           return [
             { value: pd, readOnly: false },
             { value: namedetail, readOnly: true, className: "bg-gray-100" },
-            { value: item.name || "" },
+            {
+              value: item.name || "",
+              readOnly: true,
+              className: "bg-gray-100",
+            },
             { value: item.brandname || "" },
             { value: item.type || "" },
             { value: steeltype, readOnly: true, className: "bg-gray-100" },
@@ -201,8 +232,12 @@ const ProductList = ({ user }) => {
               readOnly: true,
               className: "bg-gray-100",
             },
+            {
+              value: item.totalweight,
+              readOnly: true,
+              className: "bg-gray-100",
+            },
             { value: item.partner, readOnly: false },
-            { value: item.totalweight, readOnly: false },
           ];
         });
       };
@@ -215,6 +250,23 @@ const ProductList = ({ user }) => {
 
     reader.readAsArrayBuffer(file);
     e.target.value = null;
+  };
+
+  const addEmptyRow = () => {
+    const newRow = headers.map((_, index) => ({
+      value: "",
+      readOnly: index === 1 || index === 5 || (index >= 6 && index <= 9),
+      className:
+        index === 1 || index === 5 || (index >= 6 && index <= 9)
+          ? "bg-gray-100"
+          : "",
+    }));
+    setData((prev) => [...prev, newRow]);
+  };
+
+  const deleteRow = (rowIndex) => {
+    if (rowIndex === 0) return;
+    setData((prev) => prev.filter((_, i) => i !== rowIndex));
   };
 
   const convertSpreadsheetToProducts = (sheetData) => {
@@ -235,7 +287,8 @@ const ProductList = ({ user }) => {
         length: Number(row[7]?.value) || 0,
         weightperbundle: Number(row[8]?.value) || 0,
         barsperbundle: Number(row[9]?.value) || 0,
-        partner: row[10]?.value?.trim() || "",
+        totalwweight: Number(row[10]?.value) || "",
+        partner: row[11]?.value?.trim() || "",
       };
     });
   };
@@ -287,9 +340,7 @@ const ProductList = ({ user }) => {
     );
 
     if (duplicates.length > 0) {
-      toast.error(
-        `Có ${duplicates.length} sản phẩm trùng. Vui lòng sửa lại trong bảng trước khi xác nhận.`
-      );
+      toast.error(`${duplicates.length} mặt hàng đã tồn tại`);
       return;
     }
 
@@ -522,15 +573,114 @@ const ProductList = ({ user }) => {
       )}
 
       {showExcelConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 ms-[20%] ">
-          <div className="bg-white p-6 rounded-lg shadow-lg border border-black mx-16 w-[80%] text-sm">
-            <h2 className="text-lg font-semibold mb-6">
-              Xác nhận thêm hàng hóa
-            </h2>
+        <div className="fixed inset-0 flex items-center justify-center z-50 ms-[20%]">
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-black mx-16 w-[100%] text-xs">
+            <div className="flex justify-between mb-6">
+              <h2 className="text-lg font-semibold ">Xác nhận thêm hàng hóa</h2>
+              <div className="flex gap-4 text-white font-medium">
+                <button
+                  onClick={addEmptyRow}
+                  className="bg-green-700 px-4 py-2 rounded-full shadow hover:scale-105 transition duration-300 ease-in-out cursor-pointer"
+                >
+                  <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                  Thêm hàng mới
+                </button>
+                <button
+                  onClick={() => deleteRow(data.length - 1)}
+                  className="bg-red-700 px-4 py-2 rounded-full shadow hover:scale-105 transition duration-300 ease-in-out cursor-pointer"
+                >
+                  <FontAwesomeIcon icon={faMinus} className="mr-2" />
+                  Xóa hàng cuối
+                </button>
+              </div>
+            </div>
 
             <div className="max-h-[400px] overflow-auto scrollbar-hide">
-              <Spreadsheet data={data} onChange={setData} className="w-full" />
+              <Spreadsheet
+                data={data}
+                onChange={(newData) => {
+                  const updatedData = [...newData];
+                  const rawPartnerMap = {};
+                  partners.forEach(({ id, name }) => {
+                    rawPartnerMap[id] = name;
+                  });
+
+                  const partnerMap = Object.entries(rawPartnerMap).reduce(
+                    (acc, [rawId, name]) => {
+                      const cleanId = rawId.trim();
+                      acc[cleanId] = name;
+                      return acc;
+                    },
+                    {}
+                  );
+                  console.log("Map", partnerMap);
+                  console.log("Partner map sample:", partnerMap["KH012  "]);
+
+                  for (let row = 0; row < updatedData.length; row++) {
+                    const pdCell = updatedData[row][0]; // Mã hàng hóa
+                    const namedetailCell = updatedData[row][1];
+                    const steeltypeCell = updatedData[row][5];
+                    const partnerCell = updatedData[row][2];
+                    const partnerIdCell = updatedData[row][11];
+
+                    const pd = pdCell?.value?.trim() || "";
+                    const match = /^TD(\d{2})CB\d{3}[TV]$/.exec(pd);
+
+                    if (match) {
+                      const size = match[1];
+                      updatedData[row][1] = {
+                        ...namedetailCell,
+                        value: `Thép ${pd.slice(2)}`,
+                        readOnly: true,
+                        className: "bg-gray-100",
+                      };
+                      updatedData[row][5] = {
+                        ...steeltypeCell,
+                        value: `D${size}`,
+                        readOnly: true,
+                        className: "bg-gray-100",
+                      };
+                    } else {
+                      updatedData[row][1] = {
+                        ...namedetailCell,
+                        value: "",
+                        readOnly: true,
+                        className: "bg-gray-100",
+                      };
+                      updatedData[row][5] = {
+                        ...steeltypeCell,
+                        value: "",
+                        readOnly: true,
+                        className: "bg-gray-100",
+                      };
+                    }
+
+                    const partnerId = partnerIdCell?.value || "";
+                    console.log("partnerId", partnerId);
+                    const partnerName = partnerMap[partnerId] || "";
+                    console.log("partner", partnerName);
+                    if (partnerId) {
+                      updatedData[row][2] = {
+                        ...partnerCell,
+                        value: partnerName,
+                        readOnly: true,
+                        className: "bg-gray-100",
+                      };
+                    } else {
+                      updatedData[row][2] = {
+                        ...partnerCell,
+                        value: "",
+                        readOnly: true,
+                        className: "bg-gray-100",
+                      };
+                    }
+                  }
+
+                  setData(updatedData);
+                }}
+              />
             </div>
+
             <p className="py-6">
               Bạn có chắc chắn muốn thêm <strong>{data.length}</strong> mặt hàng
               từ file Excel không?
@@ -653,16 +803,3 @@ const TableList = ({
 };
 
 export default ProductList;
-
-const spreadsheetHeaders = [
-  "Mã HH",
-  "Tên HH",
-  "Tên đối tác",
-  "Hãng thép",
-  "Loại",
-  "Mã thép",
-  "Số lượng",
-  "Độ dài",
-  "KL bó",
-  "Số thanh/bó",
-];
