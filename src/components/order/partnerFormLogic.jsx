@@ -445,7 +445,7 @@ export function usePartnerFormLogic({
           catalog.steeltype.trim().toLowerCase() === steeltype.trim().toLowerCase() &&
           catalog.type.trim().toLowerCase() === updatedProduct.type.trim().toLowerCase()
       );
-
+      
       if (foundCatalog) {
         console.log("Found catalog:", foundCatalog);
         setCatalog(foundCatalog);
@@ -458,7 +458,7 @@ export function usePartnerFormLogic({
       isCatalogExists.current = false;
       setCatalog(updatedCatalog);
     }
-
+    console.log("isCatalogExists:", isCatalogExists.current);
     console.log("Catalog: ", updatedCatalog);
     setProduct(updatedProduct);
 
@@ -506,15 +506,16 @@ export function usePartnerFormLogic({
 
         const {trueId, ...productWithoutTrueId} = product; // Remove trueId from product}
         if (isCatalogExists.current) {
+          console.log('Catalog already exists:', catalog);
           productCalls.addProduct(productWithoutTrueId);
           toast.success("Thêm sản phẩm thành công");
           setShowForm(false);
           if(initialData !== null && selectedPartner !== null && selectedPartner.isfactory) {
             // If initialData is provided, update the existing productWithoutTrueId
             const updatedProducts = selectedProducts.map((p) =>
-              p.name === initialData.productWithoutTrueId.name ? 
+              p.name === initialData.product.name ? 
             { ...productWithoutTrueId, 
-                trueId: initialData.productWithoutTrueId.trueId,  // Keep the trueId from initialData
+                trueId: initialData.product.trueId,  // Keep the trueId from initialData
                 catalog: catalog,
                 partner: partner
               } : p
@@ -537,17 +538,18 @@ export function usePartnerFormLogic({
         else {
           
           catalogCalls.addCatalog(catalog)
+          
             .then(() => {
-              console.log('add product:', productWithoutTrueId); 
+              console.log('Catalog added successfully:', catalog);
               productCalls.addProduct(productWithoutTrueId);
               toast.success("Thêm sản phẩm thành công");
               setShowForm(false);
              if(initialData !== null && selectedPartner.isfactory) {
             // If initialData is provided, update the existing product
             const updatedProducts = selectedProducts.map((p) =>
-              p.name === initialData.productWithoutTrueId.name ? 
+              p.name === initialData.product.name ? 
             { ...productWithoutTrueId, 
-                trueId: initialData.productWithoutTrueId.trueId,  // Keep the trueId from initialData
+                trueId: initialData.product.trueId,  // Keep the trueId from initialData
                 catalog: catalog,
                 partner:partner } : p
             );
