@@ -29,6 +29,8 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
                 toast.error('CCCD/GPLX bao gồm 12 chữ số.');
             } else if (!(/^0\d{9,10}$/.test(driver.driverphonenumber))) {
                 toast.error('Số điện thoại gồm 10 hoặc 11 chữ số, bắt đầu bằng số 0.');
+            } else if (!(/^(?:\d{2}[A-Z]-\d{3}\.?\d{2}|\d{2}-\d{4})$/.test(driver.licenseplate))) {
+                toast.error('Biển số xe không hợp lệ.');
             } else if (!currentDelivery.deliverytime || !currentDelivery.gettime) {
                 toast.error('Thời gian bốc hàng và giao hàng cần được điền.');
             }
@@ -39,7 +41,7 @@ const DriverInfo = ({ setIsChangePercent, currentDelivery, setCurrentDelivery, u
             // --- END OF FIX ---
             else {
                 // await handleAddTruck(currentDelivery.id, { ...driver, deliverytime: currentDelivery.deliverytime, gettime: currentDelivery.gettime });
-                
+
                 setCurrentDelivery({
                     ...currentDelivery,
                     drivername: driver.drivername,
