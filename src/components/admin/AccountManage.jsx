@@ -31,30 +31,30 @@ const AccountManage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        // Thông tin all user
-        const response = await getAllUserInfo();
-        if (response.status !== 200) {
-          window.location.href = "/dang-nhap";
-          return;
-        }
-        const userData = response.data;
-        console.log("API Response:", userData);
-        setUsers(Array.isArray(userData) ? userData : []);
-
-        // Thông tin bản thân
-        const currentUserResponse = await getUser();
-        if (currentUserResponse.status === 200) {
-          setCurrentUser(currentUserResponse.data);
-          console.log("Current User:", currentUserResponse.data);
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setUsers([]);
+  const getData = async () => {
+    try {
+      // Thông tin all user
+      const response = await getAllUserInfo();
+      if (response.status !== 200) {
+        window.location.href = "/dang-nhap";
+        return;
       }
-    };
+      const userData = response.data;
+      console.log("API Response:", userData);
+      setUsers(Array.isArray(userData) ? userData : []);
+      // Thông tin bản thân
+      const currentUserResponse = await getUser();
+      if (currentUserResponse.status === 200) {
+        setCurrentUser(currentUserResponse.data);
+        console.log("Current User:", currentUserResponse.data);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setUsers([]);
+    }
+  };
+
+  useEffect(() => {
     getData();
   }, []);
 
@@ -93,7 +93,6 @@ const AccountManage = () => {
         selectedStatus === "" ||
         (selectedStatus === "active" && user?.status === "1") ||
         (selectedStatus === "inactive" && user?.status === "0");
-
       return matchesSearch && matchesPosition && matchesStatus;
     })
     .sort((a, b) => {
@@ -119,7 +118,6 @@ const AccountManage = () => {
     "Delivery staff",
     "System admin",
   ];
-
   const statusOptions = [
     { value: "active", label: "Active" },
     { value: "inactive", label: "Inactive" },
@@ -128,7 +126,7 @@ const AccountManage = () => {
   const handleStatusClick = (user) => {
     // Thay đổi trạng thái WH keeper / Delivery Staff
     if (
-      user.status === "0" &&
+      user.status === "0" && // chỉ khi active
       (user?.role?.rolename === "Warehouse keeper" ||
         user?.role?.rolename === "Delivery staff")
     ) {
@@ -140,14 +138,12 @@ const AccountManage = () => {
         return;
       }
     }
-
     setSelectedUser(user);
     setShowConfirmModal(true);
   };
 
   const handleConfirmStatusChange = async () => {
     if (!selectedUser) return;
-
     console.log("Selected User:", selectedUser);
     setIsUpdating(true);
     try {
@@ -156,15 +152,10 @@ const AccountManage = () => {
         ...selectedUser,
         status: newStatus,
       };
-
       const response = await updateUserInfo(updatedUserData);
       if (response.status === 200) {
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user.id === selectedUser.id ? { ...user, status: newStatus } : user
-          )
-        );
         toast.success("Cập nhật trạng thái thành công!");
+        getData(); // Refresh
       } else {
         toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
       }
@@ -180,7 +171,6 @@ const AccountManage = () => {
 
   const handleRoleConflictConfirm = async (deactivateOther) => {
     if (!selectedUser) return;
-
     setIsUpdating(true);
     try {
       if (deactivateOther && conflictingUser) {
@@ -189,36 +179,19 @@ const AccountManage = () => {
           ...conflictingUser,
           status: "0",
         });
-
         if (deactivateResponse.status !== 200) {
           toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
           return;
         }
       }
-
       // Active người dùng đc chọn
       const activateResponse = await updateUserInfo({
         ...selectedUser,
         status: "1",
       });
-
       if (activateResponse.status === 200) {
-        setUsers((prevUsers) =>
-          prevUsers.map((user) => {
-            if (user.id === selectedUser.id) {
-              return { ...user, status: "1" };
-            }
-            if (
-              deactivateOther &&
-              conflictingUser &&
-              user.id === conflictingUser.id
-            ) {
-              return { ...user, status: "0" };
-            }
-            return user;
-          })
-        );
         toast.success("Cập nhật trạng thái thành công!");
+        getData(); // Refresh
       } else {
         toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
       }
@@ -249,10 +222,8 @@ const AccountManage = () => {
     setShowEditModal(true);
   };
 
-  const handleEditSuccess = (updatedUser) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
-    );
+  const handleEditSuccess = () => {
+    getData();
     setShowEditModal(false);
     setEditingUser(null);
   };
@@ -262,16 +233,7 @@ const AccountManage = () => {
   };
 
   const handleCreateSuccess = async () => {
-    try {
-      const getUsersResponse = await getAllUserInfo();
-      if (getUsersResponse.status === 200) {
-        setUsers(
-          Array.isArray(getUsersResponse.data) ? getUsersResponse.data : []
-        );
-      }
-    } catch (error) {
-      console.error("Error refreshing user data:", error);
-    }
+    getData();
     setShowCreateModal(false);
   };
 
@@ -296,7 +258,6 @@ const AccountManage = () => {
   const getPageNumbers = () => {
     const pageNumbers = [];
     const maxVisiblePages = 5;
-
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
@@ -348,7 +309,6 @@ const AccountManage = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-
         {/* FILTER */}
         <div className="flex gap-3">
           {/* FILTER VỊ TRÍ */}
@@ -366,7 +326,6 @@ const AccountManage = () => {
               ))}
             </select>
           </div>
-
           {/* FILTER TRẠNG THÁI */}
           <div className="flex-shrink-0">
             <select
@@ -383,7 +342,6 @@ const AccountManage = () => {
             </select>
           </div>
         </div>
-
         {/* ADD */}
         <button
           onClick={handleCreateClick}
@@ -393,13 +351,11 @@ const AccountManage = () => {
           <span>Thêm tài khoản</span>
         </button>
       </div>
-
       {/* Results Info */}
       <div className="mb-4 text-sm text-gray-600">
         Hiển thị {startIndex + 1}-{Math.min(endIndex, filteredUsers.length)} của{" "}
         {filteredUsers.length} kết quả
       </div>
-
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="w-full">
@@ -517,7 +473,6 @@ const AccountManage = () => {
           </tbody>
         </table>
       </div>
-
       {/* PAGINATION */}
       {totalPages > 1 && (
         <div className="mt-6 flex items-center justify-between">
@@ -538,7 +493,6 @@ const AccountManage = () => {
               <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4 mr-1" />
               Trước
             </button>
-
             {/* Page Numbers */}
             <div className="flex items-center gap-1">
               {getPageNumbers().map((pageNum, index) => (
@@ -560,7 +514,6 @@ const AccountManage = () => {
                 </div>
               ))}
             </div>
-
             {/* NEXT BTN */}
             <button
               onClick={handleNextPage}
@@ -577,7 +530,6 @@ const AccountManage = () => {
           </div>
         </div>
       )}
-
       {/* Modal confirm trạng thái */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
@@ -631,11 +583,10 @@ const AccountManage = () => {
           </div>
         </div>
       )}
-
       {/* Modal conflict vị trí */}
       {showRoleConflictModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-200 rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Xác nhận thay đổi trạng thái
             </h3>
@@ -648,7 +599,10 @@ const AccountManage = () => {
               <span className="font-medium text-gray-900">
                 {selectedUser?.role?.rolename}
               </span>{" "}
-              ở trạng thái Active. Bạn có muốn deactive họ và active{" "}
+              ở trạng thái Active. Bạn có muốn deactive {" "}
+              <span className="font-medium text-gray-900">
+                {conflictingUser?.fullname}
+              </span>{" "} và active{" "}
               <span className="font-medium text-gray-900">
                 {selectedUser?.fullname}
               </span>{" "}
@@ -673,11 +627,11 @@ const AccountManage = () => {
           </div>
         </div>
       )}
-
       {/* Edit User Modal */}
       {showEditModal && (
         <EditUserModal
           user={editingUser}
+          users={users}
           onSuccess={handleEditSuccess}
           onCancel={() => {
             setShowEditModal(false);
@@ -685,7 +639,6 @@ const AccountManage = () => {
           }}
         />
       )}
-
       {/* Create User Modal */}
       {showCreateModal && (
         <CreateUserModal

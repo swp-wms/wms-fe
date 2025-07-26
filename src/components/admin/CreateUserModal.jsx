@@ -37,10 +37,13 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
   };
 
   const validatePassword = (password) => {
+    if (password === "") return "";
     if (password.length < 8 || password.length > 30) {
-      return "Mật khẩu tối thiểu 8 ký tự. Tối đa 30 ký tự.";
+      return "Mật khẩu phải từ 8 đến 30 ký tự.";
     } else if (!/^(?=.*\d)(?=.*[a-zA-Z]).*$/.test(password)) {
       return "Mật khẩu phải chứa cả chữ và số.";
+    } else if (/[^a-zA-Z0-9]/.test(password)) {
+      return "Mật khẩu chỉ được chứa chữ cái và số, không có ký tự đặc biệt.";
     }
     return "";
   };
@@ -94,12 +97,10 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
       toast.error("Vui lòng điền đầy đủ thông tin!");
       return;
     }
-
     if (emailError || passwordError) {
       toast.error("Vui lòng kiểm tra lại thông tin!");
       return;
     }
-
     // Check role conflict
     if (
       createFormData.role === "Warehouse keeper" ||
@@ -112,7 +113,6 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
         return;
       }
     }
-
     await createUserWithStatus(1); // Default status
   };
 
@@ -126,11 +126,9 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
         roleid: getRoleIdFromName(createFormData.role),
         status: status,
       };
-
       const response = await createNewUser(newUserData);
       console.log("New User Data:", newUserData);
       console.log("Response:", response);
-
       if (response.status === 200 || response.status === 201) {
         toast.success("Tạo tài khoản thành công!");
         onSuccess();
@@ -150,12 +148,11 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
   const handleRoleConflictConfirm = async () => {
     if (conflictingUser) {
       try {
-        // Deactivate acc confict
+        // Deactive acc confict
         const deactivateResponse = await updateUserInfo({
           ...conflictingUser,
           status: "0", // Deactive user cũ
         });
-
         if (deactivateResponse.status !== 200) {
           toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
           setShowRoleConflictModal(false);
@@ -170,10 +167,8 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
         return;
       }
     }
-
     setShowRoleConflictModal(false);
     setConflictingUser(null);
-
     // Tạo user mới với trạng thái active
     await createUserWithStatus(1);
   };
@@ -242,8 +237,9 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
                 </label>
                 <div className="flex-1">
                   <input
+                    autoComplete="off"
                     placeholder="example@email.com"
-                    type="email"
+                    type="text"
                     value={createFormData.username}
                     onChange={(e) =>
                       handleCreateFormChange("username", e.target.value)
@@ -264,7 +260,8 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
                 <div className="flex-1">
                   <div className="relative">
                     <input
-                      type={showPassword ? "text" : "password"}
+                      autoComplete="off"
+                      type={showPassword ? "text" : "text"}
                       value={createFormData.password}
                       onChange={(e) =>
                         handleCreateFormChange("password", e.target.value)
@@ -312,7 +309,6 @@ const CreateUserModal = ({ users, onSuccess, onCancel }) => {
           </div>
         </div>
       </div>
-
       {/* MODAL conflict vị trí */}
       {showRoleConflictModal && (
         <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-[60]">
