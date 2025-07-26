@@ -340,6 +340,7 @@ const AccountManage = () => {
             />
           </div>
           <input
+            autoComplete="off"
             type="text"
             placeholder="Tìm kiếm tên nhân viên, tên đăng nhập"
             value={searchTerm}
