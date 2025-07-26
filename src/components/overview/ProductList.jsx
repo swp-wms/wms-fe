@@ -25,18 +25,30 @@ import { getAllUsers } from "../../backendCalls/user";
 import { fetchPartners } from "../../backendCalls/partner";
 
 const headers = [
-  "Mã hàng hóa",
-  "Tên hàng",
-  "Tên đối tác",
-  "Tên hãng",
-  "Loại thép",
-  "Mã thép",
-  "Số lượng",
-  "Độ dài",
-  "Khối lượng bó",
-  "Số thanh/bó",
-  "Tổng khối lượng",
-  "Mã đối tác",
+  { value: "Mã hàng hóa", readOnly: true, className: "font-bold" },
+  { value: "Tên hàng hóa", readOnly: true, className: "font-bold" },
+  { value: "Tên đối tác", readOnly: true, className: "font-bold" },
+  {
+    value: "Tên hãng thép",
+    readOnly: true,
+    className: "font-bold",
+  },
+  { value: "Loại thép", readOnly: true, className: "font-bold" },
+  { value: "Mã thép", readOnly: true, className: "font-bold" },
+  { value: "Số lượng", readOnly: true, className: "font-bold" },
+  { value: "Độ dài", readOnly: true, className: "font-bold" },
+  {
+    value: "Khối lượng bó",
+    readOnly: true,
+    className: "font-bold",
+  },
+  { value: "Số thanh/bó", readOnly: true, className: "font-bold" },
+  {
+    value: "Tổng khối lượng",
+    readOnly: true,
+    className: "font-bold",
+  },
+  { value: "Mã đối tác", readOnly: true, className: "font-bold" },
 ];
 
 const ProductList = ({ user }) => {
@@ -52,13 +64,7 @@ const ProductList = ({ user }) => {
   const [history, setHistory] = useState([]);
   const [openHistory, setOpenHistory] = useState(false);
   const [userInfo, setUserInfo] = useState([]);
-  const [data, setData] = useState([
-    headers.map((h) => ({
-      value: h,
-      readOnly: true,
-      className: "bg-gray-300 font-bold",
-    })),
-  ]);
+  const [data, setData] = useState([]);
 
   // Fetch partner data
   useEffect(() => {
@@ -242,7 +248,7 @@ const ProductList = ({ user }) => {
         });
       };
 
-      const spreadsheetData = mapToSpreadsheetData(mappedData);
+      const spreadsheetData = [headers, ...mapToSpreadsheetData(mappedData)];
 
       setData(spreadsheetData);
       setShowExcelConfirm(true);
@@ -270,7 +276,7 @@ const ProductList = ({ user }) => {
   };
 
   const convertSpreadsheetToProducts = (sheetData) => {
-    return sheetData.map((row) => {
+    return sheetData.slice(1).map((row) => {
       const pd = row[0]?.value?.trim() || "";
       const isValidPD = /^TD\d{2}CB\d{3}[TV]$/.test(pd);
       const namedetail = isValidPD ? `Thép ${pd.slice(1)}` : "";
@@ -296,7 +302,7 @@ const ProductList = ({ user }) => {
   const validateSpreadsheetBeforeSubmit = (sheetData) => {
     const errors = [];
 
-    sheetData.forEach((row, i) => {
+    sheetData.slice(1).forEach((row, i) => {
       const pd = row[0]?.value || "";
       const name = row[2]?.value || "";
       const brandname = row[3]?.value || "";
@@ -574,7 +580,7 @@ const ProductList = ({ user }) => {
 
       {showExcelConfirm && (
         <div className="fixed inset-0 flex items-center justify-center z-50 ms-[20%]">
-          <div className="bg-white p-6 rounded-lg shadow-lg border border-black mx-16 w-[100%] text-xs">
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-black mx-16 w-[80%] text-xs">
             <div className="flex justify-between mb-6">
               <h2 className="text-lg font-semibold ">Xác nhận thêm hàng hóa</h2>
               <div className="flex gap-4 text-white font-medium">
@@ -614,10 +620,9 @@ const ProductList = ({ user }) => {
                     {}
                   );
                   console.log("Map", partnerMap);
-                  console.log("Partner map sample:", partnerMap["KH012  "]);
 
-                  for (let row = 0; row < updatedData.length; row++) {
-                    const pdCell = updatedData[row][0]; // Mã hàng hóa
+                  for (let row = 1; row < updatedData.length; row++) {
+                    const pdCell = updatedData[row][0];
                     const namedetailCell = updatedData[row][1];
                     const steeltypeCell = updatedData[row][5];
                     const partnerCell = updatedData[row][2];
@@ -655,7 +660,7 @@ const ProductList = ({ user }) => {
                       };
                     }
 
-                    const partnerId = partnerIdCell?.value || "";
+                    const partnerId = partnerIdCell?.value?.trim() || "";
                     console.log("partnerId", partnerId);
                     const partnerName = partnerMap[partnerId] || "";
                     console.log("partner", partnerName);
@@ -682,7 +687,7 @@ const ProductList = ({ user }) => {
             </div>
 
             <p className="py-6">
-              Bạn có chắc chắn muốn thêm <strong>{data.length}</strong> mặt hàng
+              Bạn có chắc chắn muốn thêm <strong>{data.slice(1).length}</strong> mặt hàng
               từ file Excel không?
             </p>
             <div className="flex justify-end gap-4 font-medium">
