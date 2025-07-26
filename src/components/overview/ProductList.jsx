@@ -313,7 +313,15 @@ const ProductList = ({ user }) => {
       }
       if (!name) errors.push(`Dòng ${i + 1}: Thiếu tên đối tác`);
       if (!brandname) errors.push(`Dòng ${i + 1}: Thiếu tên hãng thép`);
-      if (!type) errors.push(`Dòng ${i + 1}: Thiếu loại thép`);
+      if (!type) {
+        errors.push(`Dòng ${i + 1}: Thiếu loại thép`);
+      } else if (type !== "Thép Thanh" && type !== "Thép Cuộn") {
+        errors.push(
+          `Dòng ${
+            i + 1
+          }: Vui lòng điền đúng loại thép (Thép Thanh hoặc Thép Cuộn)`
+        );
+      }
     });
 
     return errors;
@@ -687,8 +695,8 @@ const ProductList = ({ user }) => {
             </div>
 
             <p className="py-6">
-              Bạn có chắc chắn muốn thêm <strong>{data.slice(1).length}</strong> mặt hàng
-              từ file Excel không?
+              Bạn có chắc chắn muốn thêm <strong>{data.slice(1).length}</strong>{" "}
+              mặt hàng từ file Excel không?
             </p>
             <div className="flex justify-end gap-4 font-medium">
               <button
