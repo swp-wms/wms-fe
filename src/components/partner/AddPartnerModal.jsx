@@ -17,8 +17,15 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
     note: "",
     isfactory: false,
   });
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({
+    taxcode: "",
+    phonenumber: "",
+    email: "",
+    bankaccount: "",
+  });
   const [isOtherBank, setIsOtherBank] = useState(false);
   const [customBankName, setCustomBankName] = useState("");
 
@@ -34,13 +41,10 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
     "TPBank",
   ];
 
-  // Generate next partner ID
   const generateNextPartnerId = () => {
     if (!allPartners || allPartners.length === 0) {
       return "KH001";
     }
-
-    // Find the highest ID number
     let maxNumber = 0;
     allPartners.forEach((p) => {
       if (p.id && p.id.startsWith("KH")) {
@@ -50,8 +54,6 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
         }
       }
     });
-
-    // Generate next ID
     const nextNumber = maxNumber + 1;
     return `KH${nextNumber.toString().padStart(3, "0")}`;
   };
@@ -80,51 +82,53 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
       note: "",
       isfactory: false,
     });
-    setError("");
+    // setError("");
+    setFieldErrors({
+      taxcode: "",
+      phonenumber: "",
+      email: "",
+      bankaccount: "",
+    });
     setIsOtherBank(false);
     setCustomBankName("");
   };
 
-  const validateInput = (name, value) => {
+  const validateInputLength = (name, value) => {
     switch (name) {
       case "taxcode":
-        return /^\d*$/.test(value) && value.length <= 13;
+        return value.length <= 13;
       case "phonenumber":
-        return /^\d*$/.test(value) && value.length <= 11;
+        return value.length <= 11;
       case "bankaccount":
-        return /^\d*$/.test(value) && value.length <= 15;
-      case "email":
-        return true;
+        return value.length <= 15;
       default:
         return true;
     }
   };
 
   const validateFinalInput = (name, value) => {
+    const safeValue = value?.toString() || "";
     switch (name) {
       case "taxcode":
-        return /^\d{10,13}$/.test(value) || value === "";
+        if (safeValue === "") return "";
+        return /^\d{10,13}$/.test(safeValue)
+          ? ""
+          : "Mã số thuế phải là dãy số từ 10-13 chữ số";
       case "phonenumber":
-        return /^\d{10,11}$/.test(value) || value === "";
+        if (safeValue === "") return "";
+        return /^0\d{9,10}$/.test(safeValue)
+          ? ""
+          : "Số điện thoại không đúng định dạng";
       case "bankaccount":
-        return /^\d{8,15}$/.test(value) || value === "";
+        if (safeValue === "") return "";
+        return /^\d{8,15}$/.test(safeValue)
+          ? ""
+          : "Số tài khoản phải là dãy số từ 8-15 chữ số";
       case "email":
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || value === "";
-      default:
-        return true;
-    }
-  };
-
-  const getErrorMessage = (name) => {
-    switch (name) {
-      case "taxcode":
-        return "Mã số thuế phải là dãy số từ 10-13 chữ số";
-      case "phonenumber":
-        return "Số điện thoại phải là dãy số từ 10-11 chữ số";
-      case "bankaccount":
-        return "Số tài khoản phải là dãy số từ 8-15 chữ số";
-      case "email":
-        return "Email không đúng định dạng";
+        if (safeValue === "") return "";
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(safeValue)
+          ? ""
+          : "Email không đúng định dạng";
       default:
         return "";
     }
@@ -134,11 +138,9 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked : value;
 
-    // Ko đổi ID
     if (name === "id") return;
 
-    // Validate
-    if (!validateInput(name, newValue) && newValue !== "") {
+    if (!validateInputLength(name, newValue)) {
       return;
     }
 
@@ -147,7 +149,15 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
       [name]: newValue,
     }));
 
-    if (error) setError("");
+    // if (error) setError("");
+
+    if (["taxcode", "phonenumber", "email", "bankaccount"].includes(name)) {
+      const fieldError = validateFinalInput(name, newValue);
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: fieldError,
+      }));
+    }
   };
 
   const handleBankChange = (e) => {
@@ -170,41 +180,29 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
 
   const validateForm = () => {
     const errors = [];
+    const newFieldErrors = {};
+    ["taxcode", "phonenumber", "email", "bankaccount"].forEach((field) => {
+      const fieldError = validateFinalInput(field, formData[field]);
+      newFieldErrors[field] = fieldError;
+      if (fieldError) {
+        errors.push(fieldError);
+      }
+    });
 
-    if (formData.taxcode && !validateFinalInput("taxcode", formData.taxcode)) {
-      errors.push(getErrorMessage("taxcode"));
-    }
-    if (
-      formData.phonenumber &&
-      !validateFinalInput("phonenumber", formData.phonenumber)
-    ) {
-      errors.push(getErrorMessage("phonenumber"));
-    }
-    if (
-      formData.bankaccount &&
-      !validateFinalInput("bankaccount", formData.bankaccount)
-    ) {
-      errors.push(getErrorMessage("bankaccount"));
-    }
-    if (formData.email && !validateFinalInput("email", formData.email)) {
-      errors.push(getErrorMessage("email"));
-    }
-
+    setFieldErrors(newFieldErrors);
     return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
-      setError(validationErrors.join(", "));
+      toast.error("Vui lòng sửa các lỗi trước khi lưu");
       return;
     }
 
     setLoading(true);
-    setError("");
-
+    // setError("");
     try {
       const response = await partner.addPartner(formData);
       if (response.status === 200 || response.status === 201) {
@@ -220,11 +218,11 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
       if (error.response) {
         const errorMessage =
           error.response.data?.message || "Có lỗi xảy ra khi thêm đối tác";
-        setError(errorMessage);
+        toast.error(errorMessage);
       } else if (error.request) {
-        setError("Không thể kết nối đến server. Vui lòng thử lại.");
+        toast.error("Không thể kết nối đến server. Vui lòng thử lại.");
       } else {
-        setError("Có lỗi không xác định xảy ra. Vui lòng thử lại.");
+        toast.error("Có lỗi không xác định xảy ra. Vui lòng thử lại.");
       }
     } finally {
       setLoading(false);
@@ -259,12 +257,7 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
           </button>
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
+        {/* {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>} */}
 
         <form onSubmit={handleSubmit}>
           {/* ID + NAME */}
@@ -325,8 +318,15 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
                 onChange={handleInputChange}
                 disabled={loading}
                 placeholder="Nhập 10-13 chữ số"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                  fieldErrors.taxcode ? "border-red-500" : "border-gray-300"
+                }`}
               />
+              {fieldErrors.taxcode && (
+                <div className="text-xs text-red-500 mt-1">
+                  {fieldErrors.taxcode}
+                </div>
+              )}
             </div>
           </div>
 
@@ -335,17 +335,24 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Số điện thoại:{" "}
-                <span className="text-xs text-gray-500">(10-11 số)</span>
+                <span className="text-xs text-gray-500">(VD: 0901234567)</span>
               </label>
               <input
-                type="tel"
+                type="text"
                 name="phonenumber"
                 value={formData.phonenumber}
                 onChange={handleInputChange}
                 disabled={loading}
-                placeholder="Nhập 10-11 chữ số"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                placeholder="VD: 0901234567"
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                  fieldErrors.phonenumber ? "border-red-500" : "border-gray-300"
+                }`}
               />
+              {fieldErrors.phonenumber && (
+                <div className="text-xs text-red-500 mt-1">
+                  {fieldErrors.phonenumber}
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -359,8 +366,15 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
                 onChange={handleInputChange}
                 disabled={loading}
                 placeholder="Nhập 8-15 chữ số"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                  fieldErrors.bankaccount ? "border-red-500" : "border-gray-300"
+                }`}
               />
+              {fieldErrors.bankaccount && (
+                <div className="text-xs text-red-500 mt-1">
+                  {fieldErrors.bankaccount}
+                </div>
+              )}
             </div>
           </div>
 
@@ -377,8 +391,15 @@ const AddPartnerModal = ({ isOpen, onClose, onSuccess, allPartners }) => {
                 onChange={handleInputChange}
                 disabled={loading}
                 placeholder="example@email.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                  fieldErrors.email ? "border-red-500" : "border-gray-300"
+                }`}
               />
+              {fieldErrors.email && (
+                <div className="text-xs text-red-500 mt-1">
+                  {fieldErrors.email}
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

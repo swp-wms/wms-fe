@@ -20,27 +20,31 @@ const EditProfile = ({
     address: "",
   });
 
+  // Safe validation functions with null/undefined checks
   const validateFullName = (name) => {
-    if (!name.trim()) return "Tên nhân viên không được để trống";
-    if (!/^[a-zA-ZÀ-ỹ\s]+$/.test(name)) {
+    const safeName = name?.toString() || "";
+    if (!safeName.trim()) return "Tên nhân viên không được để trống";
+    if (!/^[a-zA-ZÀ-ỹ\s]+$/.test(safeName)) {
       return "Tên nhân viên chỉ được chứa chữ cái và khoảng trắng";
     }
     return "";
   };
 
   const validatePhoneNumber = (phone) => {
-    if (!phone.trim()) return "Số điện thoại không được để trống";
-    const phoneRegex = /^(0[3|5|7|8|9])([0-9]{8,9})$/;
-    if (!phoneRegex.test(phone)) {
+    const safePhone = phone?.toString() || "";
+    if (!safePhone.trim()) return "Số điện thoại không được để trống";
+    const phoneRegex = /^0\d{9,10}$/;
+    if (!phoneRegex.test(safePhone)) {
       return "Số điện thoại không đúng định dạng";
     }
     return "";
   };
 
   const validateEmail = (email) => {
-    if (!email.trim()) return "Email không được để trống";
+    const safeEmail = email?.toString() || "";
+    if (!safeEmail.trim()) return "Email không được để trống";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(safeEmail)) {
       return "Email không đúng định dạng";
     }
     return "";
@@ -62,12 +66,11 @@ const EditProfile = ({
 
   const handleInputChange = (field, value) => {
     setUser({ ...user, [field]: value });
-    // Xoá tbao lỗi khi ngdung nhập ttin
+    // Xoá thông báo lỗi khi người dùng nhập thông tin
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
-
-    // VALIDAATIONS
+    // VALIDATIONS
     let error = "";
     switch (field) {
       case "fullname":
@@ -85,21 +88,22 @@ const EditProfile = ({
       default:
         break;
     }
-
     if (error) {
       setErrors((prev) => ({ ...prev, [field]: error }));
     }
   };
 
   const handleSaveInfoButton = async () => {
-    // VALIDATE ALL FIELDS
+    // VALIDATE with safe checks
     const newErrors = {
       fullname: validateFullName(user.fullname),
       gender: !user.gender ? "Vui lòng chọn giới tính" : "",
       dateofbirth: validateDateOfBirth(user.dateofbirth),
       phonenumber: validatePhoneNumber(user.phonenumber),
       username: validateEmail(user.username),
-      address: !user.address.trim() ? "Địa chỉ không được để trống" : "",
+      address: !(user.address?.toString() || "").trim()
+        ? "Địa chỉ không được để trống"
+        : "",
     };
 
     setErrors(newErrors);
@@ -125,7 +129,7 @@ const EditProfile = ({
         status: user.status,
       };
 
-      // Log để debug - đảm bảo không có password
+      ////// DEBUG
       console.log("Data being sent for profile update:", userDataToUpdate);
       console.log("Password field exists:", "password" in userDataToUpdate);
 
@@ -188,7 +192,7 @@ const EditProfile = ({
             Mã nhân viên:
           </span>
           <input
-            value={user.id}
+            value={user.id || ""}
             readOnly
             className="flex-1 ml-2 h-8 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed"
           />
@@ -200,7 +204,7 @@ const EditProfile = ({
           </span>
           <div className="flex-1 ml-2">
             <input
-              value={user.fullname}
+              value={user.fullname || ""}
               onChange={(e) => handleInputChange("fullname", e.target.value)}
               className={`w-full h-8 px-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.fullname ? "border-red-500" : "border-gray-300"
@@ -218,7 +222,7 @@ const EditProfile = ({
           </span>
           <div className="flex-1 ml-2">
             <select
-              value={user.gender}
+              value={user.gender || ""}
               onChange={(e) => handleInputChange("gender", e.target.value)}
               className={`w-full h-8 px-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.gender ? "border-red-500" : "border-gray-300"
@@ -241,7 +245,7 @@ const EditProfile = ({
           <div className="flex-1 ml-2">
             <input
               type="date"
-              value={user.dateofbirth}
+              value={user.dateofbirth || ""}
               onChange={(e) => handleInputChange("dateofbirth", e.target.value)}
               className={`w-full h-8 px-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.dateofbirth ? "border-red-500" : "border-gray-300"
@@ -262,7 +266,7 @@ const EditProfile = ({
           <div className="flex-1 ml-2">
             <input
               type="tel"
-              value={user.phonenumber}
+              value={user.phonenumber || ""}
               onChange={(e) => handleInputChange("phonenumber", e.target.value)}
               className={`w-full h-8 px-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.phonenumber ? "border-red-500" : "border-gray-300"
@@ -282,7 +286,7 @@ const EditProfile = ({
           <div className="flex-1 ml-2">
             <input
               type="email"
-              value={user.username}
+              value={user.username || ""}
               onChange={(e) => handleInputChange("username", e.target.value)}
               className={`w-full h-8 px-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.username ? "border-red-500" : "border-gray-300"
@@ -301,7 +305,7 @@ const EditProfile = ({
           </span>
           <div className="flex-1 ml-2">
             <input
-              value={user.address}
+              value={user.address || ""}
               onChange={(e) => handleInputChange("address", e.target.value)}
               className={`w-full h-8 px-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.address ? "border-red-500" : "border-gray-300"

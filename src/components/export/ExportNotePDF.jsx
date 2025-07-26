@@ -164,7 +164,7 @@ const ImportNotePDF = ({ currentDelivery, currentDeliveryDetail, currentOrder })
       {/* Form Title */}
       <Text style={styles.formTitle}>PHIẾU XUẤT KHO</Text>
       <View style={styles.dateInfo}>
-        <Text>Ngày {(new Date).getDate()} tháng {(new Date).getMonth() + 1} năm {(new Date).getFullYear()}</Text>
+        <Text>Ngày {(new Date(currentDelivery.completedate)).getDate()} tháng {(new Date(currentDelivery.completedate)).getMonth() + 1} năm {(new Date(currentDelivery.completedate)).getFullYear()}</Text>
       </View>
 
       {/* Recipient/Delivery Info */}

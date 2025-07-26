@@ -10,6 +10,7 @@ import { getAllUserInfo, updateUserInfo } from "../../backendCalls/userInfo";
 import toast from "react-hot-toast";
 import EditUserModal from "./EditUserModal";
 import CreateUserModal from "./CreateUserModal";
+import { getUser } from "../../backendCalls/user";
 
 const AccountManage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,6 +25,7 @@ const AccountManage = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,6 +34,7 @@ const AccountManage = () => {
   useEffect(() => {
     const getData = async () => {
       try {
+        // Thông tin all user
         const response = await getAllUserInfo();
         if (response.status !== 200) {
           window.location.href = "/dang-nhap";
@@ -40,6 +43,13 @@ const AccountManage = () => {
         const userData = response.data;
         console.log("API Response:", userData);
         setUsers(Array.isArray(userData) ? userData : []);
+
+        // Thông tin bản thân
+        const currentUserResponse = await getUser();
+        if (currentUserResponse.status === 200) {
+          setCurrentUser(currentUserResponse.data);
+          console.log("Current User:", currentUserResponse.data);
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
         setUsers([]);
@@ -48,28 +58,32 @@ const AccountManage = () => {
     getData();
   }, []);
 
-  // Reset trang khi thực hiện filter/ search
+  // Reset trang khi filter/ search
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedPosition, selectedStatus]);
 
-  // Helper function to get last word of name for sorting
+  // Lấy tên để sort
   const getLastWord = (fullname) => {
     if (!fullname) return "";
     const words = fullname.trim().split(/\s+/);
     return words[words.length - 1].toLowerCase();
   };
 
-  // Helper function to find active user of specific role
+  // Lấy vị trí để sort
   const findActiveUserByRole = (roleName) => {
     return users.find(
       (user) => user?.role?.rolename === roleName && user?.status === "1"
     );
   };
 
+  const isCurrentUser = (user) => {
+    if (!currentUser || !user) return false;
+    return currentUser.username === user.username;
+  };
+
   const filteredUsers = users
     .filter((user) => {
-      // Updated search to include fullname and username instead of ID
       const matchesSearch =
         user?.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user?.username?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -79,14 +93,15 @@ const AccountManage = () => {
         selectedStatus === "" ||
         (selectedStatus === "active" && user?.status === "1") ||
         (selectedStatus === "inactive" && user?.status === "0");
+
       return matchesSearch && matchesPosition && matchesStatus;
     })
     .sort((a, b) => {
-      // First sort by status (active first, inactive last)
+      // Sort trạng thái
       if (a?.status !== b?.status) {
         return b?.status?.localeCompare(a?.status || "");
       }
-      // Then sort by last word of name
+      // Sort tên
       const lastWordA = getLastWord(a?.fullname);
       const lastWordB = getLastWord(b?.fullname);
       return lastWordA.localeCompare(lastWordB);
@@ -111,12 +126,7 @@ const AccountManage = () => {
   ];
 
   const handleStatusClick = (user) => {
-    // Không cho phép thay đổi trạng thái của System admin
-    if (user?.role?.rolename === "System admin") {
-      return;
-    }
-
-    // Check if user is trying to activate a Warehouse keeper or Delivery staff
+    // Thay đổi trạng thái WH keeper / Delivery Staff
     if (
       user.status === "0" &&
       (user?.role?.rolename === "Warehouse keeper" ||
@@ -130,12 +140,14 @@ const AccountManage = () => {
         return;
       }
     }
+
     setSelectedUser(user);
     setShowConfirmModal(true);
   };
 
   const handleConfirmStatusChange = async () => {
     if (!selectedUser) return;
+
     console.log("Selected User:", selectedUser);
     setIsUpdating(true);
     try {
@@ -144,6 +156,7 @@ const AccountManage = () => {
         ...selectedUser,
         status: newStatus,
       };
+
       const response = await updateUserInfo(updatedUserData);
       if (response.status === 200) {
         setUsers((prevUsers) =>
@@ -167,24 +180,28 @@ const AccountManage = () => {
 
   const handleRoleConflictConfirm = async (deactivateOther) => {
     if (!selectedUser) return;
+
     setIsUpdating(true);
     try {
       if (deactivateOther && conflictingUser) {
-        // Deactivate the conflicting user first
+        // Deactive user conflict
         const deactivateResponse = await updateUserInfo({
           ...conflictingUser,
           status: "0",
         });
+
         if (deactivateResponse.status !== 200) {
           toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
           return;
         }
       }
-      // Activate the selected user
+
+      // Active người dùng đc chọn
       const activateResponse = await updateUserInfo({
         ...selectedUser,
         status: "1",
       });
+
       if (activateResponse.status === 200) {
         setUsers((prevUsers) =>
           prevUsers.map((user) => {
@@ -279,6 +296,7 @@ const AccountManage = () => {
   const getPageNumbers = () => {
     const pageNumbers = [];
     const maxVisiblePages = 5;
+
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
@@ -424,7 +442,7 @@ const AccountManage = () => {
                           alt="Profile"
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            // Fallback to default avatar if image fails to load
+                            // Back về avatar default
                             e.target.style.display = "none";
                             e.target.parentNode.querySelector(
                               ".default-avatar"
@@ -452,8 +470,8 @@ const AccountManage = () => {
                     {user?.username || "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {/* System admin thì không cho click */}
-                    {user?.role?.rolename === "System admin" ? (
+                    {/* Disable nút thay đổi trạng thái của tkhoan hiện tại */}
+                    {isCurrentUser(user) ? (
                       <span
                         className={`inline-flex px-3 py-1 rounded-full text-xs font-medium cursor-not-allowed opacity-60 ${
                           user?.status === "1"
@@ -478,7 +496,7 @@ const AccountManage = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                     <div className="flex items-center justify-center gap-2">
-                      {/* Only show edit button if not System admin */}
+                      {/* Ko edit thông tin của system admin */}
                       {user?.role?.rolename !== "System admin" && (
                         <button
                           onClick={() => handleEditClick(user)}
@@ -561,8 +579,8 @@ const AccountManage = () => {
 
       {/* Modal confirm trạng thái */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-200 rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Xác nhận thay đổi trạng thái
             </h3>

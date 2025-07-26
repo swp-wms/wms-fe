@@ -120,6 +120,7 @@ const PartnerManagement = () => {
   const getPageNumbers = () => {
     const pageNumbers = [];
     const maxVisiblePages = 5;
+
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
@@ -147,6 +148,7 @@ const PartnerManagement = () => {
         pageNumbers.push(totalPages);
       }
     }
+
     return pageNumbers;
   };
 
@@ -164,6 +166,7 @@ const PartnerManagement = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
         {/* FILTER */}
         <div>
           <select
@@ -176,6 +179,7 @@ const PartnerManagement = () => {
             <option value="non-factory">Không phải nhà máy</option>
           </select>
         </div>
+
         {/* ADD BUTTON */}
         <button
           onClick={() => setIsModalOpen(true)}
@@ -247,6 +251,7 @@ const PartnerManagement = () => {
               <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4 mr-1" />
               Trước
             </button>
+
             {/* Page Numbers */}
             <div className="flex items-center gap-1">
               {getPageNumbers().map((pageNum, index) => (
@@ -268,6 +273,7 @@ const PartnerManagement = () => {
                 </div>
               ))}
             </div>
+
             {/* Next Button */}
             <button
               onClick={handleNextPage}

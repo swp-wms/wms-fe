@@ -101,7 +101,7 @@ const DeliveryCalendar = ({ user, setUser }) => {
     }, []);
 
     return (
-        <div className="fixed bottom-0 right-0 top-[90px] left-[300px] p-8 pb-0 z-50 bg-white overflow-scroll">
+        <div className="fixed z-[1] bottom-0 right-0 top-[90px] left-[300px] p-8 pb-0 bg-white overflow-scroll">
             <Calendar
                 events={deliverySchedule}
                 localizer={localizer}

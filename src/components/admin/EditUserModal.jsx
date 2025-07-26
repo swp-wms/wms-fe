@@ -44,9 +44,13 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
     // Check khi nhập mk
     if (password === "") return "";
     if (password.length < 8 || password.length > 30) {
-      return "Mật khẩu tối thiểu 8 ký tự. Tối đa 30 ký tự.";
-    } else if (!/^(?=.*\d)(?=.*[a-zA-Z]).*$/.test(password)) {
-      return "Mật khẩu phải chứa cả chữ và số.";
+      return "Mật khẩu phải từ 8 đến 30 ký tự.";
+    } else if (!/^[a-zA-Z0-9]+$/.test(password)) {
+      return "Mật khẩu chỉ được chứa chữ cái và số, không có ký tự đặc biệt.";
+    } else if (!/(?=.*[a-zA-Z])/.test(password)) {
+      return "Mật khẩu phải chứa ít nhất một chữ cái.";
+    } else if (!/(?=.*[0-9])/.test(password)) {
+      return "Mật khẩu phải chứa ít nhất một chữ số.";
     }
     return "";
   };
@@ -178,6 +182,7 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
               <div className="flex-1">
                 <div className="relative">
                   <input
+                    autoComplete="off"
                     type={showPassword ? "text" : "password"}
                     value={editFormData.password}
                     onChange={(e) =>
