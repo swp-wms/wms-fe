@@ -182,6 +182,7 @@ const EditUserModal = ({ user, onSuccess, onCancel }) => {
               <div className="flex-1">
                 <div className="relative">
                   <input
+                    autoComplete="off"
                     type={showPassword ? "text" : "password"}
                     value={editFormData.password}
                     onChange={(e) =>

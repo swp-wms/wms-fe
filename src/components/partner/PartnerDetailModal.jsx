@@ -14,12 +14,17 @@ const PartnerDetailModal = ({
   onClose,
   partner: partnerData,
   onUpdate,
-  allPartners,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({
+    taxcode: "",
+    phonenumber: "",
+    email: "",
+    bankaccount: "",
+  });
   const [isOtherBank, setIsOtherBank] = useState(false);
   const [customBankName, setCustomBankName] = useState("");
 
@@ -35,46 +40,42 @@ const PartnerDetailModal = ({
     "TPBank",
   ];
 
-  const validateInput = (name, value) => {
+  const validateInputLength = (name, value) => {
     switch (name) {
       case "taxcode":
-        return /^\d*$/.test(value) && value.length <= 13;
+        return value.length <= 13;
       case "phonenumber":
-        return /^\d*$/.test(value) && value.length <= 11;
+        return value.length <= 11;
       case "bankaccount":
-        return /^\d*$/.test(value) && value.length <= 15;
-      case "email":
-        return true;
+        return value.length <= 15;
       default:
         return true;
     }
   };
 
   const validateFinalInput = (name, value) => {
+    const safeValue = value?.toString() || "";
     switch (name) {
       case "taxcode":
-        return /^\d{10,13}$/.test(value) || value === "";
+        if (safeValue === "") return "";
+        return /^\d{10,13}$/.test(safeValue)
+          ? ""
+          : "Mã số thuế phải là dãy số từ 10-13 chữ số";
       case "phonenumber":
-        return /^\d{10,11}$/.test(value) || value === "";
+        if (safeValue === "") return "";
+        return /^0\d{9,10}$/.test(safeValue)
+          ? ""
+          : "Số điện thoại không đúng định dạng";
       case "bankaccount":
-        return /^\d{8,15}$/.test(value) || value === "";
+        if (safeValue === "") return "";
+        return /^\d{8,15}$/.test(safeValue)
+          ? ""
+          : "Số tài khoản phải là dãy số từ 8-15 chữ số";
       case "email":
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || value === "";
-      default:
-        return true;
-    }
-  };
-
-  const getErrorMessage = (name) => {
-    switch (name) {
-      case "taxcode":
-        return "Mã số thuế phải là dãy số từ 10-13 chữ số";
-      case "phonenumber":
-        return "Số điện thoại phải là dãy số từ 10-11 chữ số";
-      case "bankaccount":
-        return "Số tài khoản phải là dãy số từ 8-15 chữ số";
-      case "email":
-        return "Email không đúng định dạng";
+        if (safeValue === "") return "";
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(safeValue)
+          ? ""
+          : "Email không đúng định dạng";
       default:
         return "";
     }
@@ -83,10 +84,14 @@ const PartnerDetailModal = ({
   const handleEditClick = () => {
     setEditFormData({ ...partnerData });
     setIsEditing(true);
-    setError("");
-    // setSuccess("");
+    // setError("");
+    setFieldErrors({
+      taxcode: "",
+      phonenumber: "",
+      email: "",
+      bankaccount: "",
+    });
 
-    // Kiểm tra tên ngân hàng có trong danh sách k
     const isKnownBank = bankOptions.includes(partnerData.bankname);
     if (!isKnownBank && partnerData.bankname) {
       setIsOtherBank(true);
@@ -101,11 +106,9 @@ const PartnerDetailModal = ({
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked : value;
 
-    // Don't allow changing ID
     if (name === "id") return;
 
-    // Validate input
-    if (!validateInput(name, newValue) && newValue !== "") {
+    if (!validateInputLength(name, newValue)) {
       return;
     }
 
@@ -114,7 +117,15 @@ const PartnerDetailModal = ({
       [name]: newValue,
     }));
 
-    if (error) setError("");
+    // if (error) setError("");
+
+    if (["taxcode", "phonenumber", "email", "bankaccount"].includes(name)) {
+      const fieldError = validateFinalInput(name, newValue);
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: fieldError,
+      }));
+    }
   };
 
   const handleBankChange = (e) => {
@@ -137,45 +148,28 @@ const PartnerDetailModal = ({
 
   const validateForm = () => {
     const errors = [];
+    const newFieldErrors = {};
+    ["taxcode", "phonenumber", "email", "bankaccount"].forEach((field) => {
+      const fieldError = validateFinalInput(field, editFormData[field]);
+      newFieldErrors[field] = fieldError;
+      if (fieldError) {
+        errors.push(fieldError);
+      }
+    });
 
-    if (
-      editFormData.taxcode &&
-      !validateFinalInput("taxcode", editFormData.taxcode)
-    ) {
-      errors.push(getErrorMessage("taxcode"));
-    }
-    if (
-      editFormData.phonenumber &&
-      !validateFinalInput("phonenumber", editFormData.phonenumber)
-    ) {
-      errors.push(getErrorMessage("phonenumber"));
-    }
-    if (
-      editFormData.bankaccount &&
-      !validateFinalInput("bankaccount", editFormData.bankaccount)
-    ) {
-      errors.push(getErrorMessage("bankaccount"));
-    }
-    if (
-      editFormData.email &&
-      !validateFinalInput("email", editFormData.email)
-    ) {
-      errors.push(getErrorMessage("email"));
-    }
-
+    setFieldErrors(newFieldErrors);
     return errors;
   };
 
   const handleSave = async () => {
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
-      setError(validationErrors.join(", "));
+      toast.error("Vui lòng sửa các lỗi trước khi lưu");
       return;
     }
 
     setLoading(true);
-    setError("");
-
+    // setError("");
     try {
       const response = await partner.updatePartner(editFormData);
       if (response.status === 200) {
@@ -188,9 +182,9 @@ const PartnerDetailModal = ({
       if (error.response) {
         const errorMessage =
           error.response.data?.message || "Có lỗi xảy ra khi cập nhật đối tác";
-        setError(errorMessage);
+        toast.error(errorMessage);
       } else {
-        setError("Có lỗi xảy ra khi cập nhật đối tác");
+        toast.error("Có lỗi xảy ra khi cập nhật đối tác");
       }
     } finally {
       setLoading(false);
@@ -200,8 +194,13 @@ const PartnerDetailModal = ({
   const handleCancel = () => {
     setIsEditing(false);
     setEditFormData({});
-    setError("");
-    // setSuccess("");
+    // setError("");
+    setFieldErrors({
+      taxcode: "",
+      phonenumber: "",
+      email: "",
+      bankaccount: "",
+    });
     setIsOtherBank(false);
     setCustomBankName("");
   };
@@ -226,17 +225,7 @@ const PartnerDetailModal = ({
           </button>
         </div>
 
-        {/* Success Notification */}
-        {/* {success && (
-          <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">{success}</div>
-        )} */}
-
-        {/* Error Message */}
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
+        {/* {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>} */}
 
         {/* Partner Details */}
         <div className="space-y-4">
@@ -304,15 +293,24 @@ const PartnerDetailModal = ({
                 )}
               </label>
               {isEditing ? (
-                <input
-                  type="text"
-                  name="taxcode"
-                  value={currentData.taxcode || ""}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                  placeholder="Nhập 10-13 chữ số"
-                  className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div>
+                  <input
+                    type="text"
+                    name="taxcode"
+                    value={currentData.taxcode || ""}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                    placeholder="Nhập 10-13 chữ số"
+                    className={`w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      fieldErrors.taxcode ? "border-red-500" : "border-gray-300"
+                    }`}
+                  />
+                  {fieldErrors.taxcode && (
+                    <div className="text-xs text-red-500 mt-1">
+                      {fieldErrors.taxcode}
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="p-3 bg-gray-50 rounded border">
                   {currentData.taxcode || "Chưa có thông tin"}
@@ -325,19 +323,32 @@ const PartnerDetailModal = ({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Số điện thoại{" "}
                 {isEditing && (
-                  <span className="text-xs text-gray-500">(10-11 số)</span>
+                  <span className="text-xs text-gray-500">
+                    (VD: 0901234567)
+                  </span>
                 )}
               </label>
               {isEditing ? (
-                <input
-                  type="tel"
-                  name="phonenumber"
-                  value={currentData.phonenumber || ""}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                  placeholder="Nhập 10-11 chữ số"
-                  className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div>
+                  <input
+                    type="text"
+                    name="phonenumber"
+                    value={currentData.phonenumber || ""}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                    placeholder="VD: 0901234567"
+                    className={`w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      fieldErrors.phonenumber
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                  />
+                  {fieldErrors.phonenumber && (
+                    <div className="text-xs text-red-500 mt-1">
+                      {fieldErrors.phonenumber}
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="p-3 bg-gray-50 rounded border">
                   {currentData.phonenumber || "Chưa có thông tin"}
@@ -351,15 +362,24 @@ const PartnerDetailModal = ({
                 Email
               </label>
               {isEditing ? (
-                <input
-                  type="email"
-                  name="email"
-                  value={currentData.email || ""}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                  placeholder="example@email.com"
-                  className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={currentData.email || ""}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                    placeholder="example@email.com"
+                    className={`w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      fieldErrors.email ? "border-red-500" : "border-gray-300"
+                    }`}
+                  />
+                  {fieldErrors.email && (
+                    <div className="text-xs text-red-500 mt-1">
+                      {fieldErrors.email}
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="p-3 bg-gray-50 rounded border">
                   {currentData.email || "Chưa có thông tin"}
@@ -376,15 +396,26 @@ const PartnerDetailModal = ({
                 )}
               </label>
               {isEditing ? (
-                <input
-                  type="text"
-                  name="bankaccount"
-                  value={currentData.bankaccount || ""}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                  placeholder="Nhập 8-15 chữ số"
-                  className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div>
+                  <input
+                    type="text"
+                    name="bankaccount"
+                    value={currentData.bankaccount || ""}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                    placeholder="Nhập 8-15 chữ số"
+                    className={`w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      fieldErrors.bankaccount
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                  />
+                  {fieldErrors.bankaccount && (
+                    <div className="text-xs text-red-500 mt-1">
+                      {fieldErrors.bankaccount}
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="p-3 bg-gray-50 rounded border">
                   {currentData.bankaccount || "Chưa có thông tin"}
