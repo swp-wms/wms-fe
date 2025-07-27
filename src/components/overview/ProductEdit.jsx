@@ -67,7 +67,7 @@ const ProductEdit = ({
       const selectedPartner = partners.find((p) => p.name === value);
       console.log(selectedPartner);
       if (selectedPartner) {
-        setFormData((prev) => ({ ...prev, name: selectedPartner.name }));
+        setFormData((prev) => ({ ...prev, partnerid: selectedPartner.id, name: selectedPartner.name }));
       } else {
         toast.error("Loại thép không khả dụng cho hãng hoặc mã thép đã chọn");
       }
