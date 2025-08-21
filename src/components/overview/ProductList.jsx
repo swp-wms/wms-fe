@@ -23,6 +23,7 @@ import toast from "react-hot-toast";
 import moment from "moment";
 import { getAllUsers } from "../../backendCalls/user";
 import { fetchPartners } from "../../backendCalls/partner";
+import { use } from "react";
 
 const headers = [
   { value: "Mã hàng hóa", readOnly: true, className: "font-bold" },
@@ -142,7 +143,7 @@ const ProductList = ({ user }) => {
       if (!updatedProduct?.productid) {
         return [updatedProduct, ...prev];
       }
-
+      console.log("List: ",[updatedProduct, ...prev]);
       const index = prev.findIndex(
         (p) => p.productid === updatedProduct.productid
       );

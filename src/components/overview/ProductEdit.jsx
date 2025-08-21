@@ -6,7 +6,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { fetchPartners } from "../../backendCalls/partner";
+import partner, { fetchPartners } from "../../backendCalls/partner";
 import {
   addProduct,
   updateProductCatalog,
@@ -64,10 +64,11 @@ const ProductEdit = ({
     } else if (name === "type") {
       setFormData((prev) => ({ ...prev, [name]: value }));
     } else if (name === "partner") {
+      console.log("Value: ", value);
       const selectedPartner = partners.find((p) => p.name === value);
-      console.log(selectedPartner);
+      console.log("selected: ", selectedPartner);
       if (selectedPartner) {
-        setFormData((prev) => ({ ...prev, name: selectedPartner.name }));
+        setFormData((prev) => ({ ...prev, partnerid: selectedPartner.id, name: selectedPartner.name }));
       } else {
         toast.error("Loại thép không khả dụng cho hãng hoặc mã thép đã chọn");
       }
@@ -98,6 +99,8 @@ const ProductEdit = ({
 
     try {
       if (formData.productid) {
+        console.log("formData: ", formData);
+        
         await updateProductCatalog(formData.productid, formData);
       } else {
         await addProduct({
